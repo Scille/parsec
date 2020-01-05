@@ -1,0 +1,1 @@
+Add check in backend to prevent non-removal role update on revoked user

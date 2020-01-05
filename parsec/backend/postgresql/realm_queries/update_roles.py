@@ -3,6 +3,7 @@
 from typing import Optional
 from pypika import Parameter
 from pypika.enums import Order
+from pendulum import now as pendulum_now
 
 from parsec.api.protocol import RealmRole
 from parsec.api.protocol import OrganizationID
@@ -22,6 +23,7 @@ from parsec.backend.postgresql.tables import (
     q_realm,
     q_realm_user_role,
     q_user_internal_id,
+    q_user,
     q_device_internal_id,
 )
 
@@ -39,6 +41,7 @@ _q_get_realm_status = (
 _q_get_roles = """
 SELECT
 ({}),
+({}),
 ({})
 FROM UNNEST($3::VARCHAR[]) AS needle_user_id
 """.format(
@@ -51,6 +54,9 @@ FROM UNNEST($3::VARCHAR[]) AS needle_user_id
     .select("role")
     .orderby("certified_on", order=Order.desc)
     .limit(1),
+    q_user(organization_id=Parameter("$1"), user_id=Parameter("needle_user_id")).select(
+        "revoked_on"
+    ),
 )
 
 
@@ -97,7 +103,10 @@ async def query_update_roles(
         raise RealmInMaintenanceError("Data realm is currently under maintenance")
 
     # Check access rights and user existance
-    ((author_id, author_role), (user_id, existing_user_role)) = await conn.fetch(
+    (
+        (author_id, author_role, _),
+        (user_id, existing_user_role, user_revoked_on),
+    ) = await conn.fetch(
         _q_get_roles,
         organization_id,
         new_role.realm_id,
@@ -106,6 +115,11 @@ async def query_update_roles(
     assert author_id
     if not user_id:
         raise RealmNotFoundError(f"User `{new_role.user_id}` doesn't exist")
+
+    if user_revoked_on and user_revoked_on <= pendulum_now() and new_role.role is not None:
+        raise RealmAccessError(
+            f"User `{new_role.user_id}` has been revoked, can only remove it role"
+        )
 
     author_role = STR_TO_REALM_ROLE.get(author_role)
     existing_user_role = STR_TO_REALM_ROLE.get(existing_user_role)

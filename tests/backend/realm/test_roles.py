@@ -86,6 +86,66 @@ async def test_update_roles_bad_user(backend, alice, mallory, alice_backend_sock
 
 
 @pytest.mark.trio
+async def test_update_roles_on_revoked_user(backend, alice, bob, alice_backend_sock, realm):
+    # Bob starts with existing role
+    with freeze_time("2000-01-03"):
+        rep = await _realm_generate_certif_and_update_roles_or_fail(
+            alice_backend_sock, alice, realm, bob.user_id, RealmRole.READER
+        )
+        assert rep == {"status": "ok"}
+
+    # Now revoke Bob
+    await backend.user.revoke_user(
+        organization_id=alice.organization_id,
+        user_id=bob.user_id,
+        revoked_user_certificate=b"dummy",
+        revoked_user_certifier=alice.device_id,
+        revoked_on=Pendulum(2000, 1, 4),
+    )
+
+    # Not allowed to change Bob's role...
+    with freeze_time("2000-01-05"):
+        rep = await _realm_generate_certif_and_update_roles_or_fail(
+            alice_backend_sock, alice, realm, bob.user_id, RealmRole.MANAGER
+        )
+        assert rep == {"status": "not_allowed"}
+
+    # ...except to remove it role
+    with freeze_time("2000-01-06"):
+        rep = await _realm_generate_certif_and_update_roles_or_fail(
+            alice_backend_sock, alice, realm, bob.user_id, None
+        )
+        assert rep == {"status": "ok"}
+
+    # Sanity check
+    certifs = await _realm_get_clear_role_certifs(alice_backend_sock, realm)
+    expected_certifs = [
+        RealmRoleCertificateContent(
+            author=alice.device_id,
+            timestamp=Pendulum(2000, 1, 2),
+            realm_id=realm,
+            user_id=alice.user_id,
+            role=RealmRole.OWNER,
+        ),
+        RealmRoleCertificateContent(
+            author=alice.device_id,
+            timestamp=Pendulum(2000, 1, 3),
+            realm_id=realm,
+            user_id=bob.user_id,
+            role=RealmRole.READER,
+        ),
+        RealmRoleCertificateContent(
+            author=alice.device_id,
+            timestamp=Pendulum(2000, 1, 6),
+            realm_id=realm,
+            user_id=bob.user_id,
+            role=None,
+        ),
+    ]
+    assert certifs == expected_certifs
+
+
+@pytest.mark.trio
 async def test_update_roles_cannot_modify_self(backend, alice, alice_backend_sock, realm):
     rep = await _realm_generate_certif_and_update_roles_or_fail(
         alice_backend_sock, alice, realm, alice.user_id, RealmRole.MANAGER
