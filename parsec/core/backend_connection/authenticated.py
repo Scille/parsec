@@ -63,7 +63,12 @@ class BackendAuthenticatedCmds:
     vlob_maintenance_save_reencryption_batch = _expose_cmds_with_retrier(
         "vlob_maintenance_save_reencryption_batch"
     )
-
+    vlob_maintenance_get_garbage_collection_batch = _expose_cmds_with_retrier(
+        "vlob_maintenance_get_garbage_collection_batch"
+    )
+    vlob_maintenance_save_garbage_collection_batch = _expose_cmds_with_retrier(
+        "vlob_maintenance_save_garbage_collection_batch"
+    )
     realm_status = _expose_cmds_with_retrier("realm_status")
     realm_create = _expose_cmds_with_retrier("realm_create")
     realm_get_role_certificates = _expose_cmds_with_retrier("realm_get_role_certificates")
@@ -74,7 +79,12 @@ class BackendAuthenticatedCmds:
     realm_finish_reencryption_maintenance = _expose_cmds_with_retrier(
         "realm_finish_reencryption_maintenance"
     )
-
+    realm_start_garbage_collection_maintenance = _expose_cmds_with_retrier(
+        "realm_start_garbage_collection_maintenance"
+    )
+    realm_finish_garbage_collection_maintenance = _expose_cmds_with_retrier(
+        "realm_finish_garbage_collection_maintenance"
+    )
     block_create = _expose_cmds_with_retrier("block_create")
     block_read = _expose_cmds_with_retrier("block_read")
 

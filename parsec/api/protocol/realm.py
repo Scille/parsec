@@ -18,6 +18,8 @@ __all__ = (
     "realm_update_roles_serializer",
     "realm_start_reencryption_maintenance_serializer",
     "realm_finish_reencryption_maintenance_serializer",
+    "realm_start_garbage_collection_maintenance_serializer",
+    "realm_finish_garbage_collection_maintenance_serializer",
 )
 
 
@@ -102,6 +104,37 @@ class RealmStartReencryptionMaintenanceRepSchema(BaseRepSchema):
 
 realm_start_reencryption_maintenance_serializer = CmdSerializer(
     RealmStartReencryptionMaintenanceReqSchema, RealmStartReencryptionMaintenanceRepSchema
+)
+
+
+class RealmStartGarbageCollectionMaintenanceReqSchema(BaseReqSchema):
+    realm_id = fields.UUID(required=True)
+    garbage_collection_revision = fields.Integer(required=True)
+    timestamp = fields.DateTime(required=True)
+    per_participant_message = fields.Map(UserIDField(), fields.Bytes(required=True), required=True)
+
+
+class RealmStartGarbageCollectionMaintenanceRepSchema(BaseRepSchema):
+    pass
+
+
+realm_start_garbage_collection_maintenance_serializer = CmdSerializer(
+    RealmStartGarbageCollectionMaintenanceReqSchema, RealmStartGarbageCollectionMaintenanceRepSchema
+)
+
+
+class RealmFinishGarbageCollectionMaintenanceReqSchema(BaseReqSchema):
+    realm_id = fields.UUID(required=True)
+    garbage_collection_revision = fields.Integer(required=True)
+
+
+class RealmFinishGarbageCollectionMaintenanceRepSchema(BaseRepSchema):
+    pass
+
+
+realm_finish_garbage_collection_maintenance_serializer = CmdSerializer(
+    RealmFinishGarbageCollectionMaintenanceReqSchema,
+    RealmFinishGarbageCollectionMaintenanceRepSchema,
 )
 
 

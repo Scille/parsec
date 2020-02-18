@@ -42,6 +42,7 @@ class EventsRealmMaintenanceStartedRepSchema(BaseRepSchema):
     event = fields.CheckedConstant("realm.maintenance_started", required=True)
     realm_id = fields.UUID(required=True)
     encryption_revision = fields.Integer(required=True)
+    garbage_collection_revision = fields.Integer(required=True)
 
 
 class EventsRealmMaintenanceFinishedRepSchema(BaseRepSchema):

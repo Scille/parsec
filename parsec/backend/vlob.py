@@ -1,4 +1,5 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
+from functools import wraps
 
 from typing import List, Tuple, Dict, Optional
 from uuid import UUID
@@ -14,6 +15,8 @@ from parsec.api.protocol import (
     vlob_poll_changes_serializer,
     vlob_list_versions_serializer,
     vlob_maintenance_get_reencryption_batch_serializer,
+    vlob_maintenance_save_garbage_collection_batch_serializer,
+    vlob_maintenance_get_garbage_collection_batch_serializer,
     vlob_maintenance_save_reencryption_batch_serializer,
 )
 from parsec.backend.utils import catch_protocol_errors
@@ -59,11 +62,70 @@ class VlobMaintenanceError(VlobError):
     pass
 
 
+def _catch_common_in_maintenance_errors(serializer):
+    def decorator(fn):
+        @wraps(fn)
+        async def wrapper(*args, **kwargs):
+            try:
+                return await fn(*args, **kwargs)
+
+            except VlobNotInMaintenanceError as exc:
+                return serializer.rep_dump({"status": "not_in_maintenance", "reason": str(exc)})
+
+            except VlobMaintenanceError as exc:
+                return serializer.rep_dump({"status": "maintenance_error", "reason": str(exc)})
+
+        return wrapper
+
+    return decorator
+
+
+def _catch_common_vlob_errors(serializer):
+    def decorator(fn):
+        @wraps(fn)
+        async def wrapper(*args, **kwargs):
+            try:
+                return await fn(*args, **kwargs)
+
+            except VlobAccessError:
+                return serializer.rep_dump({"status": "not_allowed"})
+
+            except VlobNotFoundError as exc:
+                return serializer.rep_dump({"status": "not_found", "reason": str(exc)})
+
+        return wrapper
+
+    return decorator
+
+
+def _catch_item_vlob_errors(serializer):
+    def decorator(fn):
+        @wraps(fn)
+        async def wrapper(*args, **kwargs):
+            try:
+                return await fn(*args, **kwargs)
+
+            except VlobVersionError:
+                return vlob_update_serializer.rep_dump({"status": "bad_version"})
+
+            except VlobTimestampError:
+                return vlob_update_serializer.rep_dump({"status": "bad_timestamp"})
+
+            except VlobEncryptionRevisionError:
+                return vlob_create_serializer.rep_dump({"status": "bad_encryption_revision"})
+
+            except VlobInMaintenanceError:
+                return vlob_update_serializer.rep_dump({"status": "in_maintenance"})
+
+        return wrapper
+
+    return decorator
+
+
 class BaseVlobComponent:
     @catch_protocol_errors
     async def api_vlob_create(self, client_ctx, msg):
         msg = vlob_create_serializer.req_load(msg)
-
         now = pendulum.now()
         if not timestamps_in_the_ballpark(msg["timestamp"], now):
             return {"status": "bad_timestamp", "reason": f"Timestamp is out of date."}
@@ -86,31 +148,13 @@ class BaseVlobComponent:
         return vlob_create_serializer.rep_dump({"status": "ok"})
 
     @catch_protocol_errors
+    @_catch_common_vlob_errors(vlob_read_serializer)
+    @_catch_item_vlob_errors(vlob_read_serializer)
     async def api_vlob_read(self, client_ctx, msg):
         msg = vlob_read_serializer.req_load(msg)
-
-        try:
-            version, blob, author, created_on = await self.read(
-                client_ctx.organization_id, client_ctx.device_id, **msg
-            )
-
-        except VlobNotFoundError as exc:
-            return vlob_read_serializer.rep_dump({"status": "not_found", "reason": str(exc)})
-
-        except VlobAccessError:
-            return vlob_read_serializer.rep_dump({"status": "not_allowed"})
-
-        except VlobVersionError:
-            return vlob_read_serializer.rep_dump({"status": "bad_version"})
-
-        except VlobTimestampError:
-            return vlob_read_serializer.rep_dump({"status": "bad_timestamp"})
-
-        except VlobEncryptionRevisionError:
-            return vlob_create_serializer.rep_dump({"status": "bad_encryption_revision"})
-
-        except VlobInMaintenanceError:
-            return vlob_read_serializer.rep_dump({"status": "in_maintenance"})
+        version, blob, author, created_on = await self.read(
+            client_ctx.organization_id, client_ctx.device_id, **msg
+        )
 
         return vlob_read_serializer.rep_dump(
             {
@@ -123,6 +167,8 @@ class BaseVlobComponent:
         )
 
     @catch_protocol_errors
+    @_catch_common_vlob_errors(vlob_update_serializer)
+    @_catch_item_vlob_errors(vlob_update_serializer)
     async def api_vlob_update(self, client_ctx, msg):
         msg = vlob_update_serializer.req_load(msg)
 
@@ -130,30 +176,12 @@ class BaseVlobComponent:
         if not timestamps_in_the_ballpark(msg["timestamp"], now):
             return {"status": "bad_timestamp", "reason": f"Timestamp is out of date."}
 
-        try:
-            await self.update(client_ctx.organization_id, client_ctx.device_id, **msg)
-
-        except VlobNotFoundError as exc:
-            return vlob_update_serializer.rep_dump({"status": "not_found", "reason": str(exc)})
-
-        except VlobAccessError:
-            return vlob_update_serializer.rep_dump({"status": "not_allowed"})
-
-        except VlobVersionError:
-            return vlob_update_serializer.rep_dump({"status": "bad_version"})
-
-        except VlobTimestampError:
-            return vlob_update_serializer.rep_dump({"status": "bad_timestamp"})
-
-        except VlobEncryptionRevisionError:
-            return vlob_create_serializer.rep_dump({"status": "bad_encryption_revision"})
-
-        except VlobInMaintenanceError:
-            return vlob_update_serializer.rep_dump({"status": "in_maintenance"})
+        await self.update(client_ctx.organization_id, client_ctx.device_id, **msg)
 
         return vlob_update_serializer.rep_dump({"status": "ok"})
 
     @catch_protocol_errors
+    @_catch_common_vlob_errors(vlob_poll_changes_serializer)
     async def api_vlob_poll_changes(self, client_ctx, msg):
         msg = vlob_poll_changes_serializer.req_load(msg)
 
@@ -166,14 +194,6 @@ class BaseVlobComponent:
                 msg["last_checkpoint"],
             )
 
-        except VlobAccessError:
-            return vlob_poll_changes_serializer.rep_dump({"status": "not_allowed"})
-
-        except VlobNotFoundError as exc:
-            return vlob_poll_changes_serializer.rep_dump(
-                {"status": "not_found", "reason": str(exc)}
-            )
-
         except VlobInMaintenanceError:
             return vlob_poll_changes_serializer.rep_dump({"status": "in_maintenance"})
 
@@ -182,6 +202,7 @@ class BaseVlobComponent:
         )
 
     @catch_protocol_errors
+    @_catch_common_vlob_errors(vlob_list_versions_serializer)
     async def api_vlob_list_versions(self, client_ctx, msg):
         msg = vlob_list_versions_serializer.req_load(msg)
 
@@ -190,20 +211,49 @@ class BaseVlobComponent:
                 client_ctx.organization_id, client_ctx.device_id, msg["vlob_id"]
             )
 
-        except VlobAccessError:
-            return vlob_list_versions_serializer.rep_dump({"status": "not_allowed"})
-
-        except VlobNotFoundError as exc:
-            return vlob_list_versions_serializer.rep_dump(
-                {"status": "not_found", "reason": str(exc)}
-            )
-
         except VlobInMaintenanceError:
             return vlob_list_versions_serializer.rep_dump({"status": "in_maintenance"})
 
         return vlob_list_versions_serializer.rep_dump({"status": "ok", "versions": versions_dict})
 
     @catch_protocol_errors
+    @_catch_common_vlob_errors(vlob_maintenance_get_garbage_collection_batch_serializer)
+    @_catch_common_in_maintenance_errors(vlob_maintenance_get_garbage_collection_batch_serializer)
+    async def api_vlob_maintenance_get_garbage_collection_batch(self, client_ctx, msg):
+        msg = vlob_maintenance_get_garbage_collection_batch_serializer.req_load(msg)
+        batch = await self.maintenance_get_garbage_collection_batch(
+            client_ctx.organization_id, client_ctx.device_id, **msg
+        )
+        return vlob_maintenance_get_garbage_collection_batch_serializer.rep_dump(
+            {
+                "status": "ok",
+                "batch": [
+                    {"vlob_id": vlob_id, "version": version, "datetime": datetime, "blob": blob}
+                    for vlob_id, version, (datetime, blob) in batch
+                ],
+            }
+        )
+
+    @catch_protocol_errors
+    @_catch_common_vlob_errors(vlob_maintenance_save_garbage_collection_batch_serializer)
+    @_catch_common_in_maintenance_errors(vlob_maintenance_save_garbage_collection_batch_serializer)
+    async def api_vlob_maintenance_save_garbage_collection_batch(self, client_ctx, msg):
+        msg = vlob_maintenance_save_garbage_collection_batch_serializer.req_load(msg)
+        total, done = await self.maintenance_save_garbage_collection_batch(
+            client_ctx.organization_id,
+            client_ctx.device_id,
+            realm_id=msg["realm_id"],
+            garbage_collection_revision=msg["garbage_collection_revision"],
+            batch=[(x["vlob_id"], x["version"], x["blocks_to_erase"]) for x in msg["batch"]],
+        )
+
+        return vlob_maintenance_save_garbage_collection_batch_serializer.rep_dump(
+            {"status": "ok", "total": total, "done": done}
+        )
+
+    @catch_protocol_errors
+    @_catch_common_vlob_errors(vlob_maintenance_get_reencryption_batch_serializer)
+    @_catch_common_in_maintenance_errors(vlob_maintenance_get_reencryption_batch_serializer)
     async def api_vlob_maintenance_get_reencryption_batch(self, client_ctx, msg):
         msg = vlob_maintenance_get_reencryption_batch_serializer.req_load(msg)
 
@@ -212,28 +262,8 @@ class BaseVlobComponent:
                 client_ctx.organization_id, client_ctx.device_id, **msg
             )
 
-        except VlobAccessError:
-            return vlob_maintenance_get_reencryption_batch_serializer.rep_dump(
-                {"status": "not_allowed"}
-            )
-
-        except VlobNotFoundError as exc:
-            return vlob_maintenance_get_reencryption_batch_serializer.rep_dump(
-                {"status": "not_found", "reason": str(exc)}
-            )
-
-        except VlobNotInMaintenanceError as exc:
-            return vlob_maintenance_get_reencryption_batch_serializer.rep_dump(
-                {"status": "not_in_maintenance", "reason": str(exc)}
-            )
-
         except VlobEncryptionRevisionError:
             return vlob_create_serializer.rep_dump({"status": "bad_encryption_revision"})
-
-        except VlobMaintenanceError as exc:
-            return vlob_maintenance_get_reencryption_batch_serializer.rep_dump(
-                {"status": "maintenance_error", "reason": str(exc)}
-            )
 
         return vlob_maintenance_get_reencryption_batch_serializer.rep_dump(
             {
@@ -246,6 +276,8 @@ class BaseVlobComponent:
         )
 
     @catch_protocol_errors
+    @_catch_common_vlob_errors(vlob_maintenance_save_reencryption_batch_serializer)
+    @_catch_common_in_maintenance_errors(vlob_maintenance_save_reencryption_batch_serializer)
     async def api_vlob_maintenance_save_reencryption_batch(self, client_ctx, msg):
         msg = vlob_maintenance_save_reencryption_batch_serializer.req_load(msg)
 
@@ -258,28 +290,8 @@ class BaseVlobComponent:
                 batch=[(x["vlob_id"], x["version"], x["blob"]) for x in msg["batch"]],
             )
 
-        except VlobAccessError:
-            return vlob_maintenance_save_reencryption_batch_serializer.rep_dump(
-                {"status": "not_allowed"}
-            )
-
-        except VlobNotFoundError as exc:
-            return vlob_maintenance_save_reencryption_batch_serializer.rep_dump(
-                {"status": "not_found", "reason": str(exc)}
-            )
-
-        except VlobNotInMaintenanceError as exc:
-            return vlob_maintenance_get_reencryption_batch_serializer.rep_dump(
-                {"status": "not_in_maintenance", "reason": str(exc)}
-            )
-
         except VlobEncryptionRevisionError:
             return vlob_create_serializer.rep_dump({"status": "bad_encryption_revision"})
-
-        except VlobMaintenanceError as exc:
-            return vlob_maintenance_save_reencryption_batch_serializer.rep_dump(
-                {"status": "maintenance_error", "reason": str(exc)}
-            )
 
         return vlob_maintenance_save_reencryption_batch_serializer.rep_dump(
             {"status": "ok", "total": total, "done": done}

@@ -18,6 +18,8 @@ from parsec.api.protocol import (
     realm_update_roles_serializer,
     realm_start_reencryption_maintenance_serializer,
     realm_finish_reencryption_maintenance_serializer,
+    realm_start_garbage_collection_maintenance_serializer,
+    realm_finish_garbage_collection_maintenance_serializer,
 )
 from parsec.api.data import DataError, RealmRoleCertificateContent
 from parsec.backend.utils import catch_protocol_errors
@@ -47,6 +49,10 @@ class RealmEncryptionRevisionError(RealmError):
     pass
 
 
+class RealmGarbageCollectionRevisionError(RealmError):
+    pass
+
+
 class RealmParticipantsMismatchError(RealmError):
     pass
 
@@ -69,6 +75,7 @@ class RealmStatus:
     maintenance_started_on: Optional[DeviceID]
     maintenance_started_by: Optional[pendulum.Pendulum]
     encryption_revision: int
+    garbage_collection_revision: int
 
     @property
     def in_maintenance(self) -> bool:
@@ -143,7 +150,6 @@ class BaseRealmComponent:
 
         except RealmAlreadyExistsError:
             return realm_create_serializer.rep_dump({"status": "already_exists"})
-
         return realm_create_serializer.rep_dump({"status": "ok"})
 
     @catch_protocol_errors
@@ -252,6 +258,41 @@ class BaseRealmComponent:
         return realm_update_roles_serializer.rep_dump({"status": "ok"})
 
     @catch_protocol_errors
+    async def api_realm_start_garbage_collection_maintenance(self, client_ctx, msg):
+
+        msg = realm_start_garbage_collection_maintenance_serializer.req_load(msg)
+        now = pendulum.now()
+
+        if not timestamps_in_the_ballpark(msg["timestamp"], now):
+            return {"status": "bad_timestamp", "reason": "Timestamp is out of date."}
+        try:
+            await self.start_garbage_collection_maintenance(
+                client_ctx.organization_id, client_ctx.device_id, **msg
+            )
+
+        except RealmAccessError:
+            return realm_start_garbage_collection_maintenance_serializer.rep_dump(
+                {"status": "not_allowed"}
+            )
+
+        except RealmNotFoundError as exc:
+            return realm_start_reencryption_maintenance_serializer.rep_dump(
+                {"status": "not_found", "reason": str(exc)}
+            )
+
+        except RealmParticipantsMismatchError as exc:
+            return realm_start_garbage_collection_maintenance_serializer.rep_dump(
+                {"status": "participants_mismatch", "reason": str(exc)}
+            )
+
+        except RealmInMaintenanceError:
+            return realm_start_garbage_collection_maintenance_serializer.rep_dump(
+                {"status": "in_maintenance"}
+            )
+
+        return realm_start_garbage_collection_maintenance_serializer.rep_dump({"status": "ok"})
+
+    @catch_protocol_errors
     async def api_realm_start_reencryption_maintenance(self, client_ctx, msg):
         msg = realm_start_reencryption_maintenance_serializer.req_load(msg)
 
@@ -295,6 +336,41 @@ class BaseRealmComponent:
             )
 
         return realm_start_reencryption_maintenance_serializer.rep_dump({"status": "ok"})
+
+    @catch_protocol_errors
+    async def api_realm_finish_garbage_collection_maintenance(self, client_ctx, msg):
+        msg = realm_finish_garbage_collection_maintenance_serializer.req_load(msg)
+        try:
+            await self.finish_garbage_collection_maintenance(
+                client_ctx.organization_id, client_ctx.device_id, **msg
+            )
+
+        except RealmAccessError:
+            return realm_finish_garbage_collection_maintenance_serializer.rep_dump(
+                {"status": "not_allowed"}
+            )
+
+        except RealmNotFoundError as exc:
+            return realm_finish_garbage_collection_maintenance_serializer.rep_dump(
+                {"status": "not_found", "reason": str(exc)}
+            )
+
+        except RealmEncryptionRevisionError:
+            return realm_finish_garbage_collection_maintenance_serializer.rep_dump(
+                {"status": "bad_encryption_revision"}
+            )
+
+        except RealmNotInMaintenanceError as exc:
+            return realm_finish_garbage_collection_maintenance_serializer.rep_dump(
+                {"status": "not_in_maintenance", "reason": str(exc)}
+            )
+
+        except RealmMaintenanceError as exc:
+            return realm_finish_garbage_collection_maintenance_serializer.rep_dump(
+                {"status": "maintenance_error", "reason": str(exc)}
+            )
+
+        return realm_finish_garbage_collection_maintenance_serializer.rep_dump({"status": "ok"})
 
     @catch_protocol_errors
     async def api_realm_finish_reencryption_maintenance(self, client_ctx, msg):
@@ -414,6 +490,34 @@ class BaseRealmComponent:
         author: DeviceID,
         realm_id: UUID,
         encryption_revision: int,
+    ) -> None:
+        """
+        Raises:
+            RealmNotFoundError
+            RealmAccessError
+            RealmMaintenanceError: not in maintenance or bad encryption_revision
+        """
+        raise NotImplementedError()
+
+    async def start_garbage_collection_maintenance(
+        self,
+        organization_id: OrganizationID,
+        author: DeviceID,
+        realm_id: UUID,
+        per_participant_message: Dict[UserID, bytes],
+        timestamp: pendulum.Pendulum,
+    ) -> None:
+        """
+        Raises:
+            RealmInMaintenanceError
+            RealmMaintenanceError: bad encryption_revision or per_participant_message
+            RealmNotFoundError
+            RealmAccessError
+        """
+        raise NotImplementedError()
+
+    async def finish_garbage_collection_maintenance(
+        self, organization_id: OrganizationID, author: DeviceID, realm_id: UUID
     ) -> None:
         """
         Raises:

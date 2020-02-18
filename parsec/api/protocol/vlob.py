@@ -13,6 +13,8 @@ __all__ = (
     "vlob_list_versions_serializer",
     "vlob_maintenance_get_reencryption_batch_serializer",
     "vlob_maintenance_save_reencryption_batch_serializer",
+    "vlob_maintenance_save_garbage_collection_batch_serializer",
+    "vlob_maintenance_get_garbage_collection_batch_serializer",
 )
 
 
@@ -138,4 +140,50 @@ class VlobMaintenanceSaveReencryptionBatchRepSchema(BaseRepSchema):
 
 vlob_maintenance_save_reencryption_batch_serializer = CmdSerializer(
     VlobMaintenanceSaveReencryptionBatchReqSchema, VlobMaintenanceSaveReencryptionBatchRepSchema
+)
+
+
+class GarbageCollectionSaveBatchEntry(BaseSchema):
+    vlob_id = fields.UUID(required=True)
+    version = fields.Integer(required=True)
+    blocks_to_erase = fields.List(fields.UUID(required=False))
+
+
+class VlobMaintenanceSaveGarbageCollectionVlobReqSchema(BaseReqSchema):
+    realm_id = fields.UUID(required=True)
+    garbage_collection_revision = fields.Integer(required=True)
+    batch = fields.List(fields.Nested(GarbageCollectionSaveBatchEntry), required=True)
+
+
+class VlobMaintenanceSaveGarbageCollectionVlobRepSchema(BaseRepSchema):
+    total = fields.Integer(required=True)
+    done = fields.Integer(required=True)
+
+
+vlob_maintenance_save_garbage_collection_batch_serializer = CmdSerializer(
+    VlobMaintenanceSaveGarbageCollectionVlobReqSchema,
+    VlobMaintenanceSaveGarbageCollectionVlobRepSchema,
+)
+
+
+class VlobMaintenanceGetGarbageCollectionBatchReqSchema(BaseReqSchema):
+    realm_id = fields.UUID(required=True)
+    garbage_collection_revision = fields.Integer(required=True)
+    size = fields.Integer(required=True, validate=validate.Range(min=0, max=1000))
+
+
+class GarbageCollectionBatchEntrySchema(BaseSchema):
+    vlob_id = fields.UUID(required=True)
+    version = fields.Integer(required=True, validate=validate.Range(min=0))
+    datetime = fields.DateTime(required=True)
+    blob = fields.Bytes(required=True)
+
+
+class VlobMaintenanceGetGarbageCollectionBatchRepSchema(BaseRepSchema):
+    batch = fields.List(fields.Nested(GarbageCollectionBatchEntrySchema), required=True)
+
+
+vlob_maintenance_get_garbage_collection_batch_serializer = CmdSerializer(
+    VlobMaintenanceGetGarbageCollectionBatchReqSchema,
+    VlobMaintenanceGetGarbageCollectionBatchRepSchema,
 )

@@ -65,6 +65,8 @@ from parsec.api.protocol.realm import (
     realm_update_roles_serializer,
     realm_start_reencryption_maintenance_serializer,
     realm_finish_reencryption_maintenance_serializer,
+    realm_start_garbage_collection_maintenance_serializer,
+    realm_finish_garbage_collection_maintenance_serializer,
 )
 from parsec.api.protocol.block import block_create_serializer, block_read_serializer
 from parsec.api.protocol.vlob import (
@@ -75,6 +77,8 @@ from parsec.api.protocol.vlob import (
     vlob_list_versions_serializer,
     vlob_maintenance_get_reencryption_batch_serializer,
     vlob_maintenance_save_reencryption_batch_serializer,
+    vlob_maintenance_get_garbage_collection_batch_serializer,
+    vlob_maintenance_save_garbage_collection_batch_serializer,
 )
 
 
@@ -141,6 +145,8 @@ __all__ = (
     "realm_update_roles_serializer",
     "realm_start_reencryption_maintenance_serializer",
     "realm_finish_reencryption_maintenance_serializer",
+    "realm_start_garbage_collection_maintenance_serializer",
+    "realm_finish_garbage_collection_maintenance_serializer",
     # Vlob
     "vlob_create_serializer",
     "vlob_read_serializer",
@@ -149,6 +155,8 @@ __all__ = (
     "vlob_list_versions_serializer",
     "vlob_maintenance_get_reencryption_batch_serializer",
     "vlob_maintenance_save_reencryption_batch_serializer",
+    "vlob_maintenance_get_garbage_collection_batch_serializer",
+    "vlob_maintenance_save_garbage_collection_batch_serializer",
     # Block
     "block_create_serializer",
     "block_read_serializer",

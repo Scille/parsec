@@ -26,6 +26,8 @@ from parsec.api.protocol import (
     vlob_update_serializer,
     vlob_poll_changes_serializer,
     vlob_list_versions_serializer,
+    vlob_maintenance_get_garbage_collection_batch_serializer,
+    vlob_maintenance_save_garbage_collection_batch_serializer,
     vlob_maintenance_get_reencryption_batch_serializer,
     vlob_maintenance_save_reencryption_batch_serializer,
     realm_create_serializer,
@@ -34,6 +36,8 @@ from parsec.api.protocol import (
     realm_update_roles_serializer,
     realm_start_reencryption_maintenance_serializer,
     realm_finish_reencryption_maintenance_serializer,
+    realm_start_garbage_collection_maintenance_serializer,
+    realm_finish_garbage_collection_maintenance_serializer,
     block_create_serializer,
     block_read_serializer,
     user_get_serializer,
@@ -199,6 +203,35 @@ async def vlob_list_versions(transport: Transport, vlob_id: UUID) -> dict:
     )
 
 
+async def vlob_maintenance_get_garbage_collection_batch(
+    transport: Transport, realm_id: UUID, garbage_collection_revision: int, size: int
+) -> List[Tuple[EntryID, int, bytes]]:
+    return await _send_cmd(
+        transport,
+        vlob_maintenance_get_garbage_collection_batch_serializer,
+        cmd="vlob_maintenance_get_garbage_collection_batch",
+        realm_id=realm_id,
+        garbage_collection_revision=garbage_collection_revision,
+        size=size,
+    )
+
+
+async def vlob_maintenance_save_garbage_collection_batch(
+    transport: Transport,
+    realm_id: UUID,
+    garbage_collection_revision: int,
+    batch: List[Tuple[EntryID, int, List[EntryID]]],
+) -> Tuple[int, int]:
+    return await _send_cmd(
+        transport,
+        vlob_maintenance_save_garbage_collection_batch_serializer,
+        cmd="vlob_maintenance_save_garbage_collection_batch",
+        realm_id=realm_id,
+        garbage_collection_revision=garbage_collection_revision,
+        batch=[{"vlob_id": x[0], "version": x[1], "blocks_to_erase": x[2]} for x in batch],
+    )
+
+
 async def vlob_maintenance_get_reencryption_batch(
     transport: Transport, realm_id: UUID, encryption_revision: int, size: int
 ) -> dict:
@@ -291,6 +324,36 @@ async def realm_finish_reencryption_maintenance(
         cmd="realm_finish_reencryption_maintenance",
         realm_id=realm_id,
         encryption_revision=encryption_revision,
+    )
+
+
+async def realm_start_garbage_collection_maintenance(
+    transport: Transport,
+    realm_id: UUID,
+    garbage_collection_revision: int,
+    timestamp: pendulum.Pendulum,
+    per_participant_message: Dict[UserID, bytes],
+) -> None:
+    return await _send_cmd(
+        transport,
+        realm_start_garbage_collection_maintenance_serializer,
+        cmd="realm_start_garbage_collection_maintenance",
+        realm_id=realm_id,
+        garbage_collection_revision=garbage_collection_revision,
+        timestamp=timestamp,
+        per_participant_message=per_participant_message,
+    )
+
+
+async def realm_finish_garbage_collection_maintenance(
+    transport: Transport, realm_id: UUID, garbage_collection_revision: int
+) -> None:
+    await _send_cmd(
+        transport,
+        realm_finish_garbage_collection_maintenance_serializer,
+        cmd="realm_finish_garbage_collection_maintenance",
+        realm_id=realm_id,
+        garbage_collection_revision=garbage_collection_revision,
     )
 
 

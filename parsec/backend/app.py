@@ -189,6 +189,8 @@ class BackendApp:
             "vlob_read": self.vlob.api_vlob_read,
             "vlob_update": self.vlob.api_vlob_update,
             "vlob_list_versions": self.vlob.api_vlob_list_versions,
+            "vlob_maintenance_get_garbage_collection_batch": self.vlob.api_vlob_maintenance_get_garbage_collection_batch,
+            "vlob_maintenance_save_garbage_collection_batch": self.vlob.api_vlob_maintenance_save_garbage_collection_batch,
             "vlob_maintenance_get_reencryption_batch": self.vlob.api_vlob_maintenance_get_reencryption_batch,
             "vlob_maintenance_save_reencryption_batch": self.vlob.api_vlob_maintenance_save_reencryption_batch,
             # Realm
@@ -196,6 +198,8 @@ class BackendApp:
             "realm_status": self.realm.api_realm_status,
             "realm_get_role_certificates": self.realm.api_realm_get_role_certificates,
             "realm_update_roles": self.realm.api_realm_update_roles,
+            "realm_start_garbage_collection_maintenance": self.realm.api_realm_start_garbage_collection_maintenance,
+            "realm_finish_garbage_collection_maintenance": self.realm.api_realm_finish_garbage_collection_maintenance,
             "realm_start_reencryption_maintenance": self.realm.api_realm_start_reencryption_maintenance,
             "realm_finish_reencryption_maintenance": self.realm.api_realm_finish_reencryption_maintenance,
         }

@@ -18,6 +18,7 @@ class MessageContent(BaseAPISignedData):
             return {
                 "sharing.granted": SharingGrantedMessageContent.SCHEMA_CLS,
                 "sharing.reencrypted": SharingReencryptedMessageContent.SCHEMA_CLS,
+                "sharing.garbage_collected": SharingGarbageCollectedMessageContent.SCHEMA_CLS,
                 "sharing.revoked": SharingRevokedMessageContent.SCHEMA_CLS,
                 "ping": PingMessageContent.SCHEMA_CLS,
             }
@@ -34,6 +35,7 @@ class SharingGrantedMessageContent(MessageContent):
         encryption_revision = fields.Integer(required=True)
         encrypted_on = fields.DateTime(required=True)
         key = fields.SecretKey(required=True)
+        garbage_collection_revision = fields.Integer(required=True)
         # Don't include role given the only reliable way to get this information
         # is to fetch the realm role certificate from the backend.
         # Besides, we will also need the message sender's realm role certificate
@@ -49,6 +51,7 @@ class SharingGrantedMessageContent(MessageContent):
     encryption_revision: int
     encrypted_on: Pendulum
     key: SecretKey
+    garbage_collection_revision: int
 
 
 class SharingReencryptedMessageContent(SharingGrantedMessageContent):
@@ -73,6 +76,19 @@ class SharingRevokedMessageContent(MessageContent):
         def make_obj(self, data):
             data.pop("type")
             return SharingRevokedMessageContent(**data)
+
+    id: EntryID
+
+
+class SharingGarbageCollectedMessageContent(MessageContent):
+    class SCHEMA_CLS(BaseSignedDataSchema):
+        type = fields.CheckedConstant("sharing.garbage_collected", required=True)
+        id = EntryIDField(required=True)
+
+        @post_load
+        def make_obj(self, data):
+            data.pop("type")
+            return SharingGarbageCollectedMessageContent(**data)
 
     id: EntryID
 

@@ -14,6 +14,7 @@ from parsec.api.protocol import (
     realm_get_role_certificates_serializer,
     realm_update_roles_serializer,
     realm_start_reencryption_maintenance_serializer,
+    realm_start_garbage_collection_maintenance_serializer,
     realm_finish_reencryption_maintenance_serializer,
     vlob_create_serializer,
     vlob_read_serializer,
@@ -114,6 +115,28 @@ async def realm_start_reencryption_maintenance(
     )
     raw_rep = await sock.recv()
     rep = realm_start_reencryption_maintenance_serializer.rep_loads(raw_rep)
+    if check_rep:
+        assert rep == {"status": "ok"}
+    return rep
+
+
+async def realm_start_garbage_collection_maintenance(
+    sock, realm_id, garbage_collection_revision, timestamp, per_participant_message, check_rep=True
+):
+
+    raw_rep = await sock.send(
+        realm_start_garbage_collection_maintenance_serializer.req_dumps(
+            {
+                "cmd": "realm_start_garbage_collection_maintenance",
+                "realm_id": realm_id,
+                "garbage_collection_revision": garbage_collection_revision,
+                "timestamp": timestamp,
+                "per_participant_message": per_participant_message,
+            }
+        )
+    )
+    raw_rep = await sock.recv()
+    rep = realm_start_garbage_collection_maintenance_serializer.rep_loads(raw_rep)
     if check_rep:
         assert rep == {"status": "ok"}
     return rep

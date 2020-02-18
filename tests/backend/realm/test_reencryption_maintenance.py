@@ -456,6 +456,7 @@ async def test_reencryption_events(
             "event": "realm.maintenance_started",
             "realm_id": realm,
             "encryption_revision": 2,
+            "garbage_collection_revision": 0,
         }
         rep = await events_listen_nowait(alice_backend_sock)
         assert rep == {"status": "ok", "event": "message.received", "index": 1}

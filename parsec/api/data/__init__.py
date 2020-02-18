@@ -26,6 +26,7 @@ from parsec.api.data.message import (
     SharingGrantedMessageContent,
     SharingReencryptedMessageContent,
     SharingRevokedMessageContent,
+    SharingGarbageCollectedMessageContent,
     PingMessageContent,
 )
 from parsec.api.data.manifest import (
@@ -73,6 +74,7 @@ __all__ = (
     "SharingGrantedMessageContent",
     "SharingReencryptedMessageContent",
     "SharingRevokedMessageContent",
+    "SharingGarbageCollectedMessageContent",
     "PingMessageContent",
     # Manifests
     "BlockID",

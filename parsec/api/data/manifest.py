@@ -53,6 +53,8 @@ class WorkspaceEntry(BaseData):
         encrypted_on = fields.DateTime(required=True)
         role_cached_on = fields.DateTime(required=True)
         role = RealmRoleField(required=True, allow_none=True)
+        garbage_collected_on = fields.DateTime(required=False, allow_none=True)
+        garbage_collection_revision = fields.Int(required=True, validate=validate.Range(min=0))
 
         @post_load
         def make_obj(self, data):
@@ -65,6 +67,8 @@ class WorkspaceEntry(BaseData):
     encrypted_on: Pendulum
     role_cached_on: Pendulum
     role: Optional[RealmRole]
+    garbage_collected_on: Optional[Pendulum] = None
+    garbage_collection_revision: int = 0
 
     @classmethod
     def new(cls, name):
@@ -77,6 +81,7 @@ class WorkspaceEntry(BaseData):
             encrypted_on=now,
             role_cached_on=now,
             role=RealmRole.OWNER,
+            garbage_collection_revision=0,
         )
 
     def is_revoked(self) -> bool:
