@@ -323,10 +323,12 @@ extra_requirements = {
     "core": [
         PYQT_DEP,
         BABEL_DEP,
-        'fusepy==3.0.1;platform_system=="Linux"',
-        'winfspy==0.7.4;platform_system=="Windows"',
         "zxcvbn==4.4.27",
         "psutil==5.6.3",
+        'fusepy==3.0.1;platform_system=="Linux"',  # FUSE mountpoint
+        'winfspy==0.7.4;platform_system=="Windows"',  # WinFSP mountpoint
+        "wsgidav==3.0.2",  # WebDAV mountpoint
+        "cheroot==8.3.0",  # WebDAV mountpoint
     ],
     "backend": [
         # PostgreSQL

@@ -19,21 +19,22 @@ from parsec.core.mountpoint.exceptions import (
     MountpointConfigurationWorkspaceFSTimestampedError,
     MountpointAlreadyMounted,
     MountpointNotMounted,
-    MountpointWinfspNotAvailable,
-    MountpointFuseNotAvailable,
 )
 from parsec.core.mountpoint.winify import winify_entry_name
+from parsec.core.mountpoint.webdav_runner import webdav_mountpoint_runner
 
 
 def get_mountpoint_runner():
+    return webdav_mountpoint_runner  # TODO: remove me
     # Windows
     if os.name == "nt":
 
         try:
             # Use import function for easier mock up
             import_function("winfspy")
-        except RuntimeError as exc:
-            raise MountpointWinfspNotAvailable(exc) from exc
+        except RuntimeError:
+            # Fallback to wevdav
+            return webdav_mountpoint_runner
 
         logging.getLogger("winfspy").setLevel(logging.WARNING)
         from parsec.core.mountpoint.winfsp_runner import winfsp_mountpoint_runner
@@ -45,8 +46,9 @@ def get_mountpoint_runner():
         try:
             # Use import function for easier mock up
             import_function("fuse")
-        except ImportError as exc:
-            raise MountpointFuseNotAvailable(exc) from exc
+        except ImportError:
+            # Fallback to wevdav
+            return webdav_mountpoint_runner
 
         logging.getLogger("fuse").setLevel(logging.WARNING)
         from parsec.core.mountpoint.fuse_runner import fuse_mountpoint_runner

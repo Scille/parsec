@@ -59,9 +59,6 @@ class ThreadFSAccess:
     def fd_close(self, fh):
         return self._run(self.workspace_fs.transactions.fd_close, fh)
 
-    def fd_seek(self, fh, offset):
-        return self._run(self.workspace_fs.transactions.fd_seek, fh, offset)
-
     def fd_read(self, fh, size, offset, raise_eof=False):
         return self._run(self.workspace_fs.transactions.fd_read, fh, size, offset, raise_eof)
 
@@ -73,3 +70,14 @@ class ThreadFSAccess:
 
     def fd_flush(self, fh):
         return self._run(self.workspace_fs.transactions.fd_flush, fh)
+
+    # Not-atomic stuff (for webdav fallback only)
+
+    def move(self, source, destination):
+        return self._run(self.workspace_fs.move, source, destination)
+
+    def copytree(self, source, destination):
+        return self._run(self.workspace_fs.copytree, source, destination)
+
+    def copyfile(self, source, destination):
+        return self._run(self.workspace_fs.copyfile, source, destination)
