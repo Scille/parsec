@@ -1,16 +1,8 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
 from PyQt5.QtCore import pyqtSignal
-from PyQt5.QtGui import QPixmap, QColor
-from PyQt5.QtWidgets import QGraphicsDropShadowEffect, QWidget
-
-from parsec.core.gui import desktop
-from parsec.core.gui.mount_widget import MountWidget
-from parsec.core.gui.users_widget import UsersWidget
-from parsec.core.gui.devices_widget import DevicesWidget
-from parsec.core.gui.menu_widget import MenuWidget
-from parsec.core.gui.lang import translate as _
-from parsec.core.gui.ui.central_widget import Ui_CentralWidget
+from PyQt5.QtGui import QPixmap, QColor, QIcon
+from PyQt5.QtWidgets import QWidget, QGraphicsDropShadowEffect
 
 from parsec.api.protocol import (
     HandshakeAPIVersionError,
@@ -24,6 +16,16 @@ from parsec.core.fs import (
     FSWorkspaceInMaintenance,
 )
 
+from parsec.core.gui import desktop
+from parsec.core.gui.mount_widget import MountWidget
+from parsec.core.gui.users_widget import UsersWidget
+from parsec.core.gui.devices_widget import DevicesWidget
+from parsec.core.gui.menu_widget import MenuWidget
+from parsec.core.gui.lang import translate as _
+from parsec.core.gui.popup_widget import PopupWidget
+
+from parsec.core.gui.ui.central_widget import Ui_CentralWidget
+
 
 class CentralWidget(QWidget, Ui_CentralWidget):
     NOTIFICATION_EVENTS = [
@@ -32,7 +34,7 @@ class CentralWidget(QWidget, Ui_CentralWidget):
         "mountpoint.remote_error",
         "mountpoint.unhandled_error",
         "sharing.updated",
-        "fs.entry.file_update_conflicted",
+        "fs.entry.file_conflict_resolved",
     ]
 
     connection_state_changed = pyqtSignal(object, object)
@@ -67,19 +69,24 @@ class CentralWidget(QWidget, Ui_CentralWidget):
         self.menu.logout_clicked.connect(self.logout_requested.emit)
         self.connection_state_changed.connect(self._on_connection_state_changed)
 
+        self.widget_notif.close_requested.connect(self.button_notifications.toggle)
+        self.widget_notif.notification_count_updated.connect(self._on_notification_count_updated)
+        self.widget_notif.hide()
+        effect = QGraphicsDropShadowEffect(self)
+        effect.setColor(QColor(0xDD, 0xDD, 0xDD))
+        effect.setBlurRadius(10)
+        effect.setXOffset(-2)
+        effect.setYOffset(2)
+        self.widget_notif.setGraphicsEffect(effect)
+
+        self.button_notifications.apply_style()
+        self.button_notifications.toggled.connect(self._toggle_notifications_center)
         self.widget_title2.hide()
         self.widget_title3.hide()
         self.title2_icon.apply_style()
         self.title3_icon.apply_style()
 
         self.icon_mountpoint.apply_style()
-
-        effect = QGraphicsDropShadowEffect(self)
-        effect.setColor(QColor(100, 100, 100))
-        effect.setBlurRadius(4)
-        effect.setXOffset(-2)
-        effect.setYOffset(2)
-        self.widget_notif.setGraphicsEffect(effect)
 
         self.mount_widget = MountWidget(self.core, self.jobs_ctx, self.event_bus, parent=self)
         self.widget_central.layout().insertWidget(0, self.mount_widget)
@@ -94,7 +101,26 @@ class CentralWidget(QWidget, Ui_CentralWidget):
         self._on_connection_state_changed(
             self.core.backend_conn.status, self.core.backend_conn.status_exc
         )
+        self.popup = PopupWidget(self)
+
         self.show_mount_widget()
+
+    def _on_notification_count_updated(self, count):
+        self.button_notifications.current_color = QColor(0, 0, 0)
+        if count == 0:
+            self.button_notifications.setIcon(QIcon(":/icons/images/material/notifications.svg"))
+        else:
+            self.button_notifications.setIcon(
+                QIcon(":/icons/images/material/notifications_active.svg")
+            )
+        self.button_notifications.apply_style()
+
+    def _toggle_notifications_center(self, state):
+        if state:
+            self.button_notifications.current_color = QColor(0, 0, 0)
+            self.button_notifications.setIcon(QIcon(":/icons/images/material/notifications.svg"))
+            self.button_notifications.apply_style()
+        self.widget_notif.setVisible(state)
 
     def _on_folder_changed(self, workspace_name, path):
         if workspace_name and path:
@@ -113,18 +139,27 @@ class CentralWidget(QWidget, Ui_CentralWidget):
         if event == "backend.connection.changed":
             self.connection_state_changed.emit(kwargs["status"], kwargs["status_exc"])
         elif event == "mountpoint.stopped":
-            self.new_notification.emit("WARNING", _("NOTIF_WARN_MOUNTPOINT_UNMOUNTED"))
+            self.new_notification.emit(
+                "WARNING",
+                _("TEXT_NOTIF_WARN_MOUNTPOINT_UNMOUNTED_mountpoint").format(
+                    mountpoint=kwargs["mountpoint"]
+                ),
+            )
         elif event == "mountpoint.remote_error":
             exc = kwargs["exc"]
             path = kwargs["path"]
             if isinstance(exc, FSWorkspaceNoReadAccess):
-                msg = _("NOTIF_WARN_WORKSPACE_READ_ACCESS_LOST_{}").format(path)
+                msg = _("TEXT_NOTIF_WARN_WORKSPACE_READ_ACCESS_LOST_workspace").format(
+                    workspace=path
+                )
             elif isinstance(exc, FSWorkspaceNoWriteAccess):
-                msg = _("NOTIF_WARN_WORKSPACE_WRITE_ACCESS_LOST_{}").format(path)
+                msg = _("TEXT_NOTIF_WARN_WORKSPACE_WRITE_ACCESS_LOST_workspace").format(
+                    workspace=path
+                )
             elif isinstance(exc, FSWorkspaceInMaintenance):
-                msg = _("NOTIF_WARN_WORKSPACE_IN_MAINTENANCE_{}").format(path)
+                msg = _("TEXT_NOTIF_WARN_WORKSPACE_IN_MAINTENANCE_workspace").format(workspace=path)
             else:
-                msg = _("NOTIF_WARN_MOUNTPOINT_REMOTE_ERROR_{}_{}").format(path, str(exc))
+                msg = _("TEXT_NOTIF_WARN_MOUNTPOINT_REMOTE_ERROR_path").format(path=path)
             self.new_notification.emit("WARNING", msg)
         elif event == "mountpoint.unhandled_error":
             exc = kwargs["exc"]
@@ -132,8 +167,8 @@ class CentralWidget(QWidget, Ui_CentralWidget):
             operation = kwargs["operation"]
             self.new_notification.emit(
                 "ERROR",
-                _("NOTIF_ERR_MOUNTPOINT_UNEXPECTED_ERROR_{}_{}_{}").format(
-                    operation, path, str(exc)
+                _("TEXT_NOTIF_ERR_MOUNTPOINT_UNEXPECTED_ERROR_operation-path").format(
+                    operation=operation, path=path
                 ),
             )
         elif event == "sharing.updated":
@@ -143,19 +178,28 @@ class CentralWidget(QWidget, Ui_CentralWidget):
             previous_role = getattr(previous_entry, "role", None)
             if new_role is not None and previous_role is None:
                 self.new_notification.emit(
-                    "INFO", _("NOTIF_INFO_WORKSPACE_SHARED_{}").format(new_entry.name)
+                    "INFO",
+                    _("TEXT_NOTIF_INFO_WORKSPACE_SHARED_workspace").format(
+                        workspace=new_entry.name
+                    ),
                 )
             elif new_role is not None and previous_role is not None:
                 self.new_notification.emit(
-                    "INFO", _("NOTIF_INFO_WORKSPACE_ROLE_UPDATED_{}").format(new_entry.name)
+                    "INFO",
+                    _("TEXT_NOTIF_INFO_WORKSPACE_ROLE_UPDATED_workspace").format(
+                        workspace=new_entry.name
+                    ),
                 )
             elif new_role is None and previous_role is not None:
                 self.new_notification.emit(
-                    "INFO", _("NOTIF_INFO_WORKSPACE_UNSHARED_{}").format(previous_entry.name)
+                    "INFO",
+                    _("TEXT_NOTIF_INFO_WORKSPACE_UNSHARED_workspace").format(
+                        workspace=previous_entry.name
+                    ),
                 )
-        elif event == "fs.entry.file_update_conflicted":
+        elif event == "fs.entry.file_conflict_resolved":
             self.new_notification.emit(
-                "WARNING", _("NOTIF_WARN_SYNC_CONFLICT_{}").format(kwargs["path"])
+                "WARNING", _("TEXT_NOTIF_WARN_SYNC_CONFLICT_path").format(path=kwargs["path"])
             )
 
     def _on_connection_state_changed(self, status, status_exc):
@@ -199,7 +243,10 @@ class CentralWidget(QWidget, Ui_CentralWidget):
             self.new_notification.emit(*notif)
 
     def on_new_notification(self, notif_type, msg):
-        pass
+        self.widget_notif.new_notification(notif_type, msg)
+        if self.isVisible() and not self.popup.isVisible():
+            self.popup.set_message(msg)
+            self.popup.show()
 
     def show_mount_widget(self):
         self.clear_widgets()

@@ -3,8 +3,8 @@
 import pendulum
 
 from PyQt5.QtCore import pyqtSignal
-from PyQt5.QtWidgets import QWidget, QStyle, QStyleOption
-from PyQt5.QtGui import QPixmap, QPainter
+from PyQt5.QtWidgets import QWidget
+from PyQt5.QtGui import QPixmap, QColor
 
 from parsec.core.gui.ui.notification_widget import Ui_NotificationWidget
 from parsec.core.gui.lang import format_datetime
@@ -13,12 +13,32 @@ from parsec.core.gui.lang import format_datetime
 class NotificationWidget(QWidget, Ui_NotificationWidget):
     close_clicked = pyqtSignal(QWidget)
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, color, message):
+        super().__init__()
         self.setupUi(self)
         now = pendulum.now()
+        self._seen = False
+        self.label_icon.setProperty("color", color)
+        self.label_icon.apply_style()
+        color_name = color.name()
+        self.setStyleSheet(
+            f"#label_message{{color: {color_name};}} #label_date{{color: {color_name};}}"
+        )
+        self.message = message
         self.label_date.setText(format_datetime(now))
-        self.button_close.clicked.connect(self.emit_close_clicked)
+
+    @property
+    def seen(self):
+        return self._seen
+
+    @seen.setter
+    def seen(self, v):
+        if v:
+            self.setStyleSheet(f"#label_message{{color: #999999;}} #label_date{{color: #999999;}}")
+            self.label_icon.setProperty("color", QColor(0x99, 0x99, 0x99))
+            self.label_icon.setPixmap(QPixmap(":/icons/images/material/error_outline.svg"))
+            self.label_icon.apply_style()
+        self._seen = v
 
     @property
     def message(self):
@@ -28,38 +48,11 @@ class NotificationWidget(QWidget, Ui_NotificationWidget):
     def message(self, val):
         self.label_message.setText(val)
 
-    def emit_close_clicked(self):
-        self.close_clicked.emit(self)
 
-    def set_icon(self, icon_path):
-        self.label_icon.setPixmap(QPixmap(icon_path))
-
-    def paintEvent(self, _):
-        opt = QStyleOption()
-        opt.initFrom(self)
-        p = QPainter(self)
-        self.style().drawPrimitive(QStyle.PE_Widget, opt, p, self)
-
-
-class ErrorNotificationWidget(NotificationWidget):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.label_message.setStyleSheet("color: rgb(218, 53, 69);")
-        self.label_date.setStyleSheet("color: rgb(218, 53, 69);")
-        self.set_icon(":/icons/images/icons/error.png")
-
-
-class WarningNotificationWidget(NotificationWidget):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.label_message.setStyleSheet("color: rgb(254, 195, 7);")
-        self.label_date.setStyleSheet("color: rgb(254, 195, 7);")
-        self.set_icon(":/icons/images/icons/warning.png")
-
-
-class InfoNotificationWidget(NotificationWidget):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.label_message.setStyleSheet("color: rgb(20, 160, 183);")
-        self.label_date.setStyleSheet("color: rgb(20, 160, 183);")
-        self.set_icon(":/icons/images/icons/info.png")
+def create_notification(notif_type, message):
+    if notif_type == "ERROR":
+        return NotificationWidget(QColor(0xF4, 0x43, 0x36), message)
+    elif notif_type == "WARNING":
+        return NotificationWidget(QColor(0xF1, 0x96, 0x2B), message)
+    elif notif_type == "INFO":
+        return NotificationWidget(QColor(0x00, 0x92, 0xFF), message)

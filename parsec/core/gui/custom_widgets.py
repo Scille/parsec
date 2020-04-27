@@ -103,6 +103,8 @@ class Button(QPushButton):
         self.current_color = color
 
     def leaveEvent(self, _):
+        if not self.property("hover_color"):
+            return
         self.apply_style()
 
     def apply_style(self):

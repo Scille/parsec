@@ -615,8 +615,8 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../forms/notification_center_widget.ui" line="154"/>
-        <source>LABEL_NOTIFICATIONS</source>
+        <location filename="../forms/notification_center_widget.ui" line="110"/>
+        <source>TEXT_NOTIFICATIONS_TITLE</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -20,6 +20,12 @@ def resize_imgs(input_dir):
         root = tree.getroot()
         root.attrib["width"] = "144"
         root.attrib["height"] = "144"
+        for child in root:
+            # To be able to change the color later on in Parsec, we need the image color to be
+            # pure black. Weirdly, some icons from material are very dark grey instead of
+            # completly black, so we have to enforce the #000000.
+            if child.attrib.get("fill", None) and child.attrib.get("fill", "") != "#000000":
+                child.attrib["fill"] = "#000000"
         with open(img, "w+") as fd:
             fd.write(ElementTree.tostring(root, encoding="unicode", method="xml"))
         dst = img.parent / img.name.replace("_48px", "").replace("ic_", "")

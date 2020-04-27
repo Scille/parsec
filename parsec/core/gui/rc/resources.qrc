@@ -31,6 +31,7 @@
         <file>styles/main.css</file>
     </qresource>
     <qresource prefix="/icons">
+        <file>images/icons/spinner.svg</file>
         <file>images/material/3d_rotation.svg</file>
         <file>images/material/access_alarm.svg</file>
         <file>images/material/access_alarms.svg</file>
@@ -966,7 +967,6 @@
         <file>images/material/wrap_text.svg</file>
         <file>images/material/youtube_searched_for.svg</file>
         <file>images/material/zoom_out_map.svg</file>
-        <file>images/icons/spinner.svg</file>
     </qresource>
     <qresource prefix="/file_ext">
         <file>images/file_formats/3dm-file-format.svg</file>

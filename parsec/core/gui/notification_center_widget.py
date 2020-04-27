@@ -1,47 +1,44 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-from PyQt5.QtCore import Qt, pyqtSignal
-from PyQt5.QtGui import QPainter
-from PyQt5.QtWidgets import QWidget, QStyle, QStyleOption, QStyledItemDelegate, QStyleOptionViewItem
+from PyQt5.QtCore import pyqtSignal, QTimer
+from PyQt5.QtWidgets import QWidget
 
-from parsec.core.gui.notification_widget import (
-    ErrorNotificationWidget,
-    WarningNotificationWidget,
-    InfoNotificationWidget,
-)
+from parsec.core.gui.notification_widget import create_notification
 from parsec.core.gui.ui.notification_center_widget import Ui_NotificationCenterWidget
-
-
-class ItemDelegate(QStyledItemDelegate):
-    def paint(self, painter, option, index):
-        view_option = QStyleOptionViewItem(option)
-        view_option.decorationAlignment |= Qt.AlignHCenter
-        # Even though we told Qt that we don't want any selection on our
-        # list, it still adds a blue rectangle on focused items.
-        # So we just get rid of focus.
-        if option.state & QStyle.State_HasFocus:
-            view_option.state &= ~QStyle.State_HasFocus
-        super().paint(painter, view_option, index)
 
 
 class NotificationCenterWidget(QWidget, Ui_NotificationCenterWidget):
     close_requested = pyqtSignal()
+    notification_count_updated = pyqtSignal(int)
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, parent):
+        super().__init__(parent)
         self.setupUi(self)
         self.button_close.clicked.connect(self.close_requested.emit)
+        self.button_close.apply_style()
+        self.notif_count = 0
+        self.timer = QTimer()
+        self.timer.timeout.connect(self._set_seen)
 
-    def paintEvent(self, _):
-        opt = QStyleOption()
-        opt.initFrom(self)
-        p = QPainter(self)
-        self.style().drawPrimitive(QStyle.PE_Widget, opt, p, self)
+    def setVisible(self, toggle):
+        super().setVisible(toggle)
+        if toggle:
+            self.timer.start(4000)
 
-    def close_notification(self, notif):
-        self.widget_layout.layout().removeWidget(notif)
-        notif.hide()
-        notif.setParent(None)
+    def _set_seen(self):
+        for i in range(self.widget_layout.layout().count() - 1):
+            item = self.widget_layout.layout().itemAt(i)
+            if item and item.widget():
+                item.widget().seen = True
+
+    def new_notification(self, notif_type, msg):
+        n = create_notification(notif_type, msg)
+        if n:
+            self.widget_layout.layout().insertWidget(0, n)
+            self.notif_count += 1
+            self.notification_count_updated.emit(self.notif_count)
+            if self.timer.isActive():
+                self.timer.start(4000)
 
     def clear(self):
         while self.widget_layout.layout().count() > 1:
@@ -49,17 +46,3 @@ class NotificationCenterWidget(QWidget, Ui_NotificationCenterWidget):
             if item.widget():
                 item.widget().hide()
                 item.widget().setParent(None)
-
-    def add_notification(self, notif_type, msg):
-        widget = None
-        if notif_type == "ERROR":
-            widget = ErrorNotificationWidget()
-        elif notif_type == "WARNING":
-            widget = WarningNotificationWidget()
-        elif notif_type == "INFO":
-            widget = InfoNotificationWidget()
-        if not widget:
-            return
-        widget.message = msg
-        self.widget_layout.layout().insertWidget(0, widget)
-        widget.close_clicked.connect(self.close_notification)
