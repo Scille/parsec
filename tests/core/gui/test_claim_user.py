@@ -65,7 +65,6 @@ async def _gui_ready_for_claim(aqtbot, gui, invitation, monkeypatch, qt_thread_g
     return claim_w
 
 
-@pytest.mark.skip("Uncertainties")
 @pytest.mark.gui
 @pytest.mark.trio
 async def test_claim_user_missing_fields(
@@ -87,6 +86,8 @@ async def test_claim_user_missing_fields(
             if win.objectName() == "GreyedDialog":
                 dialog = win
                 break
+        else:
+            raise RuntimeError("Greyed dialog not found")
         assert dialog is not None
         w = dialog.center_widget
         assert w is not None
@@ -115,7 +116,6 @@ async def test_claim_user_missing_fields(
     assert ruw.button_claim.isEnabled() is False
 
 
-@pytest.mark.skip("Uncertainties")
 @pytest.mark.gui
 @pytest.mark.trio
 async def test_claim_user(
@@ -124,14 +124,16 @@ async def test_claim_user(
     claim_w = await _gui_ready_for_claim(aqtbot, gui, alice_invite, monkeypatch, qt_thread_gateway)
 
     autoclose_dialog.dialogs = []
-    async with aqtbot.wait_signal(claim_w.user_claimed):
+    async with aqtbot.wait_signal(claim_w.claim_success):
         await aqtbot.mouse_click(claim_w.button_claim, QtCore.Qt.LeftButton)
     assert len(autoclose_dialog.dialogs) == 1
     assert autoclose_dialog.dialogs[0][0] == ""
-    assert autoclose_dialog.dialogs[0][1] == "YES"
+    assert (
+        autoclose_dialog.dialogs[0][1]
+        == "The user has been successfully created! You can now log in."
+    )
 
 
-@pytest.mark.skip("Uncertainties")
 @pytest.mark.gui
 @pytest.mark.trio
 async def test_claim_user_offline(
@@ -145,10 +147,13 @@ async def test_claim_user_offline(
 
     assert len(autoclose_dialog.dialogs) == 2
     assert autoclose_dialog.dialogs[1][0] == "Error"
-    assert autoclose_dialog.dialogs[1][1] == "NOP"
+    assert (
+        autoclose_dialog.dialogs[1][1]
+        == "The server is offline or you have no access to the internet."
+    )
 
 
-@pytest.mark.skip("Uncertainties")
+@pytest.mark.skip("TODO: investigate *_unknow_error tests")
 @pytest.mark.gui
 @pytest.mark.trio
 async def test_claim_user_unknown_error(
@@ -170,7 +175,7 @@ async def test_claim_user_unknown_error(
     assert autoclose_dialog.dialogs[1][1] == "An unknown error occurred while registering the user."
 
 
-@pytest.mark.skip("Uncertainties")
+@pytest.mark.skip("TODO: investigate *_with_start_arg tests")
 @pytest.mark.gui
 @pytest.mark.trio
 async def test_claim_user_with_start_arg(aqtbot, event_bus, core_config, gui_factory):

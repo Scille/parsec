@@ -33,6 +33,8 @@ async def _gui_ready_for_bootstrap(aqtbot, gui, running_backend, monkeypatch, qt
         if win.objectName() == "GreyedDialog":
             dialog = win
             break
+    else:
+        raise RuntimeError("GreyedDialog not found")
 
     bw = dialog.center_widget
     await aqtbot.key_clicks(bw.line_edit_login, user_id)
@@ -42,7 +44,6 @@ async def _gui_ready_for_bootstrap(aqtbot, gui, running_backend, monkeypatch, qt
     return bw
 
 
-@pytest.mark.skip("Too many incertainties in the order everything is done")
 @pytest.mark.gui
 @pytest.mark.trio
 async def test_bootstrap_organization(
@@ -63,7 +64,6 @@ async def test_bootstrap_organization(
     )
 
 
-@pytest.mark.skip("Too many incertainties in the order everything is done")
 @pytest.mark.gui
 @pytest.mark.trio
 async def test_bootstrap_org_missing_fields(
@@ -131,7 +131,7 @@ async def test_bootstrap_organization_backend_offline(
         )
 
 
-@pytest.mark.skip("Error modal is not opened")
+@pytest.mark.skip("TODO: investigate *_unknow_error tests")
 @pytest.mark.gui
 @pytest.mark.trio
 async def test_bootstrap_organization_unknown_error(
@@ -159,6 +159,7 @@ async def test_bootstrap_organization_unknown_error(
 
 
 @pytest.mark.skip(
+    "TODO: investigate *_unknow_error tests\n"
     "The dialog doesnt close. Everything goes perfectly fine, but we have to close it manually, even if the wait signal and the button click are performed. No idea."
 )
 @pytest.mark.gui

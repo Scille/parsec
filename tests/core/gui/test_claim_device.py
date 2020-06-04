@@ -54,6 +54,9 @@ async def _gui_ready_for_claim(aqtbot, gui, invitation, monkeypatch, qt_thread_g
         if win.objectName() == "GreyedDialog":
             dialog = win
             break
+    else:
+        raise RuntimeError("Greyes dialog not found")
+
     assert dialog is not None
     claim_w = dialog.center_widget
     assert claim_w is not None
@@ -63,7 +66,6 @@ async def _gui_ready_for_claim(aqtbot, gui, invitation, monkeypatch, qt_thread_g
     return claim_w
 
 
-@pytest.mark.skip("Uncertainties")
 @pytest.mark.gui
 @pytest.mark.trio
 async def test_claim_device_missing_fields(
@@ -110,7 +112,6 @@ async def test_claim_device_missing_fields(
     assert rdw.button_claim.isEnabled() is False
 
 
-@pytest.mark.skip("Uncertainties")
 @pytest.mark.gui
 @pytest.mark.trio
 async def test_claim_device(
@@ -124,7 +125,6 @@ async def test_claim_device(
     assert autoclose_dialog.dialogs[1][1] == "Your device was successfully registered!"
 
 
-@pytest.mark.skip("Uncertainties")
 @pytest.mark.gui
 @pytest.mark.trio
 async def test_claim_device_offline(
@@ -144,7 +144,7 @@ async def test_claim_device_offline(
     )
 
 
-@pytest.mark.skip("NOP")
+@pytest.mark.skip("TODO: investigate *_unknow_error tests")
 @pytest.mark.gui
 @pytest.mark.trio
 async def test_claim_device_unknown_error(
@@ -164,7 +164,7 @@ async def test_claim_device_unknown_error(
     assert autoclose_dialog.dialogs[1][1] == "RENOP"
 
 
-@pytest.mark.skip("Nop")
+@pytest.mark.skip("TODO: investigate *_with_start_arg tests")
 @pytest.mark.gui
 @pytest.mark.trio
 async def test_claim_device_with_start_arg(event_bus, core_config, gui_factory):
