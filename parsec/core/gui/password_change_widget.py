@@ -1,17 +1,13 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-from PyQt5.QtWidgets import QWidget, QApplication
-
+from PyQt5.QtWidgets import QApplication, QWidget
 from structlog import get_logger
 
-from parsec.core.local_device import get_key_file, change_device_password, LocalDeviceCryptoError
-
-from parsec.core.gui.password_validation import PasswordStrengthWidget, get_password_strength
-from parsec.core.gui.custom_dialogs import show_error, show_info, GreyedDialog
+from parsec.core.gui.custom_dialogs import GreyedDialog, show_error, show_info
 from parsec.core.gui.lang import translate as _
-
+from parsec.core.gui.password_validation import PasswordStrengthWidget, get_password_strength
 from parsec.core.gui.ui.password_change_widget import Ui_PasswordChangeWidget
-
+from parsec.core.local_device import LocalDeviceCryptoError, change_device_password, get_key_file
 
 logger = get_logger()
 

@@ -1,16 +1,16 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-from typing import List, Tuple, Optional
-from uuid import UUID
 from enum import Enum
 from secrets import token_bytes
+from typing import List, Optional, Tuple
+from uuid import UUID
 
-from parsec.crypto import SigningKey, VerifyKey, CryptoError
-from parsec.serde import BaseSchema, OneOfSchema, fields, validate
-from parsec.api.protocol.base import ProtocolError, InvalidMessageError, serializer_factory
-from parsec.api.protocol.types import OrganizationID, DeviceID, OrganizationIDField, DeviceIDField
+from parsec.api.protocol.base import InvalidMessageError, ProtocolError, serializer_factory
 from parsec.api.protocol.invite import InvitationType, InvitationTypeField
-from parsec.api.version import ApiVersion, API_V1_VERSION, API_V2_VERSION
+from parsec.api.protocol.types import DeviceID, DeviceIDField, OrganizationID, OrganizationIDField
+from parsec.api.version import API_V1_VERSION, API_V2_VERSION, ApiVersion
+from parsec.crypto import CryptoError, SigningKey, VerifyKey
+from parsec.serde import BaseSchema, OneOfSchema, fields, validate
 
 
 class HandshakeError(ProtocolError):

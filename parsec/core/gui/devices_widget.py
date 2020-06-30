@@ -1,17 +1,17 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-from PyQt5.QtCore import pyqtSignal, Qt, QTimer
-from PyQt5.QtWidgets import QWidget, QMenu, QGraphicsDropShadowEffect
+from PyQt5.QtCore import Qt, QTimer, pyqtSignal
 from PyQt5.QtGui import QColor
+from PyQt5.QtWidgets import QGraphicsDropShadowEffect, QMenu, QWidget
 
-from parsec.core.gui.trio_thread import JobResultError, ThreadSafeQtSignal, QtToTrioJob
+from parsec.core.backend_connection import BackendNotAvailable
+from parsec.core.gui.flow_layout import FlowLayout
+from parsec.core.gui.invite_device_widget import InviteDeviceWidget
 from parsec.core.gui.lang import translate as _
 from parsec.core.gui.password_change_widget import PasswordChangeWidget
-from parsec.core.gui.flow_layout import FlowLayout
-from parsec.core.gui.ui.devices_widget import Ui_DevicesWidget
-from parsec.core.gui.invite_device_widget import InviteDeviceWidget
+from parsec.core.gui.trio_thread import JobResultError, QtToTrioJob, ThreadSafeQtSignal
 from parsec.core.gui.ui.device_button import Ui_DeviceButton
-from parsec.core.backend_connection import BackendNotAvailable
+from parsec.core.gui.ui.devices_widget import Ui_DevicesWidget
 
 
 class DeviceButton(QWidget, Ui_DeviceButton):

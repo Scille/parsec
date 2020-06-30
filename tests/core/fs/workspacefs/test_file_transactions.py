@@ -1,23 +1,23 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
 import os
-import pytest
-from pendulum import Pendulum
 from pathlib import Path
+
+import pytest
+from hypothesis import strategies as st
 from hypothesis_trio.stateful import (
+    TrioAsyncioRuleBasedStateMachine,
     initialize,
     rule,
     run_state_machine_as_test,
-    TrioAsyncioRuleBasedStateMachine,
 )
-from hypothesis import strategies as st
+from pendulum import Pendulum
 
-from parsec.core.types import EntryID, LocalFileManifest, Chunk
+from parsec.core.fs.exceptions import FSRemoteBlockNotFound
 from parsec.core.fs.storage import WorkspaceStorage
 from parsec.core.fs.workspacefs.file_transactions import FSInvalidFileDescriptor
-from parsec.core.fs.exceptions import FSRemoteBlockNotFound
-
-from tests.common import freeze_time, call_with_control
+from parsec.core.types import Chunk, EntryID, LocalFileManifest
+from tests.common import call_with_control, freeze_time
 
 
 class File:

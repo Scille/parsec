@@ -3,10 +3,10 @@
 import pytest
 
 from parsec.api.data import UserProfile
-from parsec.api.protocol import OrganizationID, HumanHandle
+from parsec.api.protocol import HumanHandle, OrganizationID
 from parsec.core.backend_connection import apiv1_backend_anonymous_cmds_factory
+from parsec.core.invite import InviteAlreadyUsedError, InviteNotFoundError, bootstrap_organization
 from parsec.core.types import BackendOrganizationBootstrapAddr
-from parsec.core.invite import bootstrap_organization, InviteNotFoundError, InviteAlreadyUsedError
 
 
 @pytest.mark.trio

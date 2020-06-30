@@ -1,12 +1,13 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
 import os
-import re
-import pytest
-import psutil
 import pathlib
-import tempfile
+import re
 import subprocess
+import tempfile
+
+import psutil
+import pytest
 
 from parsec.core.config import config_factory
 from parsec.core.local_device import list_available_devices

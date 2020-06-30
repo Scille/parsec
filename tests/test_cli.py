@@ -1,31 +1,32 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-import re
 import os
-from pathlib import Path
-from functools import partial
-
-try:
-    import fcntl
-except ModuleNotFoundError:  # Not available on Windows
-    pass
-import sys
+import re
 import subprocess
-from time import sleep
+import sys
 from contextlib import contextmanager
+from functools import partial
+from pathlib import Path
+from time import sleep
 from unittest.mock import ANY, MagicMock, patch
 
 import attr
 import pytest
 import trustme
-from click.testing import CliRunner
 from async_generator import asynccontextmanager
+from click.testing import CliRunner
 
 from parsec import __version__ as parsec_version
-from parsec.api.protocol import OrganizationID, DeviceID
+from parsec.api.protocol import DeviceID, OrganizationID
 from parsec.backend.postgresql import MigrationItem
-from parsec.core.local_device import save_device_with_password, list_available_devices
 from parsec.cli import cli
+from parsec.core.local_device import list_available_devices, save_device_with_password
+
+try:
+    import fcntl
+except ModuleNotFoundError:  # Not available on Windows
+    pass
+
 
 CWD = Path(__file__).parent.parent
 

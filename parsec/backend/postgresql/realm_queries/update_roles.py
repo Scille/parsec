@@ -1,33 +1,33 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
 from typing import Optional
+
 from pypika import Parameter
 from pypika.enums import Order
 
-from parsec.backend.backend_events import BackendEvent
 from parsec.api.data import UserProfile
 from parsec.api.protocol import OrganizationID, RealmRole
-from parsec.backend.realm import (
-    RealmGrantedRole,
-    RealmAccessError,
-    RealmIncompatibleProfileError,
-    RealmRoleAlreadyGranted,
-    RealmNotFoundError,
-    RealmInMaintenanceError,
-)
+from parsec.backend.backend_events import BackendEvent
 from parsec.backend.postgresql.handler import send_signal
-from parsec.backend.postgresql.utils import query
 from parsec.backend.postgresql.message import send_message
 from parsec.backend.postgresql.tables import (
     STR_TO_REALM_ROLE,
-    q_realm_internal_id,
+    q_device_internal_id,
     q_realm,
+    q_realm_internal_id,
     q_realm_user_role,
     q_user,
     q_user_internal_id,
-    q_device_internal_id,
 )
-
+from parsec.backend.postgresql.utils import query
+from parsec.backend.realm import (
+    RealmAccessError,
+    RealmGrantedRole,
+    RealmIncompatibleProfileError,
+    RealmInMaintenanceError,
+    RealmNotFoundError,
+    RealmRoleAlreadyGranted,
+)
 
 _q_get_user_profile = (
     q_user(organization_id=Parameter("$1"), user_id=Parameter("$2")).select("profile")

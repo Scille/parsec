@@ -1,21 +1,21 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-from parsec.core.core_events import CoreEvent
-import pytest
 from unittest.mock import ANY
+
+import pytest
 from pendulum import Pendulum
 
 from parsec.api.data import UserManifest, WorkspaceEntry
-from parsec.core.types import WorkspaceRole, LocalUserManifest, EntryID
-from parsec.core.fs import (
-    FSError,
-    FSWorkspaceNotFoundError,
-    FSBackendOfflineError,
-    FSSharingNotAllowedError,
-)
 from parsec.backend.realm import RealmGrantedRole, RealmRole
-
-from tests.common import freeze_time, create_shared_workspace
+from parsec.core.core_events import CoreEvent
+from parsec.core.fs import (
+    FSBackendOfflineError,
+    FSError,
+    FSSharingNotAllowedError,
+    FSWorkspaceNotFoundError,
+)
+from parsec.core.types import EntryID, LocalUserManifest, WorkspaceRole
+from tests.common import create_shared_workspace, freeze_time
 
 
 @pytest.mark.trio

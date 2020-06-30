@@ -4,8 +4,7 @@ import pytest
 
 from parsec.api.data import UserProfile
 from parsec.api.protocol import human_find_serializer
-
-from tests.common import freeze_time, customize_fixtures
+from tests.common import customize_fixtures, freeze_time
 
 
 async def human_find(sock, query=None, omit_revoked=False, omit_non_human=False, **kwargs):

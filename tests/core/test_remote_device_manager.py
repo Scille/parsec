@@ -4,7 +4,6 @@ import pytest
 from pendulum import Pendulum
 
 from parsec.core.remote_devices_manager import RemoteDevicesManagerBackendOfflineError
-
 from tests.common import freeze_time
 
 

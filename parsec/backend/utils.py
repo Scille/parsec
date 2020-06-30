@@ -1,17 +1,17 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-import trio
 from functools import wraps
-from typing import Union, List
+from typing import List, Union
+
+import trio
 
 from parsec.api.protocol import (
-    ProtocolError,
-    InvalidMessageError,
-    HandshakeType,
     APIV1_HandshakeType,
+    HandshakeType,
+    InvalidMessageError,
+    ProtocolError,
 )
 from parsec.api.version import API_V1_VERSION, API_V2_VERSION
-
 
 ALLOWED_API_VERSIONS = {API_V1_VERSION.version, API_V2_VERSION.version}
 

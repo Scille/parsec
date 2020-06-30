@@ -1,17 +1,18 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-import pytest
-from pendulum import now as pendulum_now
 import zlib
 
-from parsec.serde import packb, unpackb
+import pytest
+from pendulum import now as pendulum_now
+
 from parsec.api.data import (
     DataError,
-    UserProfile,
-    UserCertificateContent,
     DeviceCertificateContent,
     RevokedUserCertificateContent,
+    UserCertificateContent,
+    UserProfile,
 )
+from parsec.serde import packb, unpackb
 
 
 @pytest.fixture(autouse=True, scope="module")

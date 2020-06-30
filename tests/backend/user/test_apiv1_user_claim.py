@@ -1,20 +1,19 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-from parsec.backend.backend_events import BackendEvent
-from parsec.event_bus import MetaEvent
 import pytest
 import trio
-from pendulum import Pendulum
 from async_generator import asynccontextmanager
+from pendulum import Pendulum
 
 from parsec.api.protocol import (
-    UserID,
     DeviceID,
-    apiv1_user_get_invitation_creator_serializer,
+    UserID,
     apiv1_user_claim_serializer,
+    apiv1_user_get_invitation_creator_serializer,
 )
-from parsec.backend.user import User, Device, UserInvitation, PEER_EVENT_MAX_WAIT
-
+from parsec.backend.backend_events import BackendEvent
+from parsec.backend.user import PEER_EVENT_MAX_WAIT, Device, User, UserInvitation
+from parsec.event_bus import MetaEvent
 from tests.common import freeze_time
 
 

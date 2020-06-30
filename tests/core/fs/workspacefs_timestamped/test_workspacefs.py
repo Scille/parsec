@@ -3,8 +3,8 @@
 import pytest
 from pendulum import Pendulum
 
-from parsec.core.types import FsPath
 from parsec.core.fs import FSError
+from parsec.core.types import FsPath
 
 
 def _day(d):

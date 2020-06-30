@@ -1,11 +1,11 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-from parsec.core.core_events import CoreEvent
 import pytest
 from PyQt5 import QtCore
 
-from parsec.core.local_device import save_device_with_password
+from parsec.core.core_events import CoreEvent
 from parsec.core.fs import FSWorkspaceNoReadAccess
+from parsec.core.local_device import save_device_with_password
 
 
 @pytest.fixture

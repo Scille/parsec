@@ -1,10 +1,10 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
 from functools import partial
+
 import pytest
 
 from parsec.core.types import FsPath
-
 from tests.common import create_shared_workspace
 
 

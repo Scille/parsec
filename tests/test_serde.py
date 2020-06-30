@@ -1,23 +1,22 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-import pytest
-import pendulum
 import uuid
 from collections import namedtuple
+from enum import Enum
+
+import pendulum
+import pytest
 
 from parsec.serde import (
+    BaseSchema,
+    MsgpackSerializer,
+    OneOfSchema,
+    SerdeError,
+    fields,
     packb,
     unpackb,
-    BaseSchema,
-    OneOfSchema,
-    MsgpackSerializer,
-    fields,
-    SerdeError,
 )
-
 from parsec.serde.schema import OneOfSchemaLegacy
-
-from enum import Enum
 
 
 def test_pack_datetime():

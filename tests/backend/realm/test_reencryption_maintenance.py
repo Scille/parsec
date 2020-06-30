@@ -2,24 +2,24 @@
 
 import pytest
 import trio
-from pendulum import Pendulum, now as pendulum_now
+from pendulum import Pendulum
+from pendulum import now as pendulum_now
 
+from parsec.api.protocol import APIEvent, MaintenanceType, RealmRole
 from parsec.backend.backend_events import BackendEvent
-from parsec.api.protocol import RealmRole, MaintenanceType, APIEvent
 from parsec.backend.realm import RealmGrantedRole
-
-from tests.common import freeze_time
-from tests.backend.test_message import message_get
 from tests.backend.common import (
-    realm_status,
-    realm_start_reencryption_maintenance,
+    events_listen_nowait,
+    events_subscribe,
     realm_finish_reencryption_maintenance,
-    vlob_read,
+    realm_start_reencryption_maintenance,
+    realm_status,
     vlob_maintenance_get_reencryption_batch,
     vlob_maintenance_save_reencryption_batch,
-    events_subscribe,
-    events_listen_nowait,
+    vlob_read,
 )
+from tests.backend.test_message import message_get
+from tests.common import freeze_time
 
 
 @pytest.mark.trio

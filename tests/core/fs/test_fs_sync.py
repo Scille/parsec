@@ -1,15 +1,15 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-from parsec.core.core_events import CoreEvent
-import pytest
-from pendulum import Pendulum
 from unittest.mock import ANY
 
-from parsec.core.types import WorkspaceEntry, WorkspaceRole
-from parsec.core.backend_connection import BackendNotAvailable
-from parsec.core.fs.exceptions import FSBackendOfflineError
+import pytest
+from pendulum import Pendulum
 
-from tests.common import freeze_time, create_shared_workspace
+from parsec.core.backend_connection import BackendNotAvailable
+from parsec.core.core_events import CoreEvent
+from parsec.core.fs.exceptions import FSBackendOfflineError
+from parsec.core.types import WorkspaceEntry, WorkspaceRole
+from tests.common import create_shared_workspace, freeze_time
 
 
 async def assert_same_workspace(workspace, workspace2):

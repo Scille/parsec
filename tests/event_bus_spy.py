@@ -1,11 +1,12 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-import trio
+from contextlib import contextmanager
+from enum import Enum
+from unittest.mock import ANY
+
 import attr
 import pendulum
-from contextlib import contextmanager
-from unittest.mock import ANY
-from enum import Enum
+import trio
 
 from parsec.event_bus import EventBus
 

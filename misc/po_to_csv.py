@@ -2,11 +2,11 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
 
-import csv
 import argparse
+import csv
 import os
-from babel.messages.pofile import read_po
 
+from babel.messages.pofile import read_po
 
 TR_DIR = "parsec/core/gui/tr"
 TR_FILES = {"en": "parsec_en.po", "fr": "parsec_fr.po"}

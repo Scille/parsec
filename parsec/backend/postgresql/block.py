@@ -1,37 +1,37 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-from triopg.exceptions import UniqueViolationError
 from uuid import UUID
+
 import pendulum
 from pypika import Parameter
+from triopg.exceptions import UniqueViolationError
 
 from parsec.api.protocol import DeviceID, OrganizationID
-from parsec.backend.vlob import BaseVlobComponent
-from parsec.backend.blockstore import BaseBlockStoreComponent
 from parsec.backend.block import (
     BaseBlockComponent,
-    BlockError,
-    BlockAlreadyExistsError,
-    BlockNotFoundError,
     BlockAccessError,
+    BlockAlreadyExistsError,
+    BlockError,
     BlockInMaintenanceError,
+    BlockNotFoundError,
 )
+from parsec.backend.blockstore import BaseBlockStoreComponent
 from parsec.backend.postgresql.handler import PGHandler
-from parsec.backend.postgresql.utils import Query, fn_exists
+from parsec.backend.postgresql.realm_queries.maintenance import RealmNotFoundError, get_realm_status
 from parsec.backend.postgresql.tables import (
-    t_block,
-    t_block_data,
     q_block,
+    q_device_internal_id,
+    q_organization_internal_id,
     q_realm,
+    q_realm_internal_id,
     q_user_can_read_vlob,
     q_user_can_write_vlob,
     q_user_internal_id,
-    q_realm_internal_id,
-    q_organization_internal_id,
-    q_device_internal_id,
+    t_block,
+    t_block_data,
 )
-from parsec.backend.postgresql.realm_queries.maintenance import get_realm_status, RealmNotFoundError
-
+from parsec.backend.postgresql.utils import Query, fn_exists
+from parsec.backend.vlob import BaseVlobComponent
 
 _q_get_realm_id_from_block_id = (
     q_block(organization_id=Parameter("$1"), block_id=Parameter("$2"))

@@ -1,26 +1,27 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-from typing import Tuple, Dict, Optional
+from typing import Dict, Optional, Tuple
+
 from pendulum import now as pendulum_now
 
-from parsec.api.transport import Transport
 from parsec.api.protocol import (
-    ProtocolError,
-    InvitationType,
-    HandshakeType,
     APIV1_HandshakeType,
+    HandshakeType,
+    InvitationType,
+    ProtocolError,
     ServerHandshake,
 )
+from parsec.api.transport import Transport
 from parsec.backend.client_context import (
-    BaseClientContext,
-    AuthenticatedClientContext,
-    InvitedClientContext,
-    APIV1_AnonymousClientContext,
     APIV1_AdministrationClientContext,
+    APIV1_AnonymousClientContext,
+    AuthenticatedClientContext,
+    BaseClientContext,
+    InvitedClientContext,
 )
-from parsec.backend.user import UserNotFoundError
+from parsec.backend.invite import DeviceInvitation, InvitationError, UserInvitation
 from parsec.backend.organization import OrganizationNotFoundError
-from parsec.backend.invite import InvitationError, UserInvitation, DeviceInvitation
+from parsec.backend.user import UserNotFoundError
 
 
 async def do_handshake(

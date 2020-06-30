@@ -5,10 +5,9 @@ import time
 import trio
 from async_generator import asynccontextmanager
 
-from parsec.core.types import ChunkID
 from parsec.core.fs.exceptions import FSLocalMissError
-from parsec.core.types import LocalDevice, DEFAULT_BLOCK_SIZE
 from parsec.core.fs.storage.local_database import LocalDatabase
+from parsec.core.types import DEFAULT_BLOCK_SIZE, ChunkID, LocalDevice
 
 
 class ChunkStorage:

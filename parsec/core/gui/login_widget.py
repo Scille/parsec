@@ -1,12 +1,12 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-from PyQt5.QtCore import pyqtSignal, Qt
+from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtWidgets import QWidget
 
-from parsec.core.local_device import list_available_devices
 from parsec.core.gui.lang import translate as _
 from parsec.core.gui.parsec_application import ParsecApp
 from parsec.core.gui.ui.login_widget import Ui_LoginWidget
+from parsec.core.local_device import list_available_devices
 
 
 class LoginWidget(QWidget, Ui_LoginWidget):

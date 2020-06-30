@@ -1,25 +1,26 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
 import pytest
-from pendulum import now as pendulum_now
-from hypothesis import strategies as st, note
+from hypothesis import note
+from hypothesis import strategies as st
 from hypothesis.stateful import (
-    run_state_machine_as_test,
     Bundle,
-    precondition,
-    initialize,
-    rule,
-    consumes,
     RuleBasedStateMachine,
+    consumes,
+    initialize,
+    precondition,
+    rule,
+    run_state_machine_as_test,
 )
+from pendulum import now as pendulum_now
 
-from parsec.api.protocol import UserID
 from parsec.api.data import (
-    UserProfile,
-    UserCertificateContent,
-    RevokedUserCertificateContent,
     DeviceCertificateContent,
+    RevokedUserCertificateContent,
+    UserCertificateContent,
+    UserProfile,
 )
+from parsec.api.protocol import UserID
 from parsec.core.trustchain import TrustchainContext
 
 

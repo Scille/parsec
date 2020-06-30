@@ -3,9 +3,9 @@
 import pytest
 import trio
 
-from tests.backend.common import events_subscribe, events_listen, events_listen_nowait, ping
 from parsec.api.protocol import APIEvent
 from parsec.backend.backend_events import BackendEvent
+from tests.backend.common import events_listen, events_listen_nowait, events_subscribe, ping
 
 
 @pytest.mark.trio

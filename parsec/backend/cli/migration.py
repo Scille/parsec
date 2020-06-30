@@ -2,9 +2,9 @@
 
 import click
 
-from parsec.utils import trio_run
-from parsec.cli_utils import spinner, cli_exception_handler, ok, ko
 from parsec.backend.postgresql import apply_migrations, retrieve_migrations
+from parsec.cli_utils import cli_exception_handler, ko, ok, spinner
+from parsec.utils import trio_run
 
 
 def _validate_postgres_db_url(ctx, param, value):

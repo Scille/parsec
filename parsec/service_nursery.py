@@ -5,8 +5,8 @@ This `open_service_nursery` implementation is taken from @oremanj gist:
 https://gist.github.com/oremanj/8c137d7b1f820d441fbd32fb584e06fd
 """
 
-import weakref
 import collections
+import weakref
 from functools import partial
 from typing import Any, AsyncIterator, Awaitable, Callable, MutableSet, Optional
 

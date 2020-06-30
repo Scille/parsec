@@ -1,13 +1,14 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-import trio
 import threading
 from unittest.mock import MagicMock
 
+import trio
+
 from parsec.core.gui.trio_thread import (
-    run_trio_thread,
-    ThreadSafeQtSignal,
     JobSchedulerNotAvailable,
+    ThreadSafeQtSignal,
+    run_trio_thread,
 )
 
 

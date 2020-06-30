@@ -4,8 +4,8 @@ import pathlib
 from enum import IntEnum
 
 from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QColor, QIcon, QPainter
 from PyQt5.QtWidgets import QTableWidgetItem
-from PyQt5.QtGui import QIcon, QPainter, QColor
 
 from parsec.core.gui.custom_widgets import Pixmap
 

@@ -1,40 +1,43 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-from parsec.core.core_events import CoreEvent
 import pathlib
+from enum import IntEnum
 from uuid import UUID
+
 import trio
 from pendulum import Pendulum
-from enum import IntEnum
+from PyQt5.QtCore import Qt, QTimer, pyqtSignal
+from PyQt5.QtWidgets import QFileDialog, QWidget
 from structlog import get_logger
 
-from PyQt5.QtCore import Qt, pyqtSignal, QTimer
-from PyQt5.QtWidgets import QFileDialog, QWidget
-
-from parsec.core.types import FsPath, WorkspaceEntry, WorkspaceRole, BackendOrganizationFileLinkAddr
+from parsec.core.core_events import CoreEvent
 from parsec.core.fs import WorkspaceFS, WorkspaceFSTimestamped
 from parsec.core.fs.exceptions import (
-    FSRemoteManifestNotFound,
-    FSInvalidArgumentError,
     FSFileNotFoundError,
+    FSInvalidArgumentError,
+    FSRemoteManifestNotFound,
 )
-
-from parsec.core.gui.trio_thread import JobResultError, ThreadSafeQtSignal, QtToTrioJob
 from parsec.core.gui import desktop
-from parsec.core.gui.file_items import FileType, TYPE_DATA_INDEX, UUID_DATA_INDEX
 from parsec.core.gui.custom_dialogs import (
-    ask_question,
-    show_error,
-    get_text_input,
-    show_info,
     GreyedDialog,
+    ask_question,
+    get_text_input,
+    show_error,
+    show_info,
 )
 from parsec.core.gui.file_history_widget import FileHistoryWidget
-from parsec.core.gui.loading_widget import LoadingWidget
+from parsec.core.gui.file_items import TYPE_DATA_INDEX, UUID_DATA_INDEX, FileType
 from parsec.core.gui.lang import translate as _
+from parsec.core.gui.loading_widget import LoadingWidget
+from parsec.core.gui.trio_thread import JobResultError, QtToTrioJob, ThreadSafeQtSignal
 from parsec.core.gui.ui.files_widget import Ui_FilesWidget
-from parsec.core.types import DEFAULT_BLOCK_SIZE
-
+from parsec.core.types import (
+    DEFAULT_BLOCK_SIZE,
+    BackendOrganizationFileLinkAddr,
+    FsPath,
+    WorkspaceEntry,
+    WorkspaceRole,
+)
 
 logger = get_logger()
 

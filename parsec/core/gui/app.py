@@ -1,27 +1,25 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-from parsec.core.core_events import CoreEvent
-
-import sys
 import signal
-from queue import Queue
+import sys
 from contextlib import contextmanager
+from queue import Queue
 
 import trio
+from PyQt5.QtCore import Qt, QTimer
+from PyQt5.QtWidgets import QApplication
 from structlog import get_logger
 
-from PyQt5.QtCore import QTimer, Qt
-from PyQt5.QtWidgets import QApplication
-
 from parsec.core.config import CoreConfig
-from parsec.event_bus import EventBus
+from parsec.core.core_events import CoreEvent
 from parsec.core.ipcinterface import (
-    run_ipc_server,
-    send_to_ipc_server,
+    IPCCommand,
     IPCServerAlreadyRunning,
     IPCServerNotRunning,
-    IPCCommand,
+    run_ipc_server,
+    send_to_ipc_server,
 )
+from parsec.event_bus import EventBus
 
 try:
     from parsec.core.gui import lang

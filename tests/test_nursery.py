@@ -1,7 +1,8 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-import trio
 import pytest
+import trio
+
 import parsec
 
 # Importing parsec is enough to add open_service_nursery to trio

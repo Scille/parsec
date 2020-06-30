@@ -1,35 +1,36 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-import click
 import platform
-from uuid import UUID
 from functools import partial
+from uuid import UUID
 
-from parsec.utils import trio_run
-from parsec.cli_utils import cli_exception_handler, spinner, operation, aprompt
+import click
+
 from parsec.api.data import UserProfile
 from parsec.api.protocol import (
     HumanHandle,
+    InvitationDeletedReason,
     InvitationStatus,
     InvitationType,
-    InvitationDeletedReason,
 )
-from parsec.core.types import BackendInvitationAddr
+from parsec.cli_utils import aprompt, cli_exception_handler, operation, spinner
 from parsec.core.backend_connection import (
+    BackendConnectionRefused,
     backend_authenticated_cmds_factory,
     backend_invited_cmds_factory,
-    BackendConnectionRefused,
 )
+from parsec.core.cli.utils import core_config_and_device_options, core_config_options
 from parsec.core.invite import (
-    InviteError,
     DeviceClaimInitialCtx,
     DeviceGreetInitialCtx,
+    InviteError,
     UserClaimInitialCtx,
     UserGreetInitialCtx,
     claimer_retrieve_info,
 )
 from parsec.core.local_device import save_device_with_password
-from parsec.core.cli.utils import core_config_and_device_options, core_config_options
+from parsec.core.types import BackendInvitationAddr
+from parsec.utils import trio_run
 
 
 async def _invite_device(config, device):

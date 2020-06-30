@@ -1,12 +1,10 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-from zxcvbn import zxcvbn
 from PyQt5.QtWidgets import QWidget
+from zxcvbn import zxcvbn
 
 from parsec.core.gui.lang import translate as _
-
 from parsec.core.gui.ui.password_strength_widget import Ui_PasswordStrengthWidget
-
 
 PASSWORD_CSS = {
     0: "color: #333333; background-color: none;",

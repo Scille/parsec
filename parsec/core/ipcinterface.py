@@ -1,24 +1,24 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
 import platform
-import trio
-from functools import partial
 from contextlib import contextmanager
+from enum import Enum
+from functools import partial
+from pathlib import Path
+
+import trio
 from async_generator import asynccontextmanager
 from structlog import get_logger
-from pathlib import Path
-from enum import Enum
 
 from parsec.serde import (
     BaseSchema,
+    MsgpackSerializer,
     OneOfSchema,
+    SerdeError,
+    Unpacker,
     fields,
     packb,
-    Unpacker,
-    SerdeError,
-    MsgpackSerializer,
 )
-
 
 logger = get_logger()
 

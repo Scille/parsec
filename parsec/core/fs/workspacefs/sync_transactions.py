@@ -1,29 +1,28 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-from parsec.core.core_events import CoreEvent
 from itertools import count
-from typing import Optional, List, Dict, Iterator
+from typing import Dict, Iterator, List, Optional
 
 from pendulum import now as pendulum_now
-from parsec.api.protocol import DeviceID
+
 from parsec.api.data import Manifest as RemoteManifest
+from parsec.api.protocol import DeviceID
+from parsec.core.core_events import CoreEvent
+from parsec.core.fs.exceptions import (
+    FSFileConflictError,
+    FSLocalMissError,
+    FSReshapingRequiredError,
+)
+from parsec.core.fs.utils import is_file_manifest
+from parsec.core.fs.workspacefs.entry_transactions import EntryTransactions
 from parsec.core.types import (
     Chunk,
     EntryID,
     EntryName,
-    LocalManifest,
     LocalFileManifest,
     LocalFolderishManifests,
+    LocalManifest,
 )
-
-from parsec.core.fs.workspacefs.entry_transactions import EntryTransactions
-from parsec.core.fs.exceptions import (
-    FSFileConflictError,
-    FSReshapingRequiredError,
-    FSLocalMissError,
-)
-
-from parsec.core.fs.utils import is_file_manifest
 
 __all__ = "SyncTransactions"
 

@@ -1,11 +1,11 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
 from typing import List, Tuple
+
 from pendulum import Pendulum
 
-from parsec.api.protocol import DeviceID, UserID, OrganizationID
-from parsec.api.protocol import message_get_serializer
-from parsec.backend.utils import catch_protocol_errors, api
+from parsec.api.protocol import DeviceID, OrganizationID, UserID, message_get_serializer
+from parsec.backend.utils import api, catch_protocol_errors
 
 
 class MessageError(Exception):

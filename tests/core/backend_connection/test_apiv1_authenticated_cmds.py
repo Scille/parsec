@@ -1,24 +1,23 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-import trio
-import pytest
 import pendulum
+import pytest
+import trio
 
-from parsec.api.transport import Transport, Ping, Pong
 from parsec.api.data import RevokedUserCertificateContent
 from parsec.api.protocol import (
-    ServerHandshake,
-    APIV1_HandshakeType,
     APIV1_AUTHENTICATED_CMDS,
     APIEvent,
+    APIV1_HandshakeType,
+    ServerHandshake,
 )
-from parsec.core.types import BackendOrganizationAddr
+from parsec.api.transport import Ping, Pong, Transport
 from parsec.core.backend_connection import (
-    BackendNotAvailable,
     BackendConnectionRefused,
+    BackendNotAvailable,
     apiv1_backend_authenticated_cmds_factory,
 )
-
+from parsec.core.types import BackendOrganizationAddr
 from tests.core.backend_connection.common import ALL_CMDS
 
 

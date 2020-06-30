@@ -3,7 +3,6 @@
 import typing
 from uuid import UUID, uuid4
 
-
 K = typing.TypeVar("K")
 V = typing.TypeVar("V")
 

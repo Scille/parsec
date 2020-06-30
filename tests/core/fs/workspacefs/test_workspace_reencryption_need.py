@@ -2,20 +2,19 @@
 
 import pytest
 from hypothesis_trio.stateful import (
-    initialize,
-    rule,
-    consumes,
-    invariant,
-    run_state_machine_as_test,
-    TrioAsyncioRuleBasedStateMachine,
     Bundle,
+    TrioAsyncioRuleBasedStateMachine,
+    consumes,
+    initialize,
+    invariant,
+    rule,
+    run_state_machine_as_test,
 )
 from pendulum import now as pendulum_now
 
-from parsec.api.protocol import RealmRole
 from parsec.api.data import RealmRoleCertificateContent
+from parsec.api.protocol import RealmRole
 from parsec.backend.realm import RealmGrantedRole
-
 from tests.common import call_with_control
 
 

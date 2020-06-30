@@ -1,43 +1,44 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-from parsec.backend.backend_events import BackendEvent
-import attr
-from enum import Enum
-from uuid import UUID, uuid4
 from collections import defaultdict
-from typing import Dict, List, Optional, Union, Set
-from pendulum import Pendulum, now as pendulum_now
+from enum import Enum
+from typing import Dict, List, Optional, Set, Union
+from uuid import UUID, uuid4
 
-from parsec.crypto import PublicKey
-from parsec.event_bus import EventBus
+import attr
+from pendulum import Pendulum
+from pendulum import now as pendulum_now
+
 from parsec.api.data import UserProfile
 from parsec.api.protocol import (
-    OrganizationID,
-    UserID,
-    HumanHandle,
     HandshakeType,
-    InvitationType,
+    HumanHandle,
     InvitationDeletedReason,
     InvitationStatus,
-    invite_new_serializer,
-    invite_delete_serializer,
-    invite_list_serializer,
-    invite_info_serializer,
+    InvitationType,
+    OrganizationID,
+    UserID,
     invite_1_claimer_wait_peer_serializer,
     invite_1_greeter_wait_peer_serializer,
     invite_2a_claimer_send_hashed_nonce_serializer,
     invite_2a_greeter_get_hashed_nonce_serializer,
-    invite_2b_greeter_send_nonce_serializer,
     invite_2b_claimer_send_nonce_serializer,
-    invite_3a_greeter_wait_peer_trust_serializer,
+    invite_2b_greeter_send_nonce_serializer,
     invite_3a_claimer_signify_trust_serializer,
+    invite_3a_greeter_wait_peer_trust_serializer,
     invite_3b_claimer_wait_peer_trust_serializer,
     invite_3b_greeter_signify_trust_serializer,
-    invite_4_greeter_communicate_serializer,
     invite_4_claimer_communicate_serializer,
+    invite_4_greeter_communicate_serializer,
+    invite_delete_serializer,
+    invite_info_serializer,
+    invite_list_serializer,
+    invite_new_serializer,
 )
-from parsec.backend.utils import catch_protocol_errors, api
-
+from parsec.backend.backend_events import BackendEvent
+from parsec.backend.utils import api, catch_protocol_errors
+from parsec.crypto import PublicKey
+from parsec.event_bus import EventBus
 
 PEER_EVENT_MAX_WAIT = 300  # 5mn
 

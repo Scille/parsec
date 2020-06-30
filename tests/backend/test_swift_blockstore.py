@@ -1,16 +1,14 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-from unittest.mock import Mock
 from unittest import mock
-import swiftclient
-from swiftclient.exceptions import ClientException
+from unittest.mock import Mock
+
 import pytest
+import swiftclient  # noqa
+from swiftclient.exceptions import ClientException  # noqa
 
 from parsec.backend.block import BlockAlreadyExistsError, BlockNotFoundError, BlockTimeoutError
 from parsec.backend.swift_blockstore import SwiftBlockStoreComponent
-
-import swiftclient  # noqa
-from swiftclient.exceptions import ClientException  # noqa
 
 
 @pytest.mark.trio

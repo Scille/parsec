@@ -1,16 +1,16 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
+from collections import defaultdict
+from random import choice, randrange
+from string import ascii_lowercase
+from time import monotonic
+
+import attr
 import pytest
 import trio
-import attr
-from time import monotonic
-from collections import defaultdict
-from random import randrange, choice
-from string import ascii_lowercase
 
 from parsec.core.fs import FSError
 from parsec.core.types import WorkspaceRole
-
 
 FUZZ_PARALLELISM = 10
 FUZZ_TIME = 10.0

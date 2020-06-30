@@ -1,19 +1,19 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-import pytest
-import pendulum
 from unittest.mock import ANY
 
-from parsec.api.data import UserCertificateContent, DeviceCertificateContent, UserProfile
+import pendulum
+import pytest
+
+from parsec.api.data import DeviceCertificateContent, UserCertificateContent, UserProfile
 from parsec.api.protocol import (
     UserID,
-    apiv1_organization_create_serializer,
     apiv1_organization_bootstrap_serializer,
+    apiv1_organization_create_serializer,
 )
 from parsec.api.protocol.handshake import HandshakeOrganizationExpired
-
-from tests.common import freeze_time
 from tests.backend.common import ping
+from tests.common import freeze_time
 from tests.fixtures import local_device_to_backend_user
 
 

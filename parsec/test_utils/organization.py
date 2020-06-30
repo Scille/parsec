@@ -2,35 +2,36 @@
 
 
 import os
-import trio
-from typing import Tuple
 from pathlib import Path
+from typing import Tuple
 
-from parsec.logging import configure_logging
-from parsec.core import logged_core_factory
+import trio
+
 from parsec.api.data import UserProfile
-from parsec.api.protocol import OrganizationID, HumanHandle, InvitationType
-from parsec.core.types import (
-    WorkspaceRole,
-    BackendAddr,
-    BackendOrganizationBootstrapAddr,
-    BackendInvitationAddr,
-    LocalDevice,
-)
-from parsec.core.config import load_config
+from parsec.api.protocol import HumanHandle, InvitationType, OrganizationID
+from parsec.core import logged_core_factory
 from parsec.core.backend_connection import (
     apiv1_backend_administration_cmds_factory,
     apiv1_backend_anonymous_cmds_factory,
     backend_authenticated_cmds_factory,
     backend_invited_cmds_factory,
 )
-from parsec.core.local_device import save_device_with_password
+from parsec.core.config import load_config
 from parsec.core.invite import (
-    bootstrap_organization,
     DeviceGreetInitialCtx,
     UserGreetInitialCtx,
+    bootstrap_organization,
     claimer_retrieve_info,
 )
+from parsec.core.local_device import save_device_with_password
+from parsec.core.types import (
+    BackendAddr,
+    BackendInvitationAddr,
+    BackendOrganizationBootstrapAddr,
+    LocalDevice,
+    WorkspaceRole,
+)
+from parsec.logging import configure_logging
 
 
 async def initialize_test_organization(

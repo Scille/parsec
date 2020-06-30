@@ -1,8 +1,7 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-from ctypes import GetLastError, FormatError, WinDLL
+from ctypes import FormatError, GetLastError, WinDLL
 from ctypes.wintypes import BOOL, HANDLE, LPCWSTR, LPVOID
-
 
 ERROR_ALREADY_EXISTS = 183
 

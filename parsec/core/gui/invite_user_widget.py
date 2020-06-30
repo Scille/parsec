@@ -1,32 +1,28 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-from PyQt5.QtCore import pyqtSignal, QPoint
-from PyQt5.QtWidgets import QToolTip, QWidget, QApplication
-
+from PyQt5.QtCore import QPoint, pyqtSignal
+from PyQt5.QtWidgets import QApplication, QToolTip, QWidget
 from structlog import get_logger
 
 from parsec.api.protocol import UserID
+from parsec.core.backend_connection import (
+    BackendConnectionError,
+    BackendNotAvailable,
+    BackendNotFoundError,
+)
+from parsec.core.gui import desktop, validators
+from parsec.core.gui.custom_dialogs import GreyedDialog, show_error, show_info
+from parsec.core.gui.lang import translate as _
+from parsec.core.gui.trio_thread import JobResultError, ThreadSafeQtSignal
+from parsec.core.gui.ui.invite_user_widget import Ui_InviteUserWidget
 from parsec.core.invite_claim import (
-    InviteClaimTimeoutError,
     InviteClaimBackendOfflineError,
     InviteClaimError,
-    generate_invitation_token as core_generate_invitation_token,
-    invite_and_create_user as core_invite_and_create_user,
+    InviteClaimTimeoutError,
 )
+from parsec.core.invite_claim import generate_invitation_token as core_generate_invitation_token
+from parsec.core.invite_claim import invite_and_create_user as core_invite_and_create_user
 from parsec.core.types import BackendOrganizationClaimUserAddr
-
-from parsec.core.backend_connection import (
-    BackendNotFoundError,
-    BackendNotAvailable,
-    BackendConnectionError,
-)
-from parsec.core.gui import desktop
-from parsec.core.gui import validators
-from parsec.core.gui.custom_dialogs import show_info, show_error, GreyedDialog
-from parsec.core.gui.lang import translate as _
-from parsec.core.gui.ui.invite_user_widget import Ui_InviteUserWidget
-from parsec.core.gui.trio_thread import JobResultError, ThreadSafeQtSignal
-
 
 logger = get_logger()
 

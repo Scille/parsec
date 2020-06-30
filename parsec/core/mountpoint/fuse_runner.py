@@ -1,22 +1,22 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-from parsec.core.core_events import CoreEvent
-import sys
-import trio
-import errno
 import ctypes
+import errno
 import signal
+import sys
 import threading
-from pathlib import PurePath
-from fuse import FUSE
-from structlog import get_logger
 from contextlib import contextmanager
 from itertools import count
+from pathlib import PurePath
 
+import trio
+from fuse import FUSE
+from structlog import get_logger
+
+from parsec.core.core_events import CoreEvent
+from parsec.core.mountpoint.exceptions import MountpointDriverCrash
 from parsec.core.mountpoint.fuse_operations import FuseOperations
 from parsec.core.mountpoint.thread_fs_access import ThreadFSAccess
-from parsec.core.mountpoint.exceptions import MountpointDriverCrash
-
 
 __all__ = ("fuse_mountpoint_runner",)
 

@@ -3,8 +3,8 @@
 import pytest
 from PyQt5 import QtCore
 
-from parsec.core.local_device import save_device_with_password
 from parsec.core.gui.password_change_widget import PasswordChangeWidget
+from parsec.core.local_device import save_device_with_password
 
 
 @pytest.fixture

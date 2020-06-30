@@ -1,16 +1,14 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-from unittest.mock import Mock
 from unittest import mock
+from unittest.mock import Mock
 
-from botocore.exceptions import (
-    ClientError as S3ClientError,
-    EndpointConnectionError as S3EndpointConnectionError,
-)
 import pytest
+from botocore.exceptions import ClientError as S3ClientError
+from botocore.exceptions import EndpointConnectionError as S3EndpointConnectionError
 
-from parsec.backend.s3_blockstore import S3BlockStoreComponent
 from parsec.backend.block import BlockAlreadyExistsError, BlockNotFoundError, BlockTimeoutError
+from parsec.backend.s3_blockstore import S3BlockStoreComponent
 
 
 @pytest.mark.trio

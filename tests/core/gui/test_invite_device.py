@@ -1,14 +1,16 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
+from unittest.mock import patch
+
 import pytest
 from PyQt5 import QtCore
-from parsec.core.types import BackendOrganizationClaimDeviceAddr
-from parsec.core.gui.invite_device_widget import InviteDeviceWidget
-from unittest.mock import patch
-from parsec.utils import trio_run
-from parsec.core.local_device import save_device_with_password
-from parsec.core.invite_claim import claim_device as actual_claim_device
+
 from parsec.core.gui.custom_dialogs import GreyedDialog
+from parsec.core.gui.invite_device_widget import InviteDeviceWidget
+from parsec.core.invite_claim import claim_device as actual_claim_device
+from parsec.core.local_device import save_device_with_password
+from parsec.core.types import BackendOrganizationClaimDeviceAddr
+from parsec.utils import trio_run
 
 
 @pytest.fixture

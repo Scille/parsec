@@ -1,22 +1,22 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-from parsec.backend.backend_events import BackendEvent
-from parsec.event_bus import MetaEvent
+import pendulum
 import pytest
 import trio
-import pendulum
 
 from parsec.api.data import (
-    UserCertificateContent,
-    DeviceCertificateContent,
-    APIV1_DeviceClaimContent,
     APIV1_DeviceClaimAnswerContent,
+    APIV1_DeviceClaimContent,
+    DeviceCertificateContent,
+    UserCertificateContent,
+)
+from parsec.backend.backend_events import BackendEvent
+from parsec.core.backend_connection import (
+    apiv1_backend_anonymous_cmds_factory,
+    backend_authenticated_cmds_factory,
 )
 from parsec.crypto import PrivateKey, SigningKey
-from parsec.core.backend_connection import (
-    backend_authenticated_cmds_factory,
-    apiv1_backend_anonymous_cmds_factory,
-)
+from parsec.event_bus import MetaEvent
 
 
 @pytest.mark.trio

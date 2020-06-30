@@ -1,22 +1,22 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
 from typing import Tuple
+
 from pypika import Parameter
 
-from parsec.api.protocol import OrganizationID, UserID, DeviceID, HumanHandle
-from parsec.backend.user import User, Device, Trustchain, UserNotFoundError, GetUserAndDevicesResult
-from parsec.backend.postgresql.utils import Query, query
+from parsec.api.protocol import DeviceID, HumanHandle, OrganizationID, UserID
 from parsec.backend.postgresql.tables import (
     STR_TO_USER_PROFILE,
-    t_user,
-    t_device,
     q_device,
+    q_human,
     q_organization_internal_id,
     q_user_internal_id,
+    t_device,
     t_human,
-    q_human,
+    t_user,
 )
-
+from parsec.backend.postgresql.utils import Query, query
+from parsec.backend.user import Device, GetUserAndDevicesResult, Trustchain, User, UserNotFoundError
 
 _q_get_user = (
     Query.from_(t_user)

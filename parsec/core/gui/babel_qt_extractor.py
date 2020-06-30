@@ -2,7 +2,6 @@
 
 import xml.etree.ElementTree as ET
 
-
 IGNORE_LIST = ["Dialog", "Form"]
 
 

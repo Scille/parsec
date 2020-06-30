@@ -1,30 +1,29 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-import trio
-import attr
 import re
-from pendulum import now as pendulum_now
-import triopg
-from typing import List, Tuple, Optional
-
-from triopg import UniqueViolationError, UndefinedTableError, PostgresError
-from uuid import uuid4
-from functools import wraps
-from structlog import get_logger
 from base64 import b64decode, b64encode
-import importlib_resources
+from functools import wraps
+from typing import List, Optional, Tuple
+from uuid import uuid4
 
+import attr
+import importlib_resources
+import trio
+import triopg
+from pendulum import now as pendulum_now
+from structlog import get_logger
+from triopg import PostgresError, UndefinedTableError, UniqueViolationError
+
+from parsec.backend.backend_events import BackendEvent
+from parsec.backend.postgresql import migrations as migrations_module
+from parsec.backend.postgresql.tables import (
+    STR_TO_BACKEND_EVENTS,
+    STR_TO_INVITATION_STATUS,
+    STR_TO_REALM_ROLE,
+)
 from parsec.event_bus import EventBus
 from parsec.serde import packb, unpackb
-from parsec.utils import start_task, TaskStatus
-from parsec.backend.postgresql.tables import (
-    STR_TO_REALM_ROLE,
-    STR_TO_INVITATION_STATUS,
-    STR_TO_BACKEND_EVENTS,
-)
-from parsec.backend.postgresql import migrations as migrations_module
-from parsec.backend.backend_events import BackendEvent
-
+from parsec.utils import TaskStatus, start_task
 
 logger = get_logger()
 

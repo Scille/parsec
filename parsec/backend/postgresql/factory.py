@@ -3,19 +3,19 @@
 import trio
 from async_generator import asynccontextmanager
 
-from parsec.event_bus import EventBus
+from parsec.backend.blockstore import blockstore_factory
 from parsec.backend.config import BackendConfig
 from parsec.backend.events import EventsComponent
-from parsec.backend.blockstore import blockstore_factory
+from parsec.backend.postgresql.block import PGBlockComponent
 from parsec.backend.postgresql.handler import PGHandler
-from parsec.backend.postgresql.organization import PGOrganizationComponent
-from parsec.backend.postgresql.ping import PGPingComponent
-from parsec.backend.postgresql.user import PGUserComponent
 from parsec.backend.postgresql.invite import PGInviteComponent
 from parsec.backend.postgresql.message import PGMessageComponent
+from parsec.backend.postgresql.organization import PGOrganizationComponent
+from parsec.backend.postgresql.ping import PGPingComponent
 from parsec.backend.postgresql.realm import PGRealmComponent
+from parsec.backend.postgresql.user import PGUserComponent
 from parsec.backend.postgresql.vlob import PGVlobComponent
-from parsec.backend.postgresql.block import PGBlockComponent
+from parsec.event_bus import EventBus
 
 
 @asynccontextmanager

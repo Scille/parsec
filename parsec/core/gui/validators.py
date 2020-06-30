@@ -1,14 +1,14 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-from PyQt5.QtGui import QValidator, QIntValidator
+from PyQt5.QtGui import QIntValidator, QValidator
 
-from parsec.api.protocol import OrganizationID, UserID, DeviceName, DeviceID
+from parsec.api.protocol import DeviceID, DeviceName, OrganizationID, UserID
 from parsec.core.types import (
     BackendAddr,
     BackendOrganizationAddr,
     BackendOrganizationBootstrapAddr,
-    BackendOrganizationClaimUserAddr,
     BackendOrganizationClaimDeviceAddr,
+    BackendOrganizationClaimUserAddr,
 )
 
 

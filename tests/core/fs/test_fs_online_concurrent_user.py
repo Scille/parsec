@@ -1,14 +1,15 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-import pytest
 from string import ascii_lowercase
+
+import pytest
 from hypothesis import strategies as st
 from hypothesis_trio.stateful import (
     Bundle,
+    TrioAsyncioRuleBasedStateMachine,
     initialize,
     rule,
     run_state_machine_as_test,
-    TrioAsyncioRuleBasedStateMachine,
 )
 
 from parsec.core.fs.exceptions import FSWorkspaceNotFoundError

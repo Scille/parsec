@@ -1,25 +1,25 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
+from unittest.mock import ANY
+
 import pytest
 import trio
 from hypothesis import strategies as st
 from hypothesis_trio.stateful import (
     Bundle,
-    initialize,
-    rule,
-    invariant,
-    run_state_machine_as_test,
     TrioAsyncioRuleBasedStateMachine,
+    initialize,
+    invariant,
     multiple,
+    rule,
+    run_state_machine_as_test,
 )
-from unittest.mock import ANY
 from pendulum import now as pendulum_now
 
 from parsec.api.data import RealmRoleCertificateContent
 from parsec.api.protocol import RealmRole
-
-from tests.common import call_with_control
 from tests.backend.common import realm_get_role_certificates, realm_update_roles
+from tests.common import call_with_control
 
 
 @pytest.mark.slow

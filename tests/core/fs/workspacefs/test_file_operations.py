@@ -1,21 +1,20 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-import pytest
 from typing import Tuple
-from hypothesis import strategies
-from hypothesis.stateful import RuleBasedStateMachine, rule, invariant, run_state_machine_as_test
 
-from parsec.core.types import EntryID, ChunkID, Chunk, LocalFileManifest
-from parsec.core.fs.workspacefs.file_transactions import padded_data
+import pytest
+from hypothesis import strategies
+from hypothesis.stateful import RuleBasedStateMachine, invariant, rule, run_state_machine_as_test
+
 from parsec.core.fs.workspacefs.file_operations import (
     prepare_read,
-    prepare_write,
-    prepare_resize,
     prepare_reshape,
+    prepare_resize,
+    prepare_write,
 )
-
+from parsec.core.fs.workspacefs.file_transactions import padded_data
+from parsec.core.types import Chunk, ChunkID, EntryID, LocalFileManifest
 from tests.common import freeze_time
-
 
 MAX_SIZE = 64
 size = strategies.integers(min_value=0, max_value=MAX_SIZE)

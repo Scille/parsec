@@ -1,14 +1,14 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-import inspect
 import functools
-from pathlib import Path
+import inspect
 from concurrent.futures import ThreadPoolExecutor
-
-import trio
-import outcome
-from async_generator import asynccontextmanager
+from pathlib import Path
 from sqlite3 import connect as sqlite_connect
+
+import outcome
+import trio
+from async_generator import asynccontextmanager
 
 
 @asynccontextmanager

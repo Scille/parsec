@@ -1,16 +1,17 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-import click
 import platform
 
-from parsec.utils import trio_run
-from parsec.cli_utils import spinner, operation, cli_exception_handler, aprompt
+import click
+
 from parsec.api.protocol import HumanHandle
-from parsec.core.types import BackendOrganizationBootstrapAddr
+from parsec.cli_utils import aprompt, cli_exception_handler, operation, spinner
 from parsec.core.backend_connection import apiv1_backend_anonymous_cmds_factory
-from parsec.core.local_device import save_device_with_password
-from parsec.core.invite import bootstrap_organization as do_bootstrap_organization
 from parsec.core.cli.utils import core_config_options
+from parsec.core.invite import bootstrap_organization as do_bootstrap_organization
+from parsec.core.local_device import save_device_with_password
+from parsec.core.types import BackendOrganizationBootstrapAddr
+from parsec.utils import trio_run
 
 
 async def _bootstrap_organization(config, addr, password, force):

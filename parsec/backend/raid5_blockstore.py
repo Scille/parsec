@@ -1,16 +1,16 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-import trio
-from uuid import UUID
 import struct
-from structlog import get_logger
 from sys import byteorder
 from typing import List, Optional
+from uuid import UUID
+
+import trio
+from structlog import get_logger
 
 from parsec.api.protocol import OrganizationID
-from parsec.backend.blockstore import BaseBlockStoreComponent
 from parsec.backend.block import BlockAlreadyExistsError, BlockNotFoundError, BlockTimeoutError
-
+from parsec.backend.blockstore import BaseBlockStoreComponent
 
 logger = get_logger()
 

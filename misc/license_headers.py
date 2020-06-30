@@ -2,11 +2,10 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
 
-import sys
+import argparse
 import pathlib
 import re
-import argparse
-
+import sys
 
 HEADER = "# Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS\n\n"
 HEADER_RE = re.compile(

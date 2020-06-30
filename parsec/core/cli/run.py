@@ -1,14 +1,16 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-import trio
-import click
 from pathlib import Path
-from pendulum import Pendulum, parse as pendulum_parse
 
-from parsec.utils import trio_run
+import click
+import trio
+from pendulum import Pendulum
+from pendulum import parse as pendulum_parse
+
 from parsec.cli_utils import cli_exception_handler, generate_not_available_cmd
 from parsec.core import logged_core_factory
 from parsec.core.cli.utils import core_config_and_device_options, core_config_options
+from parsec.utils import trio_run
 
 try:
     from parsec.core.gui import run_gui as _run_gui

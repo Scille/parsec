@@ -1,8 +1,9 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
+import inspect
 from contextlib import contextmanager
 from unittest.mock import patch
-import inspect
+
 import trio
 
 from parsec.core.types import BackendAddr

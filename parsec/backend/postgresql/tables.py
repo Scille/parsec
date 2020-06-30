@@ -2,16 +2,15 @@
 
 from parsec.api.data import UserProfile
 from parsec.api.protocol import (
-    RealmRole,
-    MaintenanceType,
-    InvitationType,
-    InvitationStatus,
     InvitationDeletedReason,
+    InvitationStatus,
+    InvitationType,
+    MaintenanceType,
+    RealmRole,
 )
-from parsec.backend.invite import ConduitState
 from parsec.backend.backend_events import BackendEvent
-from parsec.backend.postgresql.utils import Query, fn_exists, Table
-
+from parsec.backend.invite import ConduitState
+from parsec.backend.postgresql.utils import Query, Table, fn_exists
 
 ### Organization ###
 

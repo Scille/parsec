@@ -1,21 +1,22 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-import trio
 from typing import Optional
 
-from parsec.crypto import VerifyKey, PublicKey
-from parsec.api.version import ApiVersion
-from parsec.api.transport import Transport
+import trio
+
 from parsec.api.data import UserProfile
 from parsec.api.protocol import (
-    ServerHandshake,
-    OrganizationID,
-    UserID,
-    DeviceName,
     DeviceID,
+    DeviceName,
     HumanHandle,
+    OrganizationID,
+    ServerHandshake,
+    UserID,
 )
+from parsec.api.transport import Transport
+from parsec.api.version import ApiVersion
 from parsec.backend.invite import Invitation
+from parsec.crypto import PublicKey, VerifyKey
 
 
 class BaseClientContext:

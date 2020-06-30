@@ -2,11 +2,12 @@
 
 from copy import copy
 from functools import wraps
+
 from pypika import Table
-from pypika.dialects import PostgreSQLQuery, PostgreQueryBuilder
-from pypika.utils import builder
-from pypika.terms import Term, Function, BasicCriterion
+from pypika.dialects import PostgreQueryBuilder, PostgreSQLQuery
 from pypika.enums import Comparator, JoinType
+from pypika.terms import BasicCriterion, Function, Term
+from pypika.utils import builder
 
 
 def query(in_transaction=False):

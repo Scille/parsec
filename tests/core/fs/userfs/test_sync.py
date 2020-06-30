@@ -1,19 +1,19 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-import pytest
-from uuid import uuid4
-from pendulum import Pendulum
 from unittest.mock import ANY
+from uuid import uuid4
+
+import pytest
+from pendulum import Pendulum
 
 from parsec.api.data import UserManifest
+from parsec.core.fs import FSBackendOfflineError, FSWorkspaceNotFoundError
 from parsec.core.types import (
-    WorkspaceEntry,
-    WorkspaceRole,
     LocalUserManifest,
     LocalWorkspaceManifest,
+    WorkspaceEntry,
+    WorkspaceRole,
 )
-from parsec.core.fs import FSWorkspaceNotFoundError, FSBackendOfflineError
-
 from tests.common import freeze_time
 
 

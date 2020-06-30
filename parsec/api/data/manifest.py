@@ -1,22 +1,24 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-import attr
-from typing import Optional, Tuple, FrozenDict
-from pendulum import Pendulum, now as pendulum_now
+from enum import Enum
+from typing import FrozenDict, Optional, Tuple
 
-from parsec.types import UUID4
-from parsec.crypto import SecretKey, HashDigest
-from parsec.serde import fields, validate, post_load, OneOfSchema
-from parsec.api.protocol import RealmRole, RealmRoleField
+import attr
+from pendulum import Pendulum
+from pendulum import now as pendulum_now
+
 from parsec.api.data.base import (
+    BaseAPISignedData,
     BaseData,
     BaseSchema,
-    BaseAPISignedData,
     BaseSignedDataSchema,
     DataValidationError,
 )
 from parsec.api.data.entry import EntryID, EntryIDField, EntryName, EntryNameField
-from enum import Enum
+from parsec.api.protocol import RealmRole, RealmRoleField
+from parsec.crypto import HashDigest, SecretKey
+from parsec.serde import OneOfSchema, fields, post_load, validate
+from parsec.types import UUID4
 
 
 class BlockID(UUID4):

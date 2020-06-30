@@ -6,18 +6,16 @@ import trio.testing
 from hypothesis import strategies as st
 from hypothesis_trio.stateful import (
     Bundle,
+    TrioAsyncioRuleBasedStateMachine,
     initialize,
+    multiple,
     rule,
     run_state_machine_as_test,
-    TrioAsyncioRuleBasedStateMachine,
-    multiple,
 )
 
+from parsec.core.fs import FSWorkspaceNoAccess, FSWorkspaceNotFoundError
 from parsec.core.types import WorkspaceRole
-from parsec.core.fs import FSWorkspaceNotFoundError, FSWorkspaceNoAccess
-
 from tests.common import call_with_control
-
 
 MISSING = object()
 TO_COMPARE_FIELDS = ("id", "created", "updated", "need_sync", "base_version", "is_placeholder")

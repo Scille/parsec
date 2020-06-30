@@ -1,32 +1,34 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-import attr
 import functools
+from enum import Enum
 from typing import Optional, Tuple
-from pendulum import Pendulum, now as pendulum_now
 
-from parsec.types import UUID4, FrozenDict
-from parsec.crypto import SecretKey, HashDigest
-from parsec.serde import fields, OneOfSchema, validate, post_load
-from parsec.api.protocol import DeviceID, RealmRole
+import attr
+from pendulum import Pendulum
+from pendulum import now as pendulum_now
+
 from parsec.api.data import (
-    BaseSchema,
     BaseData,
-    WorkspaceEntry,
+    BaseSchema,
     BlockAccess,
     BlockID,
-    Manifest as RemoteManifest,
-    UserManifest as RemoteUserManifest,
-    WorkspaceManifest as RemoteWorkspaceManifest,
-    FolderManifest as RemoteFolderManifest,
-    FileManifest as RemoteFileManifest,
     EntryID,
+    EntryIDField,
     EntryName,
     EntryNameField,
-    EntryIDField,
 )
+from parsec.api.data import FileManifest as RemoteFileManifest
+from parsec.api.data import FolderManifest as RemoteFolderManifest
+from parsec.api.data import Manifest as RemoteManifest
+from parsec.api.data import UserManifest as RemoteUserManifest
+from parsec.api.data import WorkspaceEntry
+from parsec.api.data import WorkspaceManifest as RemoteWorkspaceManifest
+from parsec.api.protocol import DeviceID, RealmRole
 from parsec.core.types.base import BaseLocalData
-from enum import Enum
+from parsec.crypto import HashDigest, SecretKey
+from parsec.serde import OneOfSchema, fields, post_load, validate
+from parsec.types import UUID4, FrozenDict
 
 __all__ = (
     "WorkspaceEntry",  # noqa: Republishing

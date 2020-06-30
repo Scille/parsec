@@ -3,14 +3,14 @@
 import pytest
 
 from parsec.api.protocol import (
-    packb,
-    unpackb,
-    InvitationType,
+    APIV1_ADMINISTRATION_CMDS,
+    APIV1_ANONYMOUS_CMDS,
+    APIV1_AUTHENTICATED_CMDS,
     AUTHENTICATED_CMDS,
     INVITED_CMDS,
-    APIV1_ADMINISTRATION_CMDS,
-    APIV1_AUTHENTICATED_CMDS,
-    APIV1_ANONYMOUS_CMDS,
+    InvitationType,
+    packb,
+    unpackb,
 )
 
 

@@ -1,19 +1,18 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-from uuid import UUID
-from pendulum import Pendulum
 from datetime import datetime
-from struct import pack as struct_pack, unpack as struct_unpack
-from msgpack import (
-    packb as msgpack_packb,
-    unpackb as msgpack_unpackb,
-    Unpacker as msgpack_Unpacker,
-    ExtType,
-)
+from struct import pack as struct_pack
+from struct import unpack as struct_unpack
+from uuid import UUID
+
+from msgpack import ExtType
+from msgpack import Unpacker as msgpack_Unpacker
+from msgpack import packb as msgpack_packb
+from msgpack import unpackb as msgpack_unpackb
 from msgpack.exceptions import ExtraData, FormatError, StackError
+from pendulum import Pendulum
 
 from parsec.serde.exceptions import SerdePackingError
-
 
 MAX_BIN_LEN = 1024 * 1024  # 1 MB
 

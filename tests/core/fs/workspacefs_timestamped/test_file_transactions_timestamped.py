@@ -2,8 +2,8 @@
 
 import pytest
 
-from parsec.core.types import FsPath
 from parsec.core.fs import FSError, FSInvalidFileDescriptor
+from parsec.core.types import FsPath
 
 
 @pytest.mark.trio

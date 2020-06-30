@@ -1,27 +1,28 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-import pytest
 from unittest.mock import ANY
 from uuid import uuid4
 
+import pytest
+
 from parsec.api.protocol import (
-    OrganizationID,
-    packb,
-    unpackb,
+    AuthenticatedClientHandshake,
+    BaseClientHandshake,
+    HandshakeAPIVersionError,
+    HandshakeBadAdministrationToken,
+    HandshakeBadIdentity,
+    HandshakeFailedChallenge,
+    HandshakeOrganizationExpired,
+    HandshakeRevokedDevice,
+    HandshakeRVKMismatch,
+    HandshakeType,
     InvalidMessageError,
     InvitationType,
-    HandshakeFailedChallenge,
-    HandshakeBadIdentity,
-    HandshakeBadAdministrationToken,
-    HandshakeRVKMismatch,
-    HandshakeRevokedDevice,
-    HandshakeAPIVersionError,
-    HandshakeType,
-    ServerHandshake,
-    BaseClientHandshake,
-    AuthenticatedClientHandshake,
     InvitedClientHandshake,
-    HandshakeOrganizationExpired,
+    OrganizationID,
+    ServerHandshake,
+    packb,
+    unpackb,
 )
 from parsec.api.version import API_V2_VERSION, ApiVersion
 

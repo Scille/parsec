@@ -1,33 +1,35 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-from parsec.backend.backend_events import BackendEvent
 import re
-from pendulum import Pendulum, now as pendulum_now
-from uuid import UUID, uuid4
 from typing import List, Optional
+from uuid import UUID, uuid4
+
+from pendulum import Pendulum
+from pendulum import now as pendulum_now
 
 from parsec.api.protocol import (
+    HumanHandle,
+    InvitationDeletedReason,
+    InvitationStatus,
+    InvitationType,
     OrganizationID,
     UserID,
-    HumanHandle,
-    InvitationType,
-    InvitationStatus,
-    InvitationDeletedReason,
 )
-from parsec.backend.postgresql.handler import send_signal, PGHandler
-from parsec.backend.postgresql.tables import STR_TO_INVITATION_CONDUIT_STATE
+from parsec.backend.backend_events import BackendEvent
 from parsec.backend.invite import (
-    ConduitState,
     NEXT_CONDUIT_STATE,
-    ConduitListenCtx,
     BaseInviteComponent,
-    Invitation,
-    UserInvitation,
+    ConduitListenCtx,
+    ConduitState,
     DeviceInvitation,
-    InvitationNotFoundError,
+    Invitation,
     InvitationAlreadyDeletedError,
     InvitationInvalidStateError,
+    InvitationNotFoundError,
+    UserInvitation,
 )
+from parsec.backend.postgresql.handler import PGHandler, send_signal
+from parsec.backend.postgresql.tables import STR_TO_INVITATION_CONDUIT_STATE
 
 
 class Q:

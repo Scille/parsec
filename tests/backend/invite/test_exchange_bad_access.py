@@ -1,30 +1,30 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
+from functools import partial
+from uuid import uuid4
+
 import pytest
 import trio
-from uuid import uuid4
 from pendulum import Pendulum
-from functools import partial
 
-from parsec.crypto import PrivateKey
-from parsec.api.transport import TransportError
 from parsec.api.protocol import InvitationDeletedReason, InvitationType
+from parsec.api.transport import TransportError
 from parsec.backend.backend_events import BackendEvent
-
+from parsec.crypto import PrivateKey
 from tests.backend.common import (
-    ping,
     invite_1_claimer_wait_peer,
     invite_1_greeter_wait_peer,
     invite_2a_claimer_send_hashed_nonce,
     invite_2a_greeter_get_hashed_nonce,
-    invite_2b_greeter_send_nonce,
     invite_2b_claimer_send_nonce,
-    invite_3a_greeter_wait_peer_trust,
+    invite_2b_greeter_send_nonce,
     invite_3a_claimer_signify_trust,
+    invite_3a_greeter_wait_peer_trust,
     invite_3b_claimer_wait_peer_trust,
     invite_3b_greeter_signify_trust,
-    invite_4_greeter_communicate,
     invite_4_claimer_communicate,
+    invite_4_greeter_communicate,
+    ping,
 )
 
 

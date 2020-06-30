@@ -1,31 +1,32 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-import pendulum
-from uuid import UUID
 from typing import Dict
+from uuid import UUID
+
+import pendulum
 from pypika import Parameter
 
+from parsec.api.protocol import DeviceID, OrganizationID, RealmRole, UserID
 from parsec.backend.backend_events import BackendEvent
-from parsec.api.protocol import DeviceID, UserID, OrganizationID, RealmRole
-from parsec.backend.realm import (
-    RealmAccessError,
-    RealmNotFoundError,
-    RealmEncryptionRevisionError,
-    RealmParticipantsMismatchError,
-    RealmMaintenanceError,
-    RealmInMaintenanceError,
-    RealmNotInMaintenanceError,
-)
 from parsec.backend.postgresql.handler import send_signal
-from parsec.backend.postgresql.utils import query
 from parsec.backend.postgresql.message import send_message
 from parsec.backend.postgresql.tables import (
     STR_TO_REALM_ROLE,
-    q_user,
-    q_organization_internal_id,
-    q_realm_internal_id,
-    q_realm,
     q_device_internal_id,
+    q_organization_internal_id,
+    q_realm,
+    q_realm_internal_id,
+    q_user,
+)
+from parsec.backend.postgresql.utils import query
+from parsec.backend.realm import (
+    RealmAccessError,
+    RealmEncryptionRevisionError,
+    RealmInMaintenanceError,
+    RealmMaintenanceError,
+    RealmNotFoundError,
+    RealmNotInMaintenanceError,
+    RealmParticipantsMismatchError,
 )
 
 

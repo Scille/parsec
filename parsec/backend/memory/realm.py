@@ -1,33 +1,34 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
+from typing import Dict, List, Optional
+from uuid import UUID
+
 import attr
 import pendulum
-from uuid import UUID
-from typing import List, Dict, Optional
 
 from parsec.api.data import UserProfile
-from parsec.api.protocol import DeviceID, UserID, OrganizationID
+from parsec.api.protocol import DeviceID, OrganizationID, UserID
 from parsec.backend.backend_events import BackendEvent
+from parsec.backend.memory.vlob import MemoryVlobComponent
+from parsec.backend.message import BaseMessageComponent
 from parsec.backend.realm import (
-    MaintenanceType,
-    RealmGrantedRole,
     BaseRealmComponent,
-    RealmRole,
-    RealmStatus,
+    MaintenanceType,
     RealmAccessError,
-    RealmIncompatibleProfileError,
     RealmAlreadyExistsError,
-    RealmRoleAlreadyGranted,
-    RealmNotFoundError,
     RealmEncryptionRevisionError,
-    RealmParticipantsMismatchError,
-    RealmMaintenanceError,
+    RealmGrantedRole,
+    RealmIncompatibleProfileError,
     RealmInMaintenanceError,
+    RealmMaintenanceError,
+    RealmNotFoundError,
     RealmNotInMaintenanceError,
+    RealmParticipantsMismatchError,
+    RealmRole,
+    RealmRoleAlreadyGranted,
+    RealmStatus,
 )
 from parsec.backend.user import BaseUserComponent, UserNotFoundError
-from parsec.backend.message import BaseMessageComponent
-from parsec.backend.memory.vlob import MemoryVlobComponent
 
 
 @attr.s

@@ -1,16 +1,18 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
 import itertools
-from pendulum import now as pendulum_now
 from functools import lru_cache
-from typing import Tuple, List
-from pypika import PostgreSQLQuery as Query, Parameter
+from typing import List, Tuple
+
+from pendulum import now as pendulum_now
+from pypika import Parameter
+from pypika import PostgreSQLQuery as Query
 from pypika.functions import Concat
 
-from parsec.api.protocol import UserID, OrganizationID, HumanHandle
-from parsec.backend.user import HumanFindResultItem
+from parsec.api.protocol import HumanHandle, OrganizationID, UserID
+from parsec.backend.postgresql.tables import q_organization_internal_id, t_human, t_user
 from parsec.backend.postgresql.utils import IRegex, query
-from parsec.backend.postgresql.tables import t_human, t_user, q_organization_internal_id
+from parsec.backend.user import HumanFindResultItem
 
 
 @lru_cache()

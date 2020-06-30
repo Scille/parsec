@@ -1,39 +1,39 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-from collections import namedtuple
-import pendulum
 import pathlib
+from collections import namedtuple
 from enum import IntEnum
 
+import pendulum
 from PyQt5.QtCore import Qt, pyqtSignal
-from PyQt5.QtGui import QIcon, QColor, QKeySequence
+from PyQt5.QtGui import QColor, QIcon, QKeySequence
 from PyQt5.QtWidgets import (
-    QTableWidget,
+    QGraphicsDropShadowEffect,
     QHeaderView,
+    QMenu,
+    QStyle,
     QStyledItemDelegate,
     QStyleOptionViewItem,
-    QStyle,
-    QMenu,
+    QTableWidget,
     QTableWidgetSelectionRange,
-    QGraphicsDropShadowEffect,
 )
 
-from parsec.core.types import WorkspaceRole
-
-from parsec.core.gui.lang import translate as _, format_datetime
+from parsec.core.gui.custom_widgets import Pixmap
 from parsec.core.gui.file_items import (
-    FileTableItem,
-    CustomTableItem,
-    FolderTableItem,
-    InconsistencyTableItem,
-    FileType,
+    COPY_STATUS_DATA_INDEX,
     NAME_DATA_INDEX,
     TYPE_DATA_INDEX,
     UUID_DATA_INDEX,
-    COPY_STATUS_DATA_INDEX,
+    CustomTableItem,
+    FileTableItem,
+    FileType,
+    FolderTableItem,
+    InconsistencyTableItem,
 )
-from parsec.core.gui.custom_widgets import Pixmap
 from parsec.core.gui.file_size import get_filesize
+from parsec.core.gui.lang import format_datetime
+from parsec.core.gui.lang import translate as _
+from parsec.core.types import WorkspaceRole
 
 
 class Column(IntEnum):

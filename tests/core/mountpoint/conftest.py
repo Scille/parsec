@@ -1,14 +1,15 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-import pytest
 import threading
-import trio
-from pathlib import Path
 from inspect import iscoroutinefunction
+from pathlib import Path
 from queue import Queue
 
-from parsec.utils import start_task
+import pytest
+import trio
+
 from parsec.core.mountpoint import mountpoint_manager_factory
+from parsec.utils import start_task
 
 
 @pytest.fixture

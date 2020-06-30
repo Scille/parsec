@@ -1,26 +1,23 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-import os
-from structlog import get_logger
-import trio
 import json
-from urllib.request import Request, urlopen
-from urllib.error import URLError
+import os
 from http.client import HTTPException
+from urllib.error import URLError
+from urllib.request import Request, urlopen
 
+import trio
 from PyQt5.QtCore import pyqtSignal
-from PyQt5.QtWidgets import QWidget, QApplication, QDialog
-
-from parsec.core.types import BackendOrganizationBootstrapAddr
+from PyQt5.QtWidgets import QApplication, QDialog, QWidget
+from structlog import get_logger
 
 from parsec.core.gui.custom_dialogs import GreyedDialog, show_error
-from parsec.core.gui.trio_thread import JobResultError, ThreadSafeQtSignal
 from parsec.core.gui.lang import translate as _
-
-from parsec.core.gui.ui.create_org_widget import Ui_CreateOrgWidget
+from parsec.core.gui.trio_thread import JobResultError, ThreadSafeQtSignal
 from parsec.core.gui.ui.create_org_first_page_widget import Ui_CreateOrgFirstPageWidget
 from parsec.core.gui.ui.create_org_second_page_widget import Ui_CreateOrgSecondPageWidget
-
+from parsec.core.gui.ui.create_org_widget import Ui_CreateOrgWidget
+from parsec.core.types import BackendOrganizationBootstrapAddr
 
 logger = get_logger()
 

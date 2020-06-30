@@ -1,39 +1,40 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-import pendulum
-from typing import Tuple, List
+from typing import List, Tuple
 
-from parsec.api.protocol import UserID, DeviceID, OrganizationID
-from parsec.backend.user import (
-    BaseUserComponent,
-    User,
-    Device,
-    Trustchain,
-    GetUserAndDevicesResult,
-    UserInvitation,
-    DeviceInvitation,
-    HumanFindResultItem,
-)
+import pendulum
+
+from parsec.api.protocol import DeviceID, OrganizationID, UserID
 from parsec.backend.postgresql.handler import PGHandler
 from parsec.backend.postgresql.user_queries import (
-    query_create_user,
+    query_cancel_device_invitation,
+    query_cancel_user_invitation,
+    query_claim_device_invitation,
+    query_claim_user_invitation,
     query_create_device,
+    query_create_device_invitation,
+    query_create_user,
+    query_create_user_invitation,
     query_find,
     query_find_humans,
+    query_get_device_invitation,
     query_get_user,
-    query_get_user_with_trustchain,
+    query_get_user_invitation,
+    query_get_user_with_device,
     query_get_user_with_device_and_trustchain,
     query_get_user_with_devices_and_trustchain,
-    query_get_user_with_device,
+    query_get_user_with_trustchain,
     query_revoke_user,
-    query_create_user_invitation,
-    query_get_user_invitation,
-    query_claim_user_invitation,
-    query_cancel_user_invitation,
-    query_create_device_invitation,
-    query_get_device_invitation,
-    query_claim_device_invitation,
-    query_cancel_device_invitation,
+)
+from parsec.backend.user import (
+    BaseUserComponent,
+    Device,
+    DeviceInvitation,
+    GetUserAndDevicesResult,
+    HumanFindResultItem,
+    Trustchain,
+    User,
+    UserInvitation,
 )
 
 

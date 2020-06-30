@@ -1,13 +1,12 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
 import pytest
-from pendulum import Pendulum
 import trio
+from pendulum import Pendulum
 
-from parsec.backend.user import UserInvitation
 from parsec.api.data import UserProfile
 from parsec.api.protocol import apiv1_user_cancel_invitation_serializer, apiv1_user_claim_serializer
-
+from parsec.backend.user import UserInvitation
 from tests.common import freeze_time
 
 

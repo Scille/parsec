@@ -1,9 +1,10 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
 import os
-import pytest
 import shutil
 from pathlib import Path
+
+import pytest
 
 
 @pytest.fixture

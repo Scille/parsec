@@ -1,18 +1,19 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
+from unittest.mock import ANY
+
 import pytest
 import trio
-from unittest.mock import ANY
 from pendulum import Pendulum
 
 from parsec.core import logged_core_factory
-from parsec.core.types import UserInfo, DeviceInfo
 from parsec.core.backend_connection import (
     BackendConnStatus,
     BackendNotAvailable,
     BackendNotFoundError,
 )
 from parsec.core.core_events import CoreEvent
+from parsec.core.types import DeviceInfo, UserInfo
 
 
 @pytest.mark.trio

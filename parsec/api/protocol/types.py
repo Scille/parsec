@@ -1,10 +1,10 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
 import re
-from typing import Union
-from uuid import uuid4
 from collections import namedtuple
 from email.utils import parseaddr
+from typing import Union
+from uuid import uuid4
 
 from parsec.serde import fields
 

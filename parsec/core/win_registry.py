@@ -1,13 +1,13 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
 import os
-import string
 import platform
+import string
+from contextlib import contextmanager
 from pathlib import Path
 
 import psutil
 from structlog import get_logger
-from contextlib import contextmanager
 
 from . import resources
 

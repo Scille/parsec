@@ -1,12 +1,12 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-import click
-import sys
 import os
+import sys
+
+import click
 
 from parsec._version import __version__
 from parsec.cli_utils import generate_not_available_cmd
-
 
 try:
     from parsec.core.cli import core_cmd

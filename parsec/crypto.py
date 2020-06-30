@@ -1,19 +1,21 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-from typing import Tuple
 from base64 import b32decode, b32encode
 from hashlib import sha256
+from typing import Tuple
 
-from nacl.exceptions import CryptoError  # noqa: republishing
-from nacl.public import SealedBox, PrivateKey as _PrivateKey, PublicKey as _PublicKey
-from nacl.signing import SigningKey as _SigningKey, VerifyKey as _VerifyKey
-from nacl.secret import SecretBox
-from nacl.bindings import crypto_sign_BYTES, crypto_scalarmult
-from nacl.hash import blake2b, BLAKE2B_BYTES
-from nacl.pwhash import argon2i
-from nacl.utils import random
+from nacl.bindings import crypto_scalarmult, crypto_sign_BYTES
 from nacl.encoding import RawEncoder
-
+from nacl.exceptions import CryptoError  # noqa: republishing
+from nacl.hash import BLAKE2B_BYTES, blake2b
+from nacl.public import PrivateKey as _PrivateKey
+from nacl.public import PublicKey as _PublicKey
+from nacl.public import SealedBox
+from nacl.pwhash import argon2i
+from nacl.secret import SecretBox
+from nacl.signing import SigningKey as _SigningKey
+from nacl.signing import VerifyKey as _VerifyKey
+from nacl.utils import random
 
 # Note to simplify things, we adopt `nacl.CryptoError` as our root error cls
 

@@ -1,22 +1,23 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-import pytest
-from unittest.mock import patch
-from functools import wraps, partial
-import trio
-from trio.testing import trio_test as vanilla_trio_test
 import queue
 import threading
 from concurrent import futures
+from functools import partial, wraps
+from unittest.mock import patch
 
-from parsec.event_bus import EventBus
+import pytest
+import trio
+from trio.testing import trio_test as vanilla_trio_test
+
 from parsec import __version__ as parsec_version
-from parsec.core.gui.main_window import MainWindow
-from parsec.core.gui.trio_thread import QtToTrioJobScheduler
-from parsec.core.gui.login_widget import LoginWidget
 from parsec.core.gui.central_widget import CentralWidget
 from parsec.core.gui.lang import switch_language
+from parsec.core.gui.login_widget import LoginWidget
+from parsec.core.gui.main_window import MainWindow
 from parsec.core.gui.parsec_application import ParsecApp
+from parsec.core.gui.trio_thread import QtToTrioJobScheduler
+from parsec.event_bus import EventBus
 
 
 class ThreadedTrioTestRunner:

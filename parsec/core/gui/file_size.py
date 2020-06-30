@@ -2,7 +2,6 @@
 
 from parsec.core.gui.lang import translate as _
 
-
 traditional = [
     (1024 ** 5, "P"),
     (1024 ** 4, "T"),

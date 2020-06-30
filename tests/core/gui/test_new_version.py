@@ -1,13 +1,13 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-import trio
-from unittest.mock import Mock, patch
-from http.client import HTTPResponse
 import hashlib
 import json
+from http.client import HTTPResponse
+from unittest.mock import Mock, patch
+
+import trio
 
 from parsec.core.gui.new_version import _do_check_new_version
-
 
 gui_check_version_url = "https://github.com/Scille/parsec-cloud/releases/latest"
 gui_web_releases_url = gui_check_version_url[:-7]

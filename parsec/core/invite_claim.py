@@ -1,37 +1,36 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-import trio
 import secrets
 from typing import Optional
+
 import pendulum
+import trio
 
-from parsec.crypto import SecretKey, PrivateKey, SigningKey
 from parsec.api.data import (
-    DataError,
-    UserProfile,
-    UserCertificateContent,
-    DeviceCertificateContent,
-    APIV1_UserClaimContent,
-    APIV1_DeviceClaimContent,
     APIV1_DeviceClaimAnswerContent,
+    APIV1_DeviceClaimContent,
+    APIV1_UserClaimContent,
+    DataError,
+    DeviceCertificateContent,
+    UserCertificateContent,
+    UserProfile,
 )
-from parsec.api.protocol import UserID, DeviceName, DeviceID
-from parsec.core.types import LocalDevice, BackendOrganizationAddr
-
+from parsec.api.protocol import DeviceID, DeviceName, UserID
 from parsec.core.backend_connection import (
-    apiv1_backend_authenticated_cmds_factory,
-    apiv1_backend_anonymous_cmds_factory,
     BackendConnectionError,
     BackendNotAvailable,
+    apiv1_backend_anonymous_cmds_factory,
+    apiv1_backend_authenticated_cmds_factory,
 )
 from parsec.core.local_device import generate_new_device
 from parsec.core.remote_devices_manager import (
-    RemoteDevicesManagerError,
     RemoteDevicesManagerBackendOfflineError,
-    get_user_invitation_creator,
+    RemoteDevicesManagerError,
     get_device_invitation_creator,
+    get_user_invitation_creator,
 )
-
+from parsec.core.types import BackendOrganizationAddr, LocalDevice
+from parsec.crypto import PrivateKey, SecretKey, SigningKey
 
 CANCEL_INVITATION_MAX_WAIT = 3
 

@@ -1,14 +1,14 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-import os
-import attr
 import json
-from typing import Optional, FrozenSet
+import os
 from pathlib import Path
+from typing import FrozenSet, Optional
+
+import attr
 from structlog import get_logger
 
 from parsec.api.data import EntryID
-
 
 logger = get_logger()
 

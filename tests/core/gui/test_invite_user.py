@@ -1,13 +1,14 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
+from unittest.mock import patch
+
 import pytest
 from PyQt5 import QtCore
-from parsec.core.types import BackendOrganizationClaimUserAddr
-from parsec.core.gui.invite_user_widget import InviteUserWidget
-from unittest.mock import patch
-from parsec.core.gui.custom_dialogs import GreyedDialog
 
+from parsec.core.gui.custom_dialogs import GreyedDialog
+from parsec.core.gui.invite_user_widget import InviteUserWidget
 from parsec.core.local_device import save_device_with_password
+from parsec.core.types import BackendOrganizationClaimUserAddr
 
 
 async def logged_gui(aqtbot, gui_factory, autoclose_dialog, core_config, user):

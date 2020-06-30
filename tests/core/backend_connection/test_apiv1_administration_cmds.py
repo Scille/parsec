@@ -5,11 +5,10 @@ import trio
 
 from parsec.api.protocol import APIV1_ADMINISTRATION_CMDS
 from parsec.core.backend_connection import (
-    BackendNotAvailable,
     BackendConnectionRefused,
+    BackendNotAvailable,
     apiv1_backend_administration_cmds_factory,
 )
-
 from tests.core.backend_connection.common import ALL_CMDS
 
 

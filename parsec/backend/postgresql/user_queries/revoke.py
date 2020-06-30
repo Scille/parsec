@@ -1,19 +1,18 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-from parsec.backend.backend_events import BackendEvent
-from pypika import Parameter
 import pendulum
+from pypika import Parameter
 
-from parsec.api.protocol import OrganizationID, UserID, DeviceID
-from parsec.backend.user import UserError, UserNotFoundError, UserAlreadyRevokedError
+from parsec.api.protocol import DeviceID, OrganizationID, UserID
+from parsec.backend.backend_events import BackendEvent
 from parsec.backend.postgresql.handler import send_signal
-from parsec.backend.postgresql.utils import query
 from parsec.backend.postgresql.tables import (
-    q_user,
-    q_organization_internal_id,
     q_device_internal_id,
+    q_organization_internal_id,
+    q_user,
 )
-
+from parsec.backend.postgresql.utils import query
+from parsec.backend.user import UserAlreadyRevokedError, UserError, UserNotFoundError
 
 _q_revoke_user = """
 UPDATE user_ SET

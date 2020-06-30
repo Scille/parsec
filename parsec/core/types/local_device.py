@@ -1,24 +1,26 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-import attr
-from typing import Tuple, Optional
 from hashlib import sha256
-from marshmallow import ValidationError
-from pendulum import Pendulum, now as pendulum_now
+from typing import Optional, Tuple
 
-from parsec.crypto import SecretKey, PrivateKey, SigningKey
-from parsec.serde import fields, post_load
-from parsec.api.protocol import (
-    UserID,
-    DeviceID,
-    OrganizationID,
-    HumanHandle,
-    DeviceIDField,
-    HumanHandleField,
-)
+import attr
+from marshmallow import ValidationError
+from pendulum import Pendulum
+from pendulum import now as pendulum_now
+
 from parsec.api.data import BaseSchema, EntryID, EntryIDField, UserProfile, UserProfileField
-from parsec.core.types.base import BaseLocalData
+from parsec.api.protocol import (
+    DeviceID,
+    DeviceIDField,
+    HumanHandle,
+    HumanHandleField,
+    OrganizationID,
+    UserID,
+)
 from parsec.core.types.backend_address import BackendOrganizationAddr, BackendOrganizationAddrField
+from parsec.core.types.base import BaseLocalData
+from parsec.crypto import PrivateKey, SecretKey, SigningKey
+from parsec.serde import fields, post_load
 
 
 class LocalDevice(BaseLocalData):

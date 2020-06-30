@@ -1,12 +1,10 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-from PyQt5.QtWidgets import QWidget
 from PyQt5.QtCore import QFile, QIODevice
-
+from PyQt5.QtWidgets import QWidget
 from structlog import get_logger
 
 from parsec.core.gui.ui.changelog_widget import Ui_ChangelogWidget
-
 
 logger = get_logger()
 

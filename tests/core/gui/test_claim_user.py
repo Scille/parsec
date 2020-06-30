@@ -1,15 +1,14 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-from parsec.backend.backend_events import BackendEvent
-from parsec.event_bus import MetaEvent
 import pytest
 import trio
 from PyQt5 import QtCore, QtWidgets
 
 from parsec.api.protocol import DeviceID
-from parsec.core.types import BackendOrganizationClaimUserAddr
+from parsec.backend.backend_events import BackendEvent
 from parsec.core.invite_claim import invite_and_create_user
-
+from parsec.core.types import BackendOrganizationClaimUserAddr
+from parsec.event_bus import MetaEvent
 from tests.common import addr_with_device_subdomain
 from tests.open_tcp_stream_mock_wrapper import offline
 

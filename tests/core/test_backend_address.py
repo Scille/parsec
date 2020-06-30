@@ -5,14 +5,13 @@ import pytest
 from parsec.api.protocol import InvitationType
 from parsec.core.types import (
     BackendAddr,
+    BackendInvitationAddr,
     BackendOrganizationAddr,
     BackendOrganizationBootstrapAddr,
-    BackendOrganizationClaimUserAddr,
     BackendOrganizationClaimDeviceAddr,
+    BackendOrganizationClaimUserAddr,
     BackendOrganizationFileLinkAddr,
-    BackendInvitationAddr,
 )
-
 
 ORG = "MyOrg"
 RVK = "P25GRG3XPSZKBEKXYQFBOLERWQNEDY3AO43MVNZCLPXPKN63JRYQssss"

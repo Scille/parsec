@@ -1,11 +1,12 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-from typing import List, Tuple
 from collections import defaultdict
+from typing import List, Tuple
+
 from pendulum import Pendulum
 
+from parsec.api.protocol import DeviceID, OrganizationID, UserID
 from parsec.backend.backend_events import BackendEvent
-from parsec.api.protocol import UserID, DeviceID, OrganizationID
 from parsec.backend.message import BaseMessageComponent
 
 

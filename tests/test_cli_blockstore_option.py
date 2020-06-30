@@ -7,9 +7,9 @@ from parsec.backend.cli.run import _parse_blockstore_params
 from parsec.backend.config import (
     MockedBlockStoreConfig,
     PostgreSQLBlockStoreConfig,
+    RAID0BlockStoreConfig,
     S3BlockStoreConfig,
     SWIFTBlockStoreConfig,
-    RAID0BlockStoreConfig,
 )
 
 

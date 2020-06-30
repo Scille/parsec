@@ -1,27 +1,27 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-import pytest
-from uuid import UUID
 from pathlib import Path
+from uuid import UUID
 
-from parsec.crypto import SigningKey
-from parsec.serde import packb, unpackb
-from parsec.api.protocol import OrganizationID, DeviceID
-from parsec.core.types import LocalDevice
+import pytest
+
+from parsec.api.protocol import DeviceID, OrganizationID
 from parsec.core.local_device import (
     AvailableDevice,
-    get_key_file,
+    LocalDeviceAlreadyExistsError,
+    LocalDeviceCryptoError,
+    LocalDeviceNotFoundError,
+    LocalDevicePackingError,
+    change_device_password,
     get_devices_dir,
+    get_key_file,
     list_available_devices,
     load_device_with_password,
     save_device_with_password,
-    change_device_password,
-    LocalDeviceCryptoError,
-    LocalDeviceNotFoundError,
-    LocalDeviceAlreadyExistsError,
-    LocalDevicePackingError,
 )
-
+from parsec.core.types import LocalDevice
+from parsec.crypto import SigningKey
+from parsec.serde import packb, unpackb
 from tests.common import customize_fixtures
 
 

@@ -5,7 +5,7 @@ from pathlib import Path
 import pytest
 
 from parsec.core.fs.storage import UserStorage
-from parsec.core.types import LocalUserManifest, EntryID
+from parsec.core.types import EntryID, LocalUserManifest
 
 
 @pytest.fixture

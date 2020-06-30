@@ -1,19 +1,20 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-import attr
 from typing import Optional
+
+import attr
 from pendulum import Pendulum
 
+from parsec.api.protocol import DeviceID, DeviceIDField
+from parsec.crypto import CryptoError, PrivateKey, PublicKey, SecretKey, SigningKey, VerifyKey
 from parsec.serde import (
     BaseSchema,
-    fields,
-    SerdeValidationError,
-    SerdePackingError,
     BaseSerializer,
+    SerdePackingError,
+    SerdeValidationError,
     ZipMsgpackSerializer,
+    fields,
 )
-from parsec.crypto import CryptoError, PrivateKey, PublicKey, SigningKey, VerifyKey, SecretKey
-from parsec.api.protocol import DeviceID, DeviceIDField
 
 
 class DataError(Exception):

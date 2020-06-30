@@ -1,31 +1,32 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-import attr
 import re
-import pytest
-import pendulum
 from collections import defaultdict
-from typing import Union, Optional, Tuple
+from typing import Optional, Tuple, Union
+
+import attr
+import pendulum
+import pytest
 from async_generator import asynccontextmanager
 from pendulum import Pendulum
 
-from parsec.crypto import SigningKey
 from parsec.api.data import (
-    UserProfile,
-    UserCertificateContent,
-    UserManifest,
-    RevokedUserCertificateContent,
     DeviceCertificateContent,
     RealmRoleCertificateContent,
+    RevokedUserCertificateContent,
+    UserCertificateContent,
+    UserManifest,
+    UserProfile,
 )
-from parsec.api.protocol import OrganizationID, UserID, DeviceID, HumanHandle, RealmRole
+from parsec.api.protocol import DeviceID, HumanHandle, OrganizationID, RealmRole, UserID
 from parsec.backend.backend_events import BackendEvent
-from parsec.core.types import LocalDevice, LocalUserManifest, BackendOrganizationBootstrapAddr
-from parsec.core.local_device import generate_new_device
-from parsec.backend.user import User as BackendUser, Device as BackendDevice
 from parsec.backend.realm import RealmGrantedRole
-
-from tests.common import freeze_time, addr_with_device_subdomain
+from parsec.backend.user import Device as BackendDevice
+from parsec.backend.user import User as BackendUser
+from parsec.core.local_device import generate_new_device
+from parsec.core.types import BackendOrganizationBootstrapAddr, LocalDevice, LocalUserManifest
+from parsec.crypto import SigningKey
+from tests.common import addr_with_device_subdomain, freeze_time
 
 
 @pytest.fixture

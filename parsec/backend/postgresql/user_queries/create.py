@@ -1,27 +1,27 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-from parsec.backend.backend_events import BackendEvent
 import itertools
 from typing import Optional
-from triopg import UniqueViolationError
-from pypika import Parameter
 from uuid import UUID
+
 from pendulum import now as pendulum_now
+from pypika import Parameter
+from triopg import UniqueViolationError
 
 from parsec.api.protocol import OrganizationID
-from parsec.backend.user import User, Device, UserError, UserNotFoundError, UserAlreadyExistsError
+from parsec.backend.backend_events import BackendEvent
 from parsec.backend.postgresql.handler import send_signal
-from parsec.backend.postgresql.utils import Query, query
 from parsec.backend.postgresql.tables import (
-    t_device,
-    t_user,
-    t_human,
-    q_organization_internal_id,
-    q_human_internal_id,
-    q_user_internal_id,
     q_device_internal_id,
+    q_human_internal_id,
+    q_organization_internal_id,
+    q_user_internal_id,
+    t_device,
+    t_human,
+    t_user,
 )
-
+from parsec.backend.postgresql.utils import Query, query
+from parsec.backend.user import Device, User, UserAlreadyExistsError, UserError, UserNotFoundError
 
 _q_get_user_devices = (
     Query.from_(t_device)

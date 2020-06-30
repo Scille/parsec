@@ -1,24 +1,26 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-from parsec.backend.backend_events import BackendEvent
-import attr
-from uuid import UUID
-from typing import List, Optional, Tuple
 from collections import defaultdict
-from pendulum import Pendulum, now as pendulum_now
+from typing import List, Optional, Tuple
+from uuid import UUID
 
-from parsec.api.protocol import OrganizationID, UserID, InvitationStatus, InvitationDeletedReason
+import attr
+from pendulum import Pendulum
+from pendulum import now as pendulum_now
+
+from parsec.api.protocol import InvitationDeletedReason, InvitationStatus, OrganizationID, UserID
+from parsec.backend.backend_events import BackendEvent
 from parsec.backend.invite import (
-    ConduitState,
     NEXT_CONDUIT_STATE,
-    ConduitListenCtx,
     BaseInviteComponent,
-    Invitation,
-    UserInvitation,
+    ConduitListenCtx,
+    ConduitState,
     DeviceInvitation,
-    InvitationNotFoundError,
+    Invitation,
     InvitationAlreadyDeletedError,
     InvitationInvalidStateError,
+    InvitationNotFoundError,
+    UserInvitation,
 )
 
 

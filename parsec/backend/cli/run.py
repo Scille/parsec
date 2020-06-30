@@ -1,27 +1,27 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
 import ssl
-import trio
-import click
-from structlog import get_logger
-from itertools import count
 from collections import defaultdict
+from itertools import count
 
-from parsec.utils import trio_run
-from parsec.cli_utils import cli_exception_handler
-from parsec.logging import configure_logging, configure_sentry_logging
+import click
+import trio
+from structlog import get_logger
+
 from parsec.backend import backend_app_factory
 from parsec.backend.config import (
     BackendConfig,
     MockedBlockStoreConfig,
     PostgreSQLBlockStoreConfig,
-    S3BlockStoreConfig,
-    SWIFTBlockStoreConfig,
     RAID0BlockStoreConfig,
     RAID1BlockStoreConfig,
     RAID5BlockStoreConfig,
+    S3BlockStoreConfig,
+    SWIFTBlockStoreConfig,
 )
-
+from parsec.cli_utils import cli_exception_handler
+from parsec.logging import configure_logging, configure_sentry_logging
+from parsec.utils import trio_run
 
 logger = get_logger()
 

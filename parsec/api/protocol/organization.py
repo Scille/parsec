@@ -1,9 +1,8 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-from parsec.serde import fields
-from parsec.api.protocol.base import BaseReqSchema, BaseRepSchema, CmdSerializer
+from parsec.api.protocol.base import BaseRepSchema, BaseReqSchema, CmdSerializer
 from parsec.api.protocol.types import OrganizationIDField
-
+from parsec.serde import fields
 
 __all__ = "organization_bootstrap_serializer"
 

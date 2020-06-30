@@ -1,14 +1,13 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
 import pathlib
+
 import pytest
 from PyQt5 import QtCore, QtWidgets
 
-from parsec.core.local_device import save_device_with_password
-
+from parsec.core.gui.file_items import NAME_DATA_INDEX, TYPE_DATA_INDEX, FileType
 from parsec.core.gui.lang import translate as _
-from parsec.core.gui.file_items import FileType, NAME_DATA_INDEX, TYPE_DATA_INDEX
-
+from parsec.core.local_device import save_device_with_password
 from parsec.test_utils import create_inconsistent_workspace
 
 

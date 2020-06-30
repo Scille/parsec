@@ -3,9 +3,7 @@
 from PyQt5.QtWidgets import QWidget
 
 from parsec import __version__
-
 from parsec.core.gui.lang import translate as _
-
 from parsec.core.gui.ui.about_widget import Ui_AboutWidget
 
 

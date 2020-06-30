@@ -1,23 +1,19 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-from PyQt5.QtCore import pyqtSignal, Qt
-from PyQt5.QtWidgets import QWidget, QDialog, QApplication
-
+from PyQt5.QtCore import Qt, pyqtSignal
+from PyQt5.QtWidgets import QApplication, QDialog, QWidget
 from structlog import get_logger
 
 from parsec.api.protocol import DeviceID
-from parsec.core.types import BackendOrganizationClaimDeviceAddr
-from parsec.core.local_device import LocalDeviceAlreadyExistsError, save_device_with_password
-from parsec.core.invite_claim import (
-    claim_device as core_claim_device,
-    InviteClaimError,
-    InviteClaimBackendOfflineError,
-)
-from parsec.core.gui.trio_thread import JobResultError, ThreadSafeQtSignal
-from parsec.core.gui.custom_dialogs import show_error, show_info, GreyedDialog
+from parsec.core.gui.custom_dialogs import GreyedDialog, show_error, show_info
 from parsec.core.gui.lang import translate as _
-from parsec.core.gui.password_validation import get_password_strength, PasswordStrengthWidget
+from parsec.core.gui.password_validation import PasswordStrengthWidget, get_password_strength
+from parsec.core.gui.trio_thread import JobResultError, ThreadSafeQtSignal
 from parsec.core.gui.ui.claim_device_widget import Ui_ClaimDeviceWidget
+from parsec.core.invite_claim import InviteClaimBackendOfflineError, InviteClaimError
+from parsec.core.invite_claim import claim_device as core_claim_device
+from parsec.core.local_device import LocalDeviceAlreadyExistsError, save_device_with_password
+from parsec.core.types import BackendOrganizationClaimDeviceAddr
 
 logger = get_logger()
 

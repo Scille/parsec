@@ -1,16 +1,16 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
+from typing import Optional, Tuple
+from urllib.parse import parse_qs, quote_plus, unquote_plus, urlsplit, urlunsplit
 from uuid import UUID
-from typing import Tuple, Optional
-from urllib.parse import urlsplit, urlunsplit, parse_qs, quote_plus, unquote_plus
+
 from marshmallow import ValidationError
 
-from parsec.serde import fields
-from parsec.crypto import VerifyKey, export_root_verify_key, import_root_verify_key
-from parsec.api.protocol import OrganizationID, UserID, DeviceID, InvitationType
 from parsec.api.data import EntryID
+from parsec.api.protocol import DeviceID, InvitationType, OrganizationID, UserID
 from parsec.core.types.base import FsPath
-
+from parsec.crypto import VerifyKey, export_root_verify_key, import_root_verify_key
+from parsec.serde import fields
 
 PARSEC_SCHEME = "parsec"
 

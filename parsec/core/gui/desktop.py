@@ -1,9 +1,8 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
 import psutil
-
-from PyQt5.QtCore import QUrl, QFileInfo, QSysInfo, QLocale
-from PyQt5.QtGui import QDesktopServices, QGuiApplication, QClipboard
+from PyQt5.QtCore import QFileInfo, QLocale, QSysInfo, QUrl
+from PyQt5.QtGui import QClipboard, QDesktopServices, QGuiApplication
 
 from parsec.api.protocol import DeviceName
 

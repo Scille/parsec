@@ -4,21 +4,18 @@ import platform
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPainter
-from PyQt5.QtWidgets import QWidget, QCompleter, QDialog, QApplication, QStyleOption, QStyle
-
+from PyQt5.QtWidgets import QApplication, QCompleter, QDialog, QStyle, QStyleOption, QWidget
 from structlog import get_logger
 
-from parsec.core.gui.lang import translate as _
 from parsec.core.gui import desktop
 from parsec.core.gui.custom_widgets import Button
+from parsec.core.gui.lang import translate as _
 from parsec.core.gui.parsec_application import ParsecApp
-
 from parsec.core.gui.ui.error_widget import Ui_ErrorWidget
-from parsec.core.gui.ui.info_widget import Ui_InfoWidget
-from parsec.core.gui.ui.question_widget import Ui_QuestionWidget
-from parsec.core.gui.ui.input_widget import Ui_InputWidget
 from parsec.core.gui.ui.greyed_dialog import Ui_GreyedDialog
-
+from parsec.core.gui.ui.info_widget import Ui_InfoWidget
+from parsec.core.gui.ui.input_widget import Ui_InputWidget
+from parsec.core.gui.ui.question_widget import Ui_QuestionWidget
 
 logger = get_logger()
 

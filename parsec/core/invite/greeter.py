@@ -1,40 +1,41 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-import attr
+from typing import List, Optional, Tuple
 from uuid import UUID
-from typing import Optional, List, Tuple
+
+import attr
 from pendulum import now as pendulum_now
 
-from parsec.crypto import (
-    generate_shared_secret_key,
-    generate_nonce,
-    SecretKey,
-    PrivateKey,
-    HashDigest,
-    PublicKey,
-    VerifyKey,
-)
 from parsec.api.data import (
     DataError,
-    SASCode,
-    UserProfile,
-    generate_sas_codes,
-    generate_sas_code_candidates,
-    InviteUserData,
-    InviteUserConfirmation,
-    InviteDeviceData,
-    InviteDeviceConfirmation,
     DeviceCertificateContent,
+    InviteDeviceConfirmation,
+    InviteDeviceData,
+    InviteUserConfirmation,
+    InviteUserData,
+    SASCode,
     UserCertificateContent,
+    UserProfile,
+    generate_sas_code_candidates,
+    generate_sas_codes,
 )
-from parsec.api.protocol import DeviceName, DeviceID, HumanHandle, InvitationDeletedReason
+from parsec.api.protocol import DeviceID, DeviceName, HumanHandle, InvitationDeletedReason
 from parsec.core.backend_connection import BackendInvitedCmds
-from parsec.core.types import LocalDevice
 from parsec.core.invite.exceptions import (
-    InviteError,
-    InvitePeerResetError,
-    InviteNotFoundError,
     InviteAlreadyUsedError,
+    InviteError,
+    InviteNotFoundError,
+    InvitePeerResetError,
+)
+from parsec.core.types import LocalDevice
+from parsec.crypto import (
+    HashDigest,
+    PrivateKey,
+    PublicKey,
+    SecretKey,
+    VerifyKey,
+    generate_nonce,
+    generate_shared_secret_key,
 )
 
 

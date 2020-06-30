@@ -3,9 +3,9 @@
 
 import attr
 import trio
+from async_generator import asynccontextmanager
 from pendulum import Pendulum
 from structlog import get_logger
-from async_generator import asynccontextmanager
 
 from parsec import service_nursery
 from parsec.monitoring import TaskMonitoringInstrument

@@ -1,27 +1,25 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-from parsec.core.core_events import CoreEvent
-import os
 import errno
+import os
+from pathlib import Path, PurePath
 from uuid import uuid4
 
-import trio
 import pytest
-from pathlib import Path, PurePath
+import trio
 
-from parsec.core.mountpoint import (
-    mountpoint_manager_factory,
-    MountpointConfigurationError,
-    MountpointAlreadyMounted,
-    MountpointNotMounted,
-    MountpointFuseNotAvailable,
-    MountpointWinfspNotAvailable,
-)
 from parsec.core import logged_core_factory
+from parsec.core.core_events import CoreEvent
+from parsec.core.mountpoint import (
+    MountpointAlreadyMounted,
+    MountpointConfigurationError,
+    MountpointFuseNotAvailable,
+    MountpointNotMounted,
+    MountpointWinfspNotAvailable,
+    mountpoint_manager_factory,
+)
 from parsec.core.types import FsPath, WorkspaceRole
-
 from tests.common import create_shared_workspace
-
 
 # Helper
 

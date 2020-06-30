@@ -1,10 +1,10 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-from parsec.core.core_events import CoreEvent
 import pytest
 import trio
 from async_generator import asynccontextmanager
 
+from parsec.core.core_events import CoreEvent
 from tests.common import freeze_time
 from tests.open_tcp_stream_mock_wrapper import offline
 

@@ -2,14 +2,14 @@
 
 from pathlib import Path
 from typing import Dict, Set, Tuple
+
 from async_generator import asynccontextmanager
 
 from parsec.core.fs.exceptions import FSLocalMissError
-from parsec.core.types import EntryID, LocalDevice, LocalUserManifest
-
-from parsec.core.fs.storage.version import USER_STORAGE_NAME
 from parsec.core.fs.storage.local_database import LocalDatabase
 from parsec.core.fs.storage.manifest_storage import ManifestStorage
+from parsec.core.fs.storage.version import USER_STORAGE_NAME
+from parsec.core.types import EntryID, LocalDevice, LocalUserManifest
 
 
 class UserStorage:

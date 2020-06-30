@@ -4,9 +4,9 @@ import pytest
 from pendulum import Pendulum
 
 from parsec.api.data import (
-    UserCertificateContent,
     DeviceCertificateContent,
     RevokedUserCertificateContent,
+    UserCertificateContent,
     UserProfile,
 )
 from parsec.core.trustchain import TrustchainContext, TrustchainError

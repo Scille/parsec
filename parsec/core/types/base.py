@@ -2,9 +2,8 @@
 
 from typing import Tuple
 
-from parsec.serde import BaseSchema, MsgpackSerializer
 from parsec.api.data import BaseData, EntryName
-
+from parsec.serde import BaseSchema, MsgpackSerializer
 
 __all__ = ("BaseLocalData", "FsPath")
 

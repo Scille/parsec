@@ -1,8 +1,8 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
 from parsec.api.protocol import DeviceID, OrganizationID
-from parsec.backend.ping import BasePingComponent
 from parsec.backend.backend_events import BackendEvent
+from parsec.backend.ping import BasePingComponent
 
 
 class MemoryPingComponent(BasePingComponent):

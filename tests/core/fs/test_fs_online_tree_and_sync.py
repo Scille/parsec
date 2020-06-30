@@ -1,8 +1,9 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
 import os
-import pytest
 from string import ascii_lowercase
+
+import pytest
 from hypothesis import strategies as st
 from hypothesis_trio.stateful import Bundle, initialize, rule
 

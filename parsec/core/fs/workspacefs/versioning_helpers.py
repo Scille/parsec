@@ -15,21 +15,22 @@ the download of the soonest needed manifests (which is already implemented), or 
 concurrent downloads (which will be implemented in a next version).
 """
 
-from heapq import heappush, heappop
-import attr
 import math
-import trio
 import typing
-from functools import partial
-from typing import List, Tuple, NamedTuple, Optional
-from pendulum import Pendulum
 from collections import defaultdict
+from functools import partial
+from heapq import heappop, heappush
+from typing import List, NamedTuple, Optional, Tuple
+
+import attr
+import trio
+from pendulum import Pendulum
 
 from parsec.api.data import Manifest as RemoteManifest
 from parsec.api.protocol import DeviceID
-from parsec.core.types import FsPath, EntryID
-from parsec.core.fs.utils import is_file_manifest, is_folder_manifest, is_workspace_manifest
 from parsec.core.fs.exceptions import FSRemoteManifestNotFound
+from parsec.core.fs.utils import is_file_manifest, is_folder_manifest, is_workspace_manifest
+from parsec.core.types import EntryID, FsPath
 
 
 class EntryNotFound(Exception):

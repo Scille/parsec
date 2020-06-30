@@ -1,9 +1,10 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-import pytest
 import os
-import time
 import threading
+import time
+
+import pytest
 
 from parsec.core.fs.utils import ntstatus
 

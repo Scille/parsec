@@ -1,21 +1,22 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-import attr
-from typing import List, Optional
-from pathlib import Path
 from hashlib import sha256
+from pathlib import Path
+from typing import List, Optional
 
-from parsec.serde import BaseSchema, fields, MsgpackSerializer
+import attr
+
+from parsec.api.data import DataError, UserProfile
+from parsec.api.protocol import DeviceID, HumanHandle, HumanHandleField, OrganizationID
+from parsec.core.types import BackendOrganizationAddr, EntryID, LocalDevice
 from parsec.crypto import (
+    CryptoError,
+    PrivateKey,
     SecretKey,
     SigningKey,
-    PrivateKey,
-    CryptoError,
     derivate_secret_key_from_password,
 )
-from parsec.api.protocol import OrganizationID, DeviceID, HumanHandle, HumanHandleField
-from parsec.api.data import DataError, UserProfile
-from parsec.core.types import EntryID, LocalDevice, BackendOrganizationAddr
+from parsec.serde import BaseSchema, MsgpackSerializer, fields
 
 
 class LocalDeviceError(Exception):

@@ -6,15 +6,15 @@ import trio
 from parsec.api.data import UserProfile
 from parsec.api.protocol import HumanHandle, InvitationType
 from parsec.core.backend_connection import backend_invited_cmds_factory
-from parsec.core.types import BackendInvitationAddr, LocalDevice, WorkspaceRole
 from parsec.core.invite import (
-    InvitePeerResetError,
-    claimer_retrieve_info,
     DeviceClaimInitialCtx,
-    UserClaimInitialCtx,
     DeviceGreetInitialCtx,
+    InvitePeerResetError,
+    UserClaimInitialCtx,
     UserGreetInitialCtx,
+    claimer_retrieve_info,
 )
+from parsec.core.types import BackendInvitationAddr, LocalDevice, WorkspaceRole
 
 
 @pytest.mark.trio

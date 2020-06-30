@@ -1,34 +1,32 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
 import pendulum
-
 from PyQt5.QtCore import pyqtSignal
-from PyQt5.QtWidgets import QWidget, QApplication, QDialog
-
+from PyQt5.QtWidgets import QApplication, QDialog, QWidget
 from structlog import get_logger
 
-from parsec.crypto import SigningKey
-from parsec.api.data import UserCertificateContent, DeviceCertificateContent, UserProfile
+from parsec.api.data import DeviceCertificateContent, UserCertificateContent, UserProfile
 from parsec.api.protocol import DeviceID
-from parsec.core.types import BackendOrganizationBootstrapAddr
 from parsec.core.backend_connection import (
-    apiv1_backend_anonymous_cmds_factory,
-    BackendNotAvailable,
-    BackendConnectionRefused,
     BackendConnectionError,
+    BackendConnectionRefused,
+    BackendNotAvailable,
+    apiv1_backend_anonymous_cmds_factory,
 )
-from parsec.core.local_device import (
-    generate_new_device,
-    save_device_with_password,
-    LocalDeviceAlreadyExistsError,
-)
-from parsec.core.gui.trio_thread import JobResultError, ThreadSafeQtSignal
-from parsec.core.gui.custom_dialogs import show_error, GreyedDialog, show_info
+from parsec.core.gui import validators
+from parsec.core.gui.custom_dialogs import GreyedDialog, show_error, show_info
 from parsec.core.gui.desktop import get_default_device
 from parsec.core.gui.lang import translate as _
-from parsec.core.gui import validators
 from parsec.core.gui.password_validation import PasswordStrengthWidget, get_password_strength
+from parsec.core.gui.trio_thread import JobResultError, ThreadSafeQtSignal
 from parsec.core.gui.ui.bootstrap_organization_widget import Ui_BootstrapOrganizationWidget
+from parsec.core.local_device import (
+    LocalDeviceAlreadyExistsError,
+    generate_new_device,
+    save_device_with_password,
+)
+from parsec.core.types import BackendOrganizationBootstrapAddr
+from parsec.crypto import SigningKey
 
 logger = get_logger()
 

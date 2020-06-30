@@ -1,15 +1,14 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-from parsec.backend.backend_events import BackendEvent
-import pytest
 import pendulum
+import pytest
 
-from parsec.backend.user import INVITATION_VALIDITY, User, Device
-from parsec.api.data import UserCertificateContent, DeviceCertificateContent, UserProfile
+from parsec.api.data import DeviceCertificateContent, UserCertificateContent, UserProfile
 from parsec.api.protocol import apiv1_user_create_serializer
-
-from tests.common import freeze_time
+from parsec.backend.backend_events import BackendEvent
+from parsec.backend.user import INVITATION_VALIDITY, Device, User
 from tests.backend.common import user_get
+from tests.common import freeze_time
 
 
 async def user_create(sock, **kwargs):

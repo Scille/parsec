@@ -1,12 +1,13 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
+from enum import Enum
+
 from pendulum import Pendulum
 
-from parsec.crypto import SecretKey
-from parsec.serde import fields, post_load, OneOfSchema
-from parsec.api.data.entry import EntryID, EntryIDField
 from parsec.api.data.base import BaseAPISignedData, BaseSignedDataSchema
-from enum import Enum
+from parsec.api.data.entry import EntryID, EntryIDField
+from parsec.crypto import SecretKey
+from parsec.serde import OneOfSchema, fields, post_load
 
 
 class MessageContentType(Enum):

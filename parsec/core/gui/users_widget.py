@@ -1,17 +1,16 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-from PyQt5.QtCore import Qt, pyqtSignal, QTimer
-from PyQt5.QtWidgets import QWidget, QMenu, QGraphicsDropShadowEffect
+from PyQt5.QtCore import Qt, QTimer, pyqtSignal
 from PyQt5.QtGui import QColor
+from PyQt5.QtWidgets import QGraphicsDropShadowEffect, QMenu, QWidget
 
 from parsec.api.data import UserProfile
-
 from parsec.core.backend_connection import BackendConnectionError, BackendNotAvailable
-
-from parsec.core.gui.trio_thread import JobResultError, ThreadSafeQtSignal, QtToTrioJob
+from parsec.core.gui.custom_dialogs import ask_question, show_error, show_info
 from parsec.core.gui.invite_user_widget import InviteUserWidget
-from parsec.core.gui.custom_dialogs import show_error, show_info, ask_question
-from parsec.core.gui.lang import translate as _, format_datetime
+from parsec.core.gui.lang import format_datetime
+from parsec.core.gui.lang import translate as _
+from parsec.core.gui.trio_thread import JobResultError, QtToTrioJob, ThreadSafeQtSignal
 from parsec.core.gui.ui.user_button import Ui_UserButton
 from parsec.core.gui.ui.users_widget import Ui_UsersWidget
 

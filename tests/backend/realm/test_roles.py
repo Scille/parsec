@@ -1,17 +1,17 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-import pytest
-from uuid import UUID
-from pendulum import Pendulum, now as pendulum_now
 from unittest.mock import ANY
+from uuid import UUID
 
-from parsec.api.protocol import RealmRole
+import pytest
+from pendulum import Pendulum
+from pendulum import now as pendulum_now
+
 from parsec.api.data import RealmRoleCertificateContent, UserProfile
+from parsec.api.protocol import RealmRole
 from parsec.backend.realm import RealmGrantedRole
-
-from tests.common import freeze_time, customize_fixtures
-from tests.backend.common import realm_update_roles, realm_get_role_certificates
-
+from tests.backend.common import realm_get_role_certificates, realm_update_roles
+from tests.common import customize_fixtures, freeze_time
 
 NOW = Pendulum(2000, 1, 1)
 VLOB_ID = UUID("00000000000000000000000000000001")

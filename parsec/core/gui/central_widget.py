@@ -1,28 +1,27 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-from parsec.core.core_events import CoreEvent
 from PyQt5.QtCore import pyqtSignal
-from PyQt5.QtGui import QPixmap, QColor
+from PyQt5.QtGui import QColor, QPixmap
 from PyQt5.QtWidgets import QGraphicsDropShadowEffect, QWidget
-
-from parsec.core.gui.mount_widget import MountWidget
-from parsec.core.gui.users_widget import UsersWidget
-from parsec.core.gui.devices_widget import DevicesWidget
-from parsec.core.gui.menu_widget import MenuWidget
-from parsec.core.gui.lang import translate as _
-from parsec.core.gui.ui.central_widget import Ui_CentralWidget
 
 from parsec.api.protocol import (
     HandshakeAPIVersionError,
-    HandshakeRevokedDevice,
     HandshakeOrganizationExpired,
+    HandshakeRevokedDevice,
 )
 from parsec.core.backend_connection import BackendConnStatus
+from parsec.core.core_events import CoreEvent
 from parsec.core.fs import (
+    FSWorkspaceInMaintenance,
     FSWorkspaceNoReadAccess,
     FSWorkspaceNoWriteAccess,
-    FSWorkspaceInMaintenance,
 )
+from parsec.core.gui.devices_widget import DevicesWidget
+from parsec.core.gui.lang import translate as _
+from parsec.core.gui.menu_widget import MenuWidget
+from parsec.core.gui.mount_widget import MountWidget
+from parsec.core.gui.ui.central_widget import Ui_CentralWidget
+from parsec.core.gui.users_widget import UsersWidget
 
 
 class CentralWidget(QWidget, Ui_CentralWidget):

@@ -1,10 +1,11 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
 import os
+from string import ascii_lowercase
+
 import pytest
 from hypothesis import strategies as st
-from hypothesis_trio.stateful import initialize, rule, Bundle
-from string import ascii_lowercase
+from hypothesis_trio.stateful import Bundle, initialize, rule
 
 
 def get_path(path):

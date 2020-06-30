@@ -1,30 +1,30 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
+from unittest.mock import ANY
+
 import pytest
 import trio
-from unittest.mock import ANY
 from pendulum import Pendulum
 
-from parsec.backend.backend_events import BackendEvent
-from parsec.api.transport import TransportError
 from parsec.api.data import UserProfile
 from parsec.api.protocol import (
-    InvitationStatus,
-    InvitationDeletedReason,
-    InvitationType,
-    HandshakeBadIdentity,
     APIEvent,
+    HandshakeBadIdentity,
+    InvitationDeletedReason,
+    InvitationStatus,
+    InvitationType,
 )
-
-from tests.common import freeze_time, customize_fixtures
+from parsec.api.transport import TransportError
+from parsec.backend.backend_events import BackendEvent
 from tests.backend.common import (
-    invite_new,
-    invite_list,
+    events_listen_wait,
+    events_subscribe,
     invite_delete,
     invite_info,
-    events_subscribe,
-    events_listen_wait,
+    invite_list,
+    invite_new,
 )
+from tests.common import customize_fixtures, freeze_time
 
 
 @pytest.mark.trio

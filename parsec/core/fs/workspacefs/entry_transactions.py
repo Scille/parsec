@@ -1,35 +1,33 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-from parsec.core.core_events import CoreEvent
 from typing import Tuple
+
 from async_generator import asynccontextmanager
 
+from parsec.core.core_events import CoreEvent
+from parsec.core.fs.exceptions import (
+    FSCrossDeviceError,
+    FSDirectoryNotEmptyError,
+    FSFileExistsError,
+    FSFileNotFoundError,
+    FSIsADirectoryError,
+    FSLocalMissError,
+    FSNoAccessError,
+    FSNotADirectoryError,
+    FSPermissionError,
+    FSReadOnlyError,
+)
+from parsec.core.fs.utils import is_file_manifest, is_folder_manifest, is_folderish_manifest
+from parsec.core.fs.workspacefs.file_transactions import FileTransactions
 from parsec.core.types import (
     EntryID,
+    FileDescriptor,
     FsPath,
-    WorkspaceRole,
-    LocalManifest,
     LocalFileManifest,
     LocalFolderManifest,
-    FileDescriptor,
+    LocalManifest,
+    WorkspaceRole,
 )
-
-
-from parsec.core.fs.workspacefs.file_transactions import FileTransactions
-from parsec.core.fs.utils import is_file_manifest, is_folder_manifest, is_folderish_manifest
-from parsec.core.fs.exceptions import (
-    FSPermissionError,
-    FSNoAccessError,
-    FSReadOnlyError,
-    FSNotADirectoryError,
-    FSFileNotFoundError,
-    FSCrossDeviceError,
-    FSFileExistsError,
-    FSIsADirectoryError,
-    FSDirectoryNotEmptyError,
-    FSLocalMissError,
-)
-
 
 WRITE_RIGHT_ROLES = (WorkspaceRole.OWNER, WorkspaceRole.MANAGER, WorkspaceRole.CONTRIBUTOR)
 

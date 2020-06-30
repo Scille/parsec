@@ -1,45 +1,41 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-from parsec.core.core_events import CoreEvent
 import platform
-from typing import Optional
-from structlog import get_logger
 from distutils.version import LooseVersion
+from typing import Optional
 
-from PyQt5.QtCore import QCoreApplication, pyqtSignal, Qt, QSize
+from PyQt5.QtCore import QCoreApplication, QSize, Qt, pyqtSignal
 from PyQt5.QtGui import QColor, QIcon, QKeySequence
-from PyQt5.QtWidgets import QMainWindow, QApplication, QMenu, QShortcut
+from PyQt5.QtWidgets import QApplication, QMainWindow, QMenu, QShortcut
+from structlog import get_logger
 
 from parsec import __version__ as PARSEC_VERSION
-
-from parsec.core.local_device import list_available_devices, get_key_file
+from parsec.core import win_registry
 from parsec.core.config import save_config
+from parsec.core.core_events import CoreEvent
+from parsec.core.gui import desktop, telemetry, validators
+from parsec.core.gui.about_widget import AboutWidget
+from parsec.core.gui.bootstrap_organization_widget import BootstrapOrganizationWidget
+from parsec.core.gui.changelog_widget import ChangelogWidget
+from parsec.core.gui.claim_device_widget import ClaimDeviceWidget
+from parsec.core.gui.claim_user_widget import ClaimUserWidget
+from parsec.core.gui.create_org_widget import CreateOrgWidget
+from parsec.core.gui.custom_dialogs import GreyedDialog, ask_question, get_text_input, show_error
+from parsec.core.gui.custom_widgets import Button
+from parsec.core.gui.instance_widget import InstanceWidget
+from parsec.core.gui.lang import translate as _
+from parsec.core.gui.license_widget import LicenseWidget
+from parsec.core.gui.parsec_application import ParsecApp
+from parsec.core.gui.settings_widget import SettingsWidget
+from parsec.core.gui.ui.main_window import Ui_MainWindow
+from parsec.core.local_device import get_key_file, list_available_devices
 from parsec.core.types import (
     BackendActionAddr,
     BackendOrganizationBootstrapAddr,
-    BackendOrganizationClaimUserAddr,
     BackendOrganizationClaimDeviceAddr,
+    BackendOrganizationClaimUserAddr,
     BackendOrganizationFileLinkAddr,
 )
-from parsec.core.gui.lang import translate as _
-from parsec.core.gui.instance_widget import InstanceWidget
-from parsec.core.gui.parsec_application import ParsecApp
-from parsec.core.gui import telemetry
-from parsec.core.gui import desktop
-from parsec.core import win_registry
-from parsec.core.gui.changelog_widget import ChangelogWidget
-from parsec.core.gui.bootstrap_organization_widget import BootstrapOrganizationWidget
-from parsec.core.gui.claim_user_widget import ClaimUserWidget
-from parsec.core.gui.claim_device_widget import ClaimDeviceWidget
-from parsec.core.gui.license_widget import LicenseWidget
-from parsec.core.gui.about_widget import AboutWidget
-from parsec.core.gui.settings_widget import SettingsWidget
-from parsec.core.gui.custom_dialogs import ask_question, show_error, GreyedDialog, get_text_input
-from parsec.core.gui.custom_widgets import Button
-from parsec.core.gui.create_org_widget import CreateOrgWidget
-from parsec.core.gui import validators
-from parsec.core.gui.ui.main_window import Ui_MainWindow
-
 
 logger = get_logger()
 

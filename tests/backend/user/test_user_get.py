@@ -5,9 +5,8 @@ from pendulum import Pendulum
 
 from parsec.api.data import UserProfile
 from parsec.api.protocol import packb, user_get_serializer
-
-from tests.common import freeze_time, customize_fixtures
 from tests.backend.common import user_get
+from tests.common import customize_fixtures, freeze_time
 
 
 @pytest.fixture

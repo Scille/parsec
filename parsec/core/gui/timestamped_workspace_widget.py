@@ -1,18 +1,16 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-from PyQt5.QtCore import Qt, QDate, QTime, pyqtSignal
+import pendulum
+from PyQt5.QtCore import QDate, Qt, QTime, pyqtSignal
 from PyQt5.QtGui import QColor
-from PyQt5.QtWidgets import QWidget, QDialog, QApplication
-
+from PyQt5.QtWidgets import QApplication, QDialog, QWidget
 from structlog import get_logger
 
-import pendulum
-
-from parsec.core.gui.lang import get_qlocale, translate as _
-from parsec.core.gui.custom_dialogs import show_error, GreyedDialog
+from parsec.core.gui.custom_dialogs import GreyedDialog, show_error
+from parsec.core.gui.lang import get_qlocale
+from parsec.core.gui.lang import translate as _
 from parsec.core.gui.trio_thread import ThreadSafeQtSignal
 from parsec.core.gui.ui.timestamped_workspace_widget import Ui_TimestampedWorkspaceWidget
-
 
 logger = get_logger()
 

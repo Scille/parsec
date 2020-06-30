@@ -1,19 +1,17 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-from PyQt5.QtCore import pyqtSignal, Qt
-from PyQt5.QtWidgets import QWidget, QGraphicsDropShadowEffect, QMenu
+from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtGui import QColor, QCursor
+from PyQt5.QtWidgets import QGraphicsDropShadowEffect, QMenu, QWidget
 
 from parsec.core.fs import WorkspaceFS
-from parsec.core.types import EntryID, WorkspaceRole
-
-from parsec.core.gui.lang import translate as _, format_datetime
 from parsec.core.gui.custom_dialogs import show_info
-
-from parsec.core.gui.ui.workspace_button import Ui_WorkspaceButton
-from parsec.core.gui.ui.empty_workspace_widget import Ui_EmptyWorkspaceWidget
-
+from parsec.core.gui.lang import format_datetime
+from parsec.core.gui.lang import translate as _
 from parsec.core.gui.switch_button import SwitchButton
+from parsec.core.gui.ui.empty_workspace_widget import Ui_EmptyWorkspaceWidget
+from parsec.core.gui.ui.workspace_button import Ui_WorkspaceButton
+from parsec.core.types import EntryID, WorkspaceRole
 
 
 # Only used because we can't hide widgets in QtDesigner and adding the empty workspace

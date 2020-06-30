@@ -1,23 +1,24 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-from parsec.backend.backend_events import BackendEvent
+from collections import defaultdict
+from typing import Dict, List, Tuple
+
 import attr
 import pendulum
-from typing import Tuple, List, Dict
-from collections import defaultdict
 
-from parsec.api.protocol import OrganizationID, UserID, DeviceID, DeviceName, HumanHandle
+from parsec.api.protocol import DeviceID, DeviceName, HumanHandle, OrganizationID, UserID
+from parsec.backend.backend_events import BackendEvent
 from parsec.backend.user import (
     BaseUserComponent,
-    User,
     Device,
-    Trustchain,
+    DeviceInvitation,
     GetUserAndDevicesResult,
     HumanFindResultItem,
-    UserInvitation,
-    DeviceInvitation,
+    Trustchain,
+    User,
     UserAlreadyExistsError,
     UserAlreadyRevokedError,
+    UserInvitation,
     UserNotFoundError,
 )
 

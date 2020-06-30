@@ -1,13 +1,14 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
+from typing import Dict, Optional, Set, Tuple
+
 import trio
-from structlog import get_logger
-from typing import Dict, Tuple, Set, Optional
 from async_generator import asynccontextmanager
+from structlog import get_logger
 
 from parsec.core.fs.exceptions import FSLocalMissError
-from parsec.core.types import EntryID, ChunkID, LocalDevice, LocalManifest
 from parsec.core.fs.storage.local_database import LocalDatabase
+from parsec.core.types import ChunkID, EntryID, LocalDevice, LocalManifest
 
 logger = get_logger()
 

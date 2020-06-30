@@ -1,12 +1,12 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
 import gc
-import time
 import inspect
+import time
 import traceback
 
-import trio
 import structlog
+import trio
 
 logger = structlog.get_logger()
 

@@ -1,56 +1,55 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
 from parsec.api.data.base import (
-    DataError,
-    BaseData,
     BaseAPIData,
+    BaseAPISignedData,
+    BaseData,
     BaseSchema,
     BaseSignedData,
-    BaseAPISignedData,
     BaseSignedDataSchema,
+    DataError,
 )
-from parsec.api.data.entry import EntryID, EntryIDField, EntryName, EntryNameField
 from parsec.api.data.certif import (
+    DeviceCertificateContent,
+    RealmRoleCertificateContent,
+    RevokedUserCertificateContent,
+    UserCertificateContent,
     UserProfile,
     UserProfileField,
-    UserCertificateContent,
-    DeviceCertificateContent,
-    RevokedUserCertificateContent,
-    RealmRoleCertificateContent,
+)
+from parsec.api.data.entry import EntryID, EntryIDField, EntryName, EntryNameField
+from parsec.api.data.invite import (
+    InviteDeviceConfirmation,
+    InviteDeviceData,
+    InviteUserConfirmation,
+    InviteUserData,
+    SASCode,
+    generate_sas_code_candidates,
+    generate_sas_codes,
 )
 from parsec.api.data.invite_claim import (
-    APIV1_UserClaimContent,
-    APIV1_DeviceClaimContent,
     APIV1_DeviceClaimAnswerContent,
+    APIV1_DeviceClaimContent,
+    APIV1_UserClaimContent,
 )
-from parsec.api.data.invite import (
-    SASCode,
-    generate_sas_codes,
-    generate_sas_code_candidates,
-    InviteUserData,
-    InviteUserConfirmation,
-    InviteDeviceData,
-    InviteDeviceConfirmation,
+from parsec.api.data.manifest import (
+    BlockAccess,
+    BlockID,
+    BlockIDField,
+    FileManifest,
+    FolderManifest,
+    Manifest,
+    UserManifest,
+    WorkspaceEntry,
+    WorkspaceManifest,
 )
 from parsec.api.data.message import (
     MessageContent,
+    PingMessageContent,
     SharingGrantedMessageContent,
     SharingReencryptedMessageContent,
     SharingRevokedMessageContent,
-    PingMessageContent,
 )
-from parsec.api.data.manifest import (
-    BlockID,
-    BlockIDField,
-    BlockAccess,
-    WorkspaceEntry,
-    Manifest,
-    UserManifest,
-    WorkspaceManifest,
-    FolderManifest,
-    FileManifest,
-)
-
 
 __all__ = (
     # Base

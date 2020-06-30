@@ -1,46 +1,48 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
+from collections import defaultdict
+from typing import AsyncGenerator, Dict, List, Tuple, Union
+
 import attr
 import trio
-from collections import defaultdict
-from typing import Union, List, Dict, Tuple, AsyncGenerator
-from pendulum import Pendulum, now as pendulum_now
+from pendulum import Pendulum
+from pendulum import now as pendulum_now
 
 from parsec.api.data import Manifest as RemoteManifest
 from parsec.api.protocol import UserID
-from parsec.core.types import (
-    FsPath,
-    EntryID,
-    LocalDevice,
-    WorkspaceRole,
-    LocalFolderishManifests,
-    LocalFileManifest,
-    DEFAULT_BLOCK_SIZE,
+from parsec.core.fs import workspacefs  # Needed to break cyclic import with WorkspaceFSTimestamped
+from parsec.core.fs.exceptions import (
+    FSBackendOfflineError,
+    FSError,
+    FSFileConflictError,
+    FSInvalidArgumentError,
+    FSLocalMissError,
+    FSNoSynchronizationRequired,
+    FSNotADirectoryError,
+    FSRemoteManifestNotFound,
+    FSRemoteManifestNotFoundBadVersion,
+    FSRemoteSyncError,
+    FSReshapingRequiredError,
+    FSWorkspaceNoAccess,
+    FSWorkspaceTimestampedTooEarly,
 )
+from parsec.core.fs.remote_loader import RemoteLoader
+from parsec.core.fs.utils import is_file_manifest, is_folderish_manifest
+from parsec.core.fs.workspacefs.sync_transactions import SyncTransactions
+from parsec.core.fs.workspacefs.versioning_helpers import VersionLister
 from parsec.core.remote_devices_manager import (
     RemoteDevicesManagerBackendOfflineError,
     RemoteDevicesManagerError,
 )
-from parsec.core.fs.exceptions import FSError, FSBackendOfflineError
-from parsec.core.fs.remote_loader import RemoteLoader
-from parsec.core.fs import workspacefs  # Needed to break cyclic import with WorkspaceFSTimestamped
-from parsec.core.fs.workspacefs.sync_transactions import SyncTransactions
-from parsec.core.fs.workspacefs.versioning_helpers import VersionLister
-from parsec.core.fs.utils import is_file_manifest, is_folderish_manifest
-from parsec.core.fs.exceptions import (
-    FSRemoteManifestNotFound,
-    FSRemoteManifestNotFoundBadVersion,
-    FSRemoteSyncError,
-    FSNoSynchronizationRequired,
-    FSFileConflictError,
-    FSReshapingRequiredError,
-    FSWorkspaceNoAccess,
-    FSWorkspaceTimestampedTooEarly,
-    FSLocalMissError,
-    FSInvalidArgumentError,
-    FSNotADirectoryError,
+from parsec.core.types import (
+    DEFAULT_BLOCK_SIZE,
+    EntryID,
+    FsPath,
+    LocalDevice,
+    LocalFileManifest,
+    LocalFolderishManifests,
+    WorkspaceRole,
 )
-
 
 AnyPath = Union[FsPath, str]
 

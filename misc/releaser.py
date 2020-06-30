@@ -1,15 +1,14 @@
 #!/usr/bin/env python
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-import sys
 import argparse
 import pathlib
-from datetime import date
-from collections import namedtuple, defaultdict
-import subprocess
 import re
+import subprocess
+import sys
 import textwrap
-
+from collections import defaultdict, namedtuple
+from datetime import date
 
 PROJECT_DIR = pathlib.Path(__file__).resolve().parent.parent
 HISTORY_FILE = PROJECT_DIR / "HISTORY.rst"

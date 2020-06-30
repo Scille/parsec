@@ -3,9 +3,8 @@
 
 import os
 
-from setuptools import setup, find_packages, distutils, Command
+from setuptools import Command, distutils, find_packages, setup
 from setuptools.command.build_py import build_py
-
 
 # Awesome hack to load `__version__`
 __version__ = None

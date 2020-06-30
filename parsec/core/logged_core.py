@@ -1,35 +1,35 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-import attr
-from pendulum import now as pendulum_now
-from typing import Optional, Tuple, List
-from structlog import get_logger
 from functools import partial
-from async_generator import asynccontextmanager
+from typing import List, Optional, Tuple
 
-from parsec.event_bus import EventBus
-from parsec.api.protocol import UserID
+import attr
+from async_generator import asynccontextmanager
+from pendulum import now as pendulum_now
+from structlog import get_logger
+
 from parsec.api.data import RevokedUserCertificateContent
-from parsec.core.types import LocalDevice, UserInfo, DeviceInfo
-from parsec.core.config import CoreConfig
+from parsec.api.protocol import UserID
 from parsec.core.backend_connection import (
     BackendAuthenticatedConn,
     BackendConnectionError,
-    BackendNotFoundError,
     BackendConnStatus,
     BackendNotAvailable,
+    BackendNotFoundError,
 )
+from parsec.core.config import CoreConfig
+from parsec.core.fs import UserFS
+from parsec.core.messages_monitor import monitor_messages
+from parsec.core.mountpoint import mountpoint_manager_factory
 from parsec.core.remote_devices_manager import (
     RemoteDevicesManager,
-    RemoteDevicesManagerError,
     RemoteDevicesManagerBackendOfflineError,
+    RemoteDevicesManagerError,
     RemoteDevicesManagerNotFoundError,
 )
-from parsec.core.mountpoint import mountpoint_manager_factory
-from parsec.core.messages_monitor import monitor_messages
 from parsec.core.sync_monitor import monitor_sync
-from parsec.core.fs import UserFS
-
+from parsec.core.types import DeviceInfo, LocalDevice, UserInfo
+from parsec.event_bus import EventBus
 
 logger = get_logger()
 

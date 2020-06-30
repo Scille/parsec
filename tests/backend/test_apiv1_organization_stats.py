@@ -1,11 +1,12 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-import pytest
-from uuid import uuid4
 from unittest.mock import ANY
+from uuid import uuid4
+
+import pytest
 
 from parsec.api.protocol import apiv1_organization_stats_serializer
-from tests.backend.common import vlob_create, block_create
+from tests.backend.common import block_create, vlob_create
 
 
 async def organization_stats(sock, organization_id):

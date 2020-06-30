@@ -1,17 +1,17 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-import pytest
-import pendulum
 from uuid import UUID
 
-from parsec.utils import TIMESTAMP_MAX_DT
+import pendulum
+import pytest
+
 from parsec.api.data import RealmRoleCertificateContent, UserProfile
 from parsec.api.protocol import RealmRole
 from parsec.backend.backend_events import BackendEvent
-
-from tests.common import freeze_time, customize_fixtures
-from tests.backend.test_events import events_subscribe
+from parsec.utils import TIMESTAMP_MAX_DT
 from tests.backend.common import realm_create
+from tests.backend.test_events import events_subscribe
+from tests.common import customize_fixtures, freeze_time
 
 
 @pytest.mark.trio

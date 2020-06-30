@@ -1,17 +1,19 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-from typing import Tuple, List, Sequence, Optional
-from pendulum import Pendulum, now as pendulum_now
+from typing import List, Optional, Sequence, Tuple
 
-from parsec.crypto import VerifyKey
-from parsec.api.protocol import UserID, DeviceID
+from pendulum import Pendulum
+from pendulum import now as pendulum_now
+
 from parsec.api.data import (
     DataError,
+    DeviceCertificateContent,
+    RevokedUserCertificateContent,
     UserCertificateContent,
     UserProfile,
-    RevokedUserCertificateContent,
-    DeviceCertificateContent,
 )
+from parsec.api.protocol import DeviceID, UserID
+from parsec.crypto import VerifyKey
 
 
 class TrustchainError(Exception):

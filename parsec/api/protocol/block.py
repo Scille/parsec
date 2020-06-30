@@ -1,8 +1,7 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
+from parsec.api.protocol.base import BaseRepSchema, BaseReqSchema, CmdSerializer
 from parsec.serde import fields
-from parsec.api.protocol.base import BaseReqSchema, BaseRepSchema, CmdSerializer
-
 
 __all__ = ("block_create_serializer", "block_read_serializer")
 

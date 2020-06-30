@@ -1,8 +1,9 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-import os
-import atexit
 import asyncio
+import atexit
+import os
+
 import asyncpg
 from asyncpg.cluster import TempCluster
 

@@ -1,12 +1,13 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
 import os
-import click
 from pathlib import Path
 
+import click
+
+from parsec.core.cli.utils import format_available_devices
 from parsec.core.config import get_default_config_dir
 from parsec.core.local_device import list_available_devices
-from parsec.core.cli.utils import format_available_devices
 
 
 @click.command()

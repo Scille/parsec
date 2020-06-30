@@ -1,13 +1,11 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
 import pytest
-
 from PyQt5 import QtCore
 
-
-from parsec.core.types import WorkspaceRole
-from parsec.core.gui.workspace_button import WorkspaceButton
 from parsec.core.gui.lang import switch_language
+from parsec.core.gui.workspace_button import WorkspaceButton
+from parsec.core.types import WorkspaceRole
 
 
 @pytest.fixture

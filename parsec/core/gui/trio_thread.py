@@ -5,12 +5,12 @@ from contextlib import contextmanager
 from inspect import iscoroutinefunction, signature
 
 import trio
+from PyQt5.QtCore import Q_ARG, QMetaObject, Qt, pyqtBoundSignal
 from structlog import get_logger
+
 from parsec.core.fs import FSError
 from parsec.core.mountpoint import MountpointError
-from parsec.utils import trio_run, split_multi_error
-from PyQt5.QtCore import pyqtBoundSignal, Q_ARG, QMetaObject, Qt
-
+from parsec.utils import split_multi_error, trio_run
 
 logger = get_logger()
 

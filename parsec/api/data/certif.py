@@ -1,23 +1,24 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
+from enum import Enum
 from typing import Optional
 from uuid import UUID
-from enum import Enum
+
 from marshmallow import ValidationError
 
-from parsec.crypto import VerifyKey, PublicKey
-from parsec.serde import fields, post_load
+from parsec.api.data.base import BaseAPISignedData, BaseSignedDataSchema, DataValidationError
 from parsec.api.protocol import (
     DeviceID,
-    UserID,
-    HumanHandle,
-    RealmRole,
     DeviceIDField,
-    UserIDField,
+    HumanHandle,
     HumanHandleField,
+    RealmRole,
     RealmRoleField,
+    UserID,
+    UserIDField,
 )
-from parsec.api.data.base import DataValidationError, BaseAPISignedData, BaseSignedDataSchema
+from parsec.crypto import PublicKey, VerifyKey
+from parsec.serde import fields, post_load
 
 
 class UserProfile(Enum):

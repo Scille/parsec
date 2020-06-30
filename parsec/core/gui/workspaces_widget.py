@@ -1,41 +1,39 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-from parsec.core.core_events import CoreEvent
 from uuid import UUID
 
-from PyQt5.QtCore import pyqtSignal, QTimer, Qt
-from PyQt5.QtWidgets import QWidget, QLabel
-
 import pendulum
+from PyQt5.QtCore import Qt, QTimer, pyqtSignal
+from PyQt5.QtWidgets import QLabel, QWidget
 
-from parsec.core.types import (
-    WorkspaceEntry,
-    FsPath,
-    EntryID,
-    EntryName,
-    BackendOrganizationFileLinkAddr,
-)
-from parsec.core.fs import WorkspaceFS, WorkspaceFSTimestamped, FSBackendOfflineError
-from parsec.core.mountpoint.exceptions import (
-    MountpointAlreadyMounted,
-    MountpointNotMounted,
-    MountpointError,
-)
-
-from parsec.core.gui.trio_thread import (
-    JobResultError,
-    ThreadSafeQtSignal,
-    QtToTrioJob,
-    JobSchedulerNotAvailable,
-)
+from parsec.core.core_events import CoreEvent
+from parsec.core.fs import FSBackendOfflineError, WorkspaceFS, WorkspaceFSTimestamped
 from parsec.core.gui import desktop
-from parsec.core.gui.custom_dialogs import show_error, get_text_input, ask_question
+from parsec.core.gui.custom_dialogs import ask_question, get_text_input, show_error
 from parsec.core.gui.flow_layout import FlowLayout
 from parsec.core.gui.lang import translate as _
-from parsec.core.gui.workspace_button import WorkspaceButton
 from parsec.core.gui.timestamped_workspace_widget import TimestampedWorkspaceWidget
+from parsec.core.gui.trio_thread import (
+    JobResultError,
+    JobSchedulerNotAvailable,
+    QtToTrioJob,
+    ThreadSafeQtSignal,
+)
 from parsec.core.gui.ui.workspaces_widget import Ui_WorkspacesWidget
+from parsec.core.gui.workspace_button import WorkspaceButton
 from parsec.core.gui.workspace_sharing_widget import WorkspaceSharingWidget
+from parsec.core.mountpoint.exceptions import (
+    MountpointAlreadyMounted,
+    MountpointError,
+    MountpointNotMounted,
+)
+from parsec.core.types import (
+    BackendOrganizationFileLinkAddr,
+    EntryID,
+    EntryName,
+    FsPath,
+    WorkspaceEntry,
+)
 
 
 async def _get_reencryption_needs(workspace_fs):

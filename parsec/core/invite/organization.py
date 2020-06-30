@@ -1,20 +1,21 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
 from typing import Optional
+
 from pendulum import now as pendulum_now
 
-from parsec.crypto import SigningKey
-from parsec.api.data import UserCertificateContent, DeviceCertificateContent, UserProfile
-from parsec.api.protocol import HumanHandle, DeviceID
-from parsec.core.types import LocalDevice, BackendOrganizationAddr
-from parsec.core.local_device import generate_new_device
+from parsec.api.data import DeviceCertificateContent, UserCertificateContent, UserProfile
+from parsec.api.protocol import DeviceID, HumanHandle
 from parsec.core.backend_connection import APIV1_BackendAnonymousCmds
 from parsec.core.invite.exceptions import (
+    InviteAlreadyUsedError,
     InviteError,
     InviteNotFoundError,
-    InviteAlreadyUsedError,
     InvitePeerResetError,
 )
+from parsec.core.local_device import generate_new_device
+from parsec.core.types import BackendOrganizationAddr, LocalDevice
+from parsec.crypto import SigningKey
 
 
 def _check_rep(rep, step_name):

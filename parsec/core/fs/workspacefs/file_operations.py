@@ -4,10 +4,9 @@
 
 import bisect
 from functools import partial
-from typing import Tuple, List, Set, Iterator, Callable
+from typing import Callable, Iterator, List, Set, Tuple
 
-from parsec.core.types import BlockID, LocalFileManifest, Chunk
-
+from parsec.core.types import BlockID, Chunk, LocalFileManifest
 
 Chunks = Tuple[Chunk, ...]
 

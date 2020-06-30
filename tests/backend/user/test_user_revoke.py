@@ -1,17 +1,17 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-from parsec.backend.backend_events import BackendEvent
 import pytest
 import trio
-from pendulum import now as pendulum_now, Pendulum
+from pendulum import Pendulum
+from pendulum import now as pendulum_now
 
-from parsec.backend.user import INVITATION_VALIDITY
 from parsec.api.data import RevokedUserCertificateContent, UserProfile
 from parsec.api.protocol import HandshakeRevokedDevice
 from parsec.api.transport import TransportError
-
+from parsec.backend.backend_events import BackendEvent
+from parsec.backend.user import INVITATION_VALIDITY
+from tests.backend.common import ping, user_revoke
 from tests.common import freeze_time
-from tests.backend.common import user_revoke, ping
 
 
 @pytest.mark.trio

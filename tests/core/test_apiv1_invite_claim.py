@@ -1,23 +1,23 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-from parsec.backend.backend_events import BackendEvent
-from parsec.event_bus import MetaEvent
 import pytest
 import trio
 
+from parsec.api.data import DeviceCertificateContent, UserCertificateContent
 from parsec.api.protocol import DeviceID
-from parsec.api.data import UserCertificateContent, DeviceCertificateContent
-from parsec.core.invite_claim import (
-    InviteClaimError,
-    InviteClaimCryptoError,
-    InviteClaimInvalidTokenError,
-    generate_invitation_token,
-    invite_and_create_user,
-    claim_user,
-    invite_and_create_device,
-    claim_device,
-)
+from parsec.backend.backend_events import BackendEvent
 from parsec.core.backend_connection import backend_authenticated_cmds_factory
+from parsec.core.invite_claim import (
+    InviteClaimCryptoError,
+    InviteClaimError,
+    InviteClaimInvalidTokenError,
+    claim_device,
+    claim_user,
+    generate_invitation_token,
+    invite_and_create_device,
+    invite_and_create_user,
+)
+from parsec.event_bus import MetaEvent
 
 
 async def _invite_and_claim(

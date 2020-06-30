@@ -1,5 +1,15 @@
 exclude: ^misc/bench.py$
 repos:
+-   repo: https://github.com/asottile/seed-isort-config
+    rev: v1.9.1
+    hooks:
+    - id: seed-isort-config
+-   repo: https://github.com/timothycrosley/isort
+    rev: 4.3.21
+    hooks:
+    - id: isort
+      args:
+          - "--filter-files"
 -   repo: https://github.com/ambv/black
     rev: 19.3b0
     hooks:

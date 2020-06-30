@@ -1,10 +1,10 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-from parsec.core.core_events import CoreEvent
 import trio
 
-from parsec.core.fs import FSBackendOfflineError
 from parsec.core.backend_connection import BackendNotAvailable
+from parsec.core.core_events import CoreEvent
+from parsec.core.fs import FSBackendOfflineError
 
 
 async def freeze_messages_monitor_mockpoint():

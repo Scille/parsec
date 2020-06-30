@@ -1,15 +1,14 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-import sys
-import re
-import shutil
 import argparse
 import platform
+import re
+import shutil
 import subprocess
+import sys
 import sysconfig
-from urllib.request import urlopen
 from pathlib import Path
-
+from urllib.request import urlopen
 
 BUILD_DIR = Path("build").resolve()
 

@@ -1,12 +1,13 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-from parsec.core.core_events import CoreEvent
 import os
-import trio
-import pytest
 from unittest.mock import patch
 
-from parsec.core.mountpoint import mountpoint_manager_factory, MountpointDriverCrash
+import pytest
+import trio
+
+from parsec.core.core_events import CoreEvent
+from parsec.core.mountpoint import MountpointDriverCrash, mountpoint_manager_factory
 
 
 @pytest.mark.linux  # win32 doesn't allow to remove an opened file

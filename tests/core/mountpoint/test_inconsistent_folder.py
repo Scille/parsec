@@ -1,13 +1,13 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-import os
 import errno
+import os
+
 import pytest
 import trio
 
 from parsec.core.mountpoint import mountpoint_manager_factory
 from parsec.test_utils import create_inconsistent_workspace
-
 
 # winerror codes corresponding to ntstatus errors
 WINDOWS_ERROR_PERMISSION_DENIED = 5  # ntstatus.ERROR_ACCESS_DENIED

@@ -2,18 +2,15 @@
 
 from parsec.serde import (
     BaseSchema,
-    fields,
-    post_load,
     MsgpackSerializer,
-    SerdeValidationError,
     SerdePackingError,
-    packb as _packb,
-    unpackb as _unpackb,
+    SerdeValidationError,
+    fields,
 )
-
-
+from parsec.serde import packb as _packb
+from parsec.serde import post_load
+from parsec.serde import unpackb as _unpackb
 from parsec.serde.schema import OneOfSchemaLegacy
-
 
 __all__ = ("ProtocolError", "BaseReqSchema", "BaseRepSchema", "CmdSerializer")
 

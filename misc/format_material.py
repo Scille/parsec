@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-from xml.etree import ElementTree
 import argparse
 import pathlib
 import shutil
+from xml.etree import ElementTree
 
 
 def move_files(input_dir, output_dir, pattern):

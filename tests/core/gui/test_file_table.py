@@ -1,9 +1,9 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-import pytest
-import pendulum
 import uuid
 
+import pendulum
+import pytest
 from PyQt5 import QtCore
 
 from parsec.core.gui.file_table import FileTable

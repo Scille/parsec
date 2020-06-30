@@ -3,9 +3,8 @@
 import pytest
 
 from parsec.api.data import UserProfile
-from parsec.api.protocol import packb, apiv1_user_find_serializer
-
-from tests.common import freeze_time, customize_fixtures
+from parsec.api.protocol import apiv1_user_find_serializer, packb
+from tests.common import customize_fixtures, freeze_time
 
 
 async def user_find(sock, **kwargs):

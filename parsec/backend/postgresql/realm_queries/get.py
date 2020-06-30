@@ -1,24 +1,24 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-import pendulum
-from uuid import UUID
 from typing import Dict, List
+from uuid import UUID
+
+import pendulum
 from pypika import Parameter
 
-from parsec.api.protocol import DeviceID, UserID, OrganizationID, RealmRole
-from parsec.backend.realm import RealmStatus, RealmAccessError, RealmNotFoundError
-from parsec.backend.postgresql.utils import query
+from parsec.api.protocol import DeviceID, OrganizationID, RealmRole, UserID
 from parsec.backend.postgresql.tables import (
-    STR_TO_REALM_ROLE,
     STR_TO_REALM_MAINTENANCE_TYPE,
-    q_user,
-    q_user_internal_id,
-    q_user_can_read_vlob,
+    STR_TO_REALM_ROLE,
     q_device,
-    q_realm_internal_id,
     q_realm,
+    q_realm_internal_id,
+    q_user,
+    q_user_can_read_vlob,
+    q_user_internal_id,
 )
-
+from parsec.backend.postgresql.utils import query
+from parsec.backend.realm import RealmAccessError, RealmNotFoundError, RealmStatus
 
 _q_get_realm_status = (
     q_realm(organization_id=Parameter("$1"), realm_id=Parameter("$2")).select(

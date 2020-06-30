@@ -1,17 +1,17 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-import pytest
-import trio
 from uuid import uuid4
 
+import pytest
+import trio
+
 from parsec.api.protocol import INVITED_CMDS, InvitationType
-from parsec.core.types import BackendInvitationAddr
 from parsec.core.backend_connection import (
-    BackendNotAvailable,
     BackendConnectionRefused,
+    BackendNotAvailable,
     backend_invited_cmds_factory,
 )
-
+from parsec.core.types import BackendInvitationAddr
 from tests.core.backend_connection.common import ALL_CMDS
 
 

@@ -1,32 +1,31 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-from pendulum import Pendulum, now as pendulum_now
-from typing import Dict, Optional, List, Tuple
+from typing import Dict, List, Optional, Tuple
 
-from parsec.utils import timestamps_in_the_ballpark
-from parsec.crypto import HashDigest, CryptoError
-from parsec.api.protocol import UserID, DeviceID, RealmRole
-from parsec.api.data import (
-    DataError,
-    BlockAccess,
-    RealmRoleCertificateContent,
-    Manifest as RemoteManifest,
-)
+from pendulum import Pendulum
+from pendulum import now as pendulum_now
+
+from parsec.api.data import BlockAccess, DataError
+from parsec.api.data import Manifest as RemoteManifest
+from parsec.api.data import RealmRoleCertificateContent
+from parsec.api.protocol import DeviceID, RealmRole, UserID
 from parsec.core.backend_connection import BackendConnectionError, BackendNotAvailable
-from parsec.core.types import EntryID, ChunkID
 from parsec.core.fs.exceptions import (
-    FSError,
-    FSRemoteSyncError,
-    FSRemoteManifestNotFound,
-    FSRemoteManifestNotFoundBadVersion,
-    FSRemoteManifestNotFoundBadTimestamp,
-    FSRemoteBlockNotFound,
     FSBackendOfflineError,
-    FSWorkspaceInMaintenance,
     FSBadEncryptionRevision,
+    FSError,
+    FSRemoteBlockNotFound,
+    FSRemoteManifestNotFound,
+    FSRemoteManifestNotFoundBadTimestamp,
+    FSRemoteManifestNotFoundBadVersion,
+    FSRemoteSyncError,
+    FSWorkspaceInMaintenance,
     FSWorkspaceNoReadAccess,
     FSWorkspaceNoWriteAccess,
 )
+from parsec.core.types import ChunkID, EntryID
+from parsec.crypto import CryptoError, HashDigest
+from parsec.utils import timestamps_in_the_ballpark
 
 
 class RemoteLoader:

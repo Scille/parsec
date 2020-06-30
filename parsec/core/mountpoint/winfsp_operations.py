@@ -1,23 +1,23 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-from parsec.core.core_events import CoreEvent
 import functools
 from contextlib import contextmanager
-from trio import Cancelled, RunFinishedError
-from structlog import get_logger
-from winfspy import (
-    NTStatusError,
-    BaseFileSystemOperations,
-    FILE_ATTRIBUTE,
-    CREATE_FILE_CREATE_OPTIONS,
-)
-from winfspy.plumbing.winstuff import dt_to_filetime, NTSTATUS, SecurityDescriptor
 
-from parsec.core.types import FsPath
+from structlog import get_logger
+from trio import Cancelled, RunFinishedError
+from winfspy import (
+    CREATE_FILE_CREATE_OPTIONS,
+    FILE_ATTRIBUTE,
+    BaseFileSystemOperations,
+    NTStatusError,
+)
+from winfspy.plumbing.winstuff import NTSTATUS, SecurityDescriptor, dt_to_filetime
+
+from parsec.core.core_events import CoreEvent
 from parsec.core.fs import FSLocalOperationError, FSRemoteOperationError
 from parsec.core.fs.workspacefs.sync_transactions import DEFAULT_BLOCK_SIZE
-from parsec.core.mountpoint.winify import winify_entry_name, unwinify_entry_name
-
+from parsec.core.mountpoint.winify import unwinify_entry_name, winify_entry_name
+from parsec.core.types import FsPath
 
 logger = get_logger()
 

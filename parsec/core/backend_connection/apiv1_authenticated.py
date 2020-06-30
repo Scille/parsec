@@ -1,23 +1,23 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
+from functools import partial
+from typing import AsyncGenerator, Callable, List, Optional
+
 import trio
 from async_generator import asynccontextmanager
-from typing import Optional, List, AsyncGenerator, Callable
 from structlog import get_logger
-from functools import partial
 
+from parsec.api.data import EntryID
+from parsec.api.protocol import APIV1_AUTHENTICATED_CMDS, APIEvent, DeviceID
+from parsec.core.backend_connection import cmds
+from parsec.core.backend_connection.authenticated import BackendConnStatus
+from parsec.core.backend_connection.exceptions import BackendConnectionRefused, BackendNotAvailable
+from parsec.core.backend_connection.expose_cmds import expose_cmds_with_retrier
+from parsec.core.backend_connection.transport import TransportPool, apiv1_connect
+from parsec.core.core_events import CoreEvent
+from parsec.core.types import BackendOrganizationAddr
 from parsec.crypto import SigningKey
 from parsec.event_bus import EventBus
-from parsec.api.data import EntryID
-from parsec.api.protocol import DeviceID, APIEvent, APIV1_AUTHENTICATED_CMDS
-from parsec.core.types import BackendOrganizationAddr
-from parsec.core.backend_connection import cmds
-from parsec.core.backend_connection.transport import apiv1_connect, TransportPool
-from parsec.core.backend_connection.exceptions import BackendNotAvailable, BackendConnectionRefused
-from parsec.core.backend_connection.expose_cmds import expose_cmds_with_retrier
-from parsec.core.backend_connection.authenticated import BackendConnStatus
-from parsec.core.core_events import CoreEvent
-
 
 logger = get_logger()
 

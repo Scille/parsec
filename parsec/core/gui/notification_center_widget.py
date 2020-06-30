@@ -2,12 +2,12 @@
 
 from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtGui import QPainter
-from PyQt5.QtWidgets import QWidget, QStyle, QStyleOption, QStyledItemDelegate, QStyleOptionViewItem
+from PyQt5.QtWidgets import QStyle, QStyledItemDelegate, QStyleOption, QStyleOptionViewItem, QWidget
 
 from parsec.core.gui.notification_widget import (
     ErrorNotificationWidget,
-    WarningNotificationWidget,
     InfoNotificationWidget,
+    WarningNotificationWidget,
 )
 from parsec.core.gui.ui.notification_center_widget import Ui_NotificationCenterWidget
 

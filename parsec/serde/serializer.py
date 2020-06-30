@@ -4,8 +4,8 @@ import zlib
 
 from marshmallow import ValidationError
 
-from parsec.serde.packing import packb, unpackb, SerdePackingError
 from parsec.serde.exceptions import SerdeValidationError
+from parsec.serde.packing import SerdePackingError, packb, unpackb
 
 
 class BaseSerializer:

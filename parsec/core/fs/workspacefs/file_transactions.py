@@ -1,24 +1,29 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-from parsec.core.core_events import CoreEvent
-from typing import Tuple, List, Callable
-
 from collections import defaultdict
+from typing import Callable, List, Tuple
+
 from async_generator import asynccontextmanager
 
-from parsec.event_bus import EventBus
-from parsec.core.types import FileDescriptor, EntryID, LocalDevice
-
+from parsec.core.core_events import CoreEvent
+from parsec.core.fs.exceptions import FSEndOfFileError, FSInvalidFileDescriptor, FSLocalMissError
 from parsec.core.fs.remote_loader import RemoteLoader
 from parsec.core.fs.storage import WorkspaceStorage
-from parsec.core.fs.exceptions import FSLocalMissError, FSInvalidFileDescriptor, FSEndOfFileError
-from parsec.core.types import Chunk, BlockID, LocalFileManifest
 from parsec.core.fs.workspacefs.file_operations import (
     prepare_read,
-    prepare_write,
-    prepare_resize,
     prepare_reshape,
+    prepare_resize,
+    prepare_write,
 )
+from parsec.core.types import (
+    BlockID,
+    Chunk,
+    EntryID,
+    FileDescriptor,
+    LocalDevice,
+    LocalFileManifest,
+)
+from parsec.event_bus import EventBus
 
 __all__ = ("FSInvalidFileDescriptor", "FileTransactions")
 

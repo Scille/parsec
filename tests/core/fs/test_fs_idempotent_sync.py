@@ -1,20 +1,20 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-import pytest
 from string import ascii_lowercase
+
+import pytest
 from hypothesis import strategies as st
 from hypothesis_trio.stateful import (
     Bundle,
-    initialize,
-    rule,
-    invariant,
-    run_state_machine_as_test,
     TrioAsyncioRuleBasedStateMachine,
+    initialize,
+    invariant,
     multiple,
+    rule,
+    run_state_machine_as_test,
 )
 
 from tests.common import call_with_control
-
 
 # The point is not to find breaking filenames here, so keep it simple
 st_entry_name = st.text(alphabet=ascii_lowercase, min_size=1, max_size=3)

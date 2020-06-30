@@ -1,10 +1,11 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-import pytest
 from unittest.mock import ANY
 
-from parsec.core.types import FsPath
+import pytest
+
 from parsec.core.fs.exceptions import FSWorkspaceTimestampedTooEarly
+from parsec.core.types import FsPath
 
 
 @pytest.mark.trio

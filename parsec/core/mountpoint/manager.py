@@ -1,33 +1,32 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-from parsec.core.core_events import CoreEvent
-import os
-import trio
 import logging
+import os
+from importlib import __import__ as import_function
 from pathlib import PurePath
+from typing import Optional, Sequence
+
+import trio
+from async_generator import asynccontextmanager
 from pendulum import Pendulum
 from structlog import get_logger
-from typing import Sequence, Optional
-from importlib import __import__ as import_function
 
-from async_generator import asynccontextmanager
-
-from parsec.utils import start_task
-from parsec.core.types import FsPath, EntryID
-from parsec.core.fs.workspacefs import WorkspaceFSTimestamped
+from parsec.core.core_events import CoreEvent
 from parsec.core.fs.exceptions import FSWorkspaceNotFoundError, FSWorkspaceTimestampedTooEarly
+from parsec.core.fs.workspacefs import WorkspaceFSTimestamped
 from parsec.core.mountpoint.exceptions import (
+    MountpointAlreadyMounted,
     MountpointConfigurationError,
     MountpointConfigurationWorkspaceFSTimestampedError,
-    MountpointAlreadyMounted,
+    MountpointError,
+    MountpointFuseNotAvailable,
     MountpointNotMounted,
     MountpointWinfspNotAvailable,
-    MountpointFuseNotAvailable,
-    MountpointError,
 )
 from parsec.core.mountpoint.winify import winify_entry_name
+from parsec.core.types import EntryID, FsPath
 from parsec.core.win_registry import cleanup_parsec_drive_icons
-
+from parsec.utils import start_task
 
 # Importing winfspy can take some time (about 0.4 seconds)
 # Let's import those bindings at module level, in order to

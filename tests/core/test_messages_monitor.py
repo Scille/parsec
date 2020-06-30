@@ -1,16 +1,17 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-from parsec.core.core_events import CoreEvent
+from unittest.mock import ANY
+
 import pytest
 import trio
-from unittest.mock import ANY
-from pendulum import Pendulum, now as pendulum_now
-
-from tests.common import create_shared_workspace, freeze_time
+from pendulum import Pendulum
+from pendulum import now as pendulum_now
 
 from parsec.api.data import PingMessageContent
-from parsec.core.types import WorkspaceEntry, WorkspaceRole
 from parsec.core.backend_connection import BackendConnStatus
+from parsec.core.core_events import CoreEvent
+from parsec.core.types import WorkspaceEntry, WorkspaceRole
+from tests.common import create_shared_workspace, freeze_time
 
 
 @pytest.mark.trio

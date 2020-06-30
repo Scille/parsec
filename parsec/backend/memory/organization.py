@@ -5,20 +5,20 @@ from typing import Optional
 from pendulum import Pendulum
 
 from parsec.api.protocol import OrganizationID
-from parsec.crypto import VerifyKey
-from parsec.backend.user import BaseUserComponent, UserError, User, Device
+from parsec.backend.memory.block import MemoryBlockComponent
+from parsec.backend.memory.vlob import MemoryVlobComponent
 from parsec.backend.organization import (
     BaseOrganizationComponent,
     Organization,
-    OrganizationStats,
-    OrganizationAlreadyExistsError,
-    OrganizationInvalidBootstrapTokenError,
     OrganizationAlreadyBootstrappedError,
-    OrganizationNotFoundError,
+    OrganizationAlreadyExistsError,
     OrganizationFirstUserCreationError,
+    OrganizationInvalidBootstrapTokenError,
+    OrganizationNotFoundError,
+    OrganizationStats,
 )
-from parsec.backend.memory.vlob import MemoryVlobComponent
-from parsec.backend.memory.block import MemoryBlockComponent
+from parsec.backend.user import BaseUserComponent, Device, User, UserError
+from parsec.crypto import VerifyKey
 
 
 class MemoryOrganizationComponent(BaseOrganizationComponent):

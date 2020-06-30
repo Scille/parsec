@@ -1,10 +1,10 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
 import os
-import pytest
-from hypothesis.stateful import RuleBasedStateMachine, initialize, rule, run_state_machine_as_test
-from hypothesis import strategies as st
 
+import pytest
+from hypothesis import strategies as st
+from hypothesis.stateful import RuleBasedStateMachine, initialize, rule, run_state_machine_as_test
 
 # Just an arbitrary value to limit the size of data hypothesis generates
 # for read/write operations

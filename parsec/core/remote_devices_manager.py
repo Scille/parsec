@@ -1,22 +1,21 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-from typing import Tuple, Optional, List
+from typing import List, Optional, Tuple
 
-from parsec.crypto import VerifyKey
-from parsec.api.protocol import DeviceID, UserID
 from parsec.api.data import (
-    UserCertificateContent,
     DeviceCertificateContent,
     RevokedUserCertificateContent,
+    UserCertificateContent,
 )
+from parsec.api.protocol import DeviceID, UserID
 from parsec.core.backend_connection import (
-    BackendAuthenticatedCmds,
     APIV1_BackendAnonymousCmds,
+    BackendAuthenticatedCmds,
     BackendConnectionError,
     BackendNotAvailable,
 )
 from parsec.core.trustchain import TrustchainContext, TrustchainError
-
+from parsec.crypto import VerifyKey
 
 DEFAULT_CACHE_VALIDITY = 60 * 60  # 1h
 

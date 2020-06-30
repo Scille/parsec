@@ -1,10 +1,11 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-from parsec.core.core_events import CoreEvent
-import pytest
-from pendulum import Pendulum
 from unittest.mock import ANY
 
+import pytest
+from pendulum import Pendulum
+
+from parsec.core.core_events import CoreEvent
 from tests.common import freeze_time
 
 

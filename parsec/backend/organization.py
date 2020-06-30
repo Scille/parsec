@@ -1,26 +1,26 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
+from secrets import token_hex
+from typing import Optional
+
 import attr
 import pendulum
-from typing import Optional
-from secrets import token_hex
-
 from pendulum import Pendulum
 
-from parsec.utils import timestamps_in_the_ballpark
-from parsec.crypto import VerifyKey
+from parsec.api.data import DataError, DeviceCertificateContent, UserCertificateContent, UserProfile
 from parsec.api.protocol import (
-    OrganizationID,
     APIV1_HandshakeType,
-    apiv1_organization_create_serializer,
+    OrganizationID,
     apiv1_organization_bootstrap_serializer,
+    apiv1_organization_create_serializer,
     apiv1_organization_stats_serializer,
     apiv1_organization_status_serializer,
     apiv1_organization_update_serializer,
 )
-from parsec.api.data import UserCertificateContent, DeviceCertificateContent, DataError, UserProfile
-from parsec.backend.user import User, Device
-from parsec.backend.utils import catch_protocol_errors, api
+from parsec.backend.user import Device, User
+from parsec.backend.utils import api, catch_protocol_errors
+from parsec.crypto import VerifyKey
+from parsec.utils import timestamps_in_the_ballpark
 
 
 class OrganizationError(Exception):

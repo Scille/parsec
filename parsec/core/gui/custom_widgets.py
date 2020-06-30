@@ -1,14 +1,14 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-from PyQt5.QtCore import Qt, pyqtSignal, QSize
-from PyQt5.QtGui import QIcon, QPainter, QColor, QPen, QCursor, QPixmap
+from PyQt5.QtCore import QSize, Qt, pyqtSignal
+from PyQt5.QtGui import QColor, QCursor, QIcon, QPainter, QPen, QPixmap
 from PyQt5.QtWidgets import (
-    QPushButton,
-    QLabel,
-    QGraphicsDropShadowEffect,
-    QWidget,
-    QListView,
     QComboBox,
+    QGraphicsDropShadowEffect,
+    QLabel,
+    QListView,
+    QPushButton,
+    QWidget,
 )
 
 

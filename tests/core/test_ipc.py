@@ -1,21 +1,22 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-import pytest
-import trio
 import os
 import subprocess
-from uuid import uuid4
 from pathlib import Path
-from parsec.core.ipcinterface import IPCCommand
+from uuid import uuid4
+
+import pytest
+import trio
 
 from parsec.core.ipcinterface import (
-    _install_win32_mutex,
+    IPCCommand,
+    IPCServerAlreadyRunning,
+    IPCServerBadResponse,
+    IPCServerError,
     _install_posix_file_lock,
+    _install_win32_mutex,
     run_ipc_server,
     send_to_ipc_server,
-    IPCServerError,
-    IPCServerBadResponse,
-    IPCServerAlreadyRunning,
 )
 
 

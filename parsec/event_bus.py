@@ -1,11 +1,12 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-from typing import List
-import trio
-from structlog import get_logger
 from collections import defaultdict
 from contextlib import contextmanager
 from enum import Enum
+from typing import List
+
+import trio
+from structlog import get_logger
 
 logger = get_logger()
 

@@ -1,18 +1,17 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-from parsec.core.core_events import CoreEvent
-import os
 import errno
-from typing import Optional
-from structlog import get_logger
+import os
 from contextlib import contextmanager
-from stat import S_IRWXU, S_IFDIR, S_IFREG
-from fuse import FuseOSError, Operations, LoggingMixIn, fuse_get_context, fuse_exit
+from stat import S_IFDIR, S_IFREG, S_IRWXU
+from typing import Optional
 
+from fuse import FuseOSError, LoggingMixIn, Operations, fuse_exit, fuse_get_context
+from structlog import get_logger
 
-from parsec.core.types import FsPath
+from parsec.core.core_events import CoreEvent
 from parsec.core.fs import FSLocalOperationError, FSRemoteOperationError
-
+from parsec.core.types import FsPath
 
 logger = get_logger()
 MODES = {os.O_RDONLY: "r", os.O_WRONLY: "w", os.O_RDWR: "rw"}

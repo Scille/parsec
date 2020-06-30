@@ -1,13 +1,14 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
 import errno
-import pytest
 from unittest.mock import ANY
 
-from parsec.api.protocol import DeviceID, RealmRole
+import pytest
+
 from parsec.api.data import Manifest as RemoteManifest
-from parsec.core.types import FsPath, EntryID
+from parsec.api.protocol import DeviceID, RealmRole
 from parsec.core.fs.exceptions import FSError
+from parsec.core.types import EntryID, FsPath
 
 
 @pytest.fixture

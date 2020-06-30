@@ -1,11 +1,12 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-import trio
-import pytest
 from unittest.mock import ANY
 
-from parsec.core.backend_connection import BackendConnStatus
+import pytest
+import trio
+
 from parsec.backend.backend_events import BackendEvent
+from parsec.core.backend_connection import BackendConnStatus
 from parsec.core.core_events import CoreEvent
 
 

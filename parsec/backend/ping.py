@@ -1,13 +1,13 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
 from parsec.api.protocol import (
-    DeviceID,
-    OrganizationID,
-    HandshakeType,
     APIV1_HandshakeType,
+    DeviceID,
+    HandshakeType,
+    OrganizationID,
     ping_serializer,
 )
-from parsec.backend.utils import catch_protocol_errors, api
+from parsec.backend.utils import api, catch_protocol_errors
 
 
 class BasePingComponent:

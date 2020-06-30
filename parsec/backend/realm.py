@@ -2,25 +2,26 @@
 
 from typing import Dict, List, Optional
 from uuid import UUID
-import pendulum
-import attr
 
-from parsec.utils import timestamps_in_the_ballpark
+import attr
+import pendulum
+
 from parsec.api.data import DataError, RealmRoleCertificateContent, UserProfile
 from parsec.api.protocol import (
-    OrganizationID,
-    UserID,
     DeviceID,
-    RealmRole,
     MaintenanceType,
-    realm_status_serializer,
+    OrganizationID,
+    RealmRole,
+    UserID,
     realm_create_serializer,
-    realm_get_role_certificates_serializer,
-    realm_update_roles_serializer,
-    realm_start_reencryption_maintenance_serializer,
     realm_finish_reencryption_maintenance_serializer,
+    realm_get_role_certificates_serializer,
+    realm_start_reencryption_maintenance_serializer,
+    realm_status_serializer,
+    realm_update_roles_serializer,
 )
-from parsec.backend.utils import catch_protocol_errors, api
+from parsec.backend.utils import api, catch_protocol_errors
+from parsec.utils import timestamps_in_the_ballpark
 
 
 class RealmError(Exception):

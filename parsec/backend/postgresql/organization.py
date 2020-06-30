@@ -3,35 +3,35 @@
 from typing import Optional
 
 from pendulum import Pendulum
+from pypika import Parameter
+from pypika import functions as fn
 from triopg import UniqueViolationError
-from pypika import Parameter, functions as fn
 
 from parsec.api.protocol import OrganizationID
-from parsec.crypto import VerifyKey
-from parsec.backend.user import UserError, User, Device
 from parsec.backend.organization import (
     BaseOrganizationComponent,
-    OrganizationStats,
     Organization,
-    OrganizationError,
-    OrganizationAlreadyExistsError,
-    OrganizationInvalidBootstrapTokenError,
     OrganizationAlreadyBootstrappedError,
-    OrganizationNotFoundError,
+    OrganizationAlreadyExistsError,
+    OrganizationError,
     OrganizationFirstUserCreationError,
+    OrganizationInvalidBootstrapTokenError,
+    OrganizationNotFoundError,
+    OrganizationStats,
 )
 from parsec.backend.postgresql.handler import PGHandler
-from parsec.backend.postgresql.utils import Query
 from parsec.backend.postgresql.tables import (
-    t_organization,
     q_organization,
     q_organization_internal_id,
+    t_block,
+    t_organization,
     t_user,
     t_vlob_atom,
-    t_block,
 )
 from parsec.backend.postgresql.user_queries.create import _create_user
-
+from parsec.backend.postgresql.utils import Query
+from parsec.backend.user import Device, User, UserError
+from parsec.crypto import VerifyKey
 
 _q_insert_organization = (
     (

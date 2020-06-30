@@ -4,21 +4,20 @@
 
 from PyQt5.QtWidgets import (
     QApplication,
+    QCheckBox,
+    QComboBox,
+    QGridLayout,
+    QLineEdit,
+    QListView,
     QMainWindow,
     QPushButton,
     QSpinBox,
-    QLineEdit,
-    QGridLayout,
-    QWidget,
     QTimeEdit,
-    QComboBox,
-    QCheckBox,
-    QListView,
+    QWidget,
 )
 
-from parsec.core.gui.resources_rc import *  # noqa
 from parsec.core.gui import custom_dialogs
-
+from parsec.core.gui.resources_rc import *  # noqa
 
 SMALL_TEXT = "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
 LARGE_TEXT = (

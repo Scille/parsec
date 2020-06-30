@@ -1,12 +1,13 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
+from functools import partial
+
 import trio
 
-from parsec.api.protocol import events_subscribe_serializer, events_listen_serializer, APIEvent
-from parsec.backend.utils import catch_protocol_errors, run_with_breathing_transport, api
-from parsec.backend.realm import BaseRealmComponent
+from parsec.api.protocol import APIEvent, events_listen_serializer, events_subscribe_serializer
 from parsec.backend.backend_events import BackendEvent
-from functools import partial
+from parsec.backend.realm import BaseRealmComponent
+from parsec.backend.utils import api, catch_protocol_errors, run_with_breathing_transport
 
 
 class EventsComponent:

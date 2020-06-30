@@ -1,15 +1,15 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
 import re
-from typing import Optional, Tuple, List
 from random import randint, shuffle
+from typing import List, Optional, Tuple
 
-from parsec.crypto import VerifyKey, PublicKey, PrivateKey, SecretKey
-from parsec.serde import fields, post_load
-from parsec.api.protocol import DeviceID, DeviceIDField, HumanHandle, HumanHandleField
 from parsec.api.data.base import BaseAPIData, BaseSchema
-from parsec.api.data.entry import EntryID, EntryIDField
 from parsec.api.data.certif import UserProfile, UserProfileField
+from parsec.api.data.entry import EntryID, EntryIDField
+from parsec.api.protocol import DeviceID, DeviceIDField, HumanHandle, HumanHandleField
+from parsec.crypto import PrivateKey, PublicKey, SecretKey, VerifyKey
+from parsec.serde import fields, post_load
 
 
 class SASCode(str):

@@ -1,19 +1,22 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-import pytest
 from uuid import uuid4
 
-from parsec.api.protocol import packb, unpackb, OrganizationID
-from parsec.api.version import ApiVersion, API_VERSION
-from parsec.api.transport import Transport
+import pytest
+
 from parsec.api.protocol import (
     AuthenticatedClientHandshake,
-    InvitationType,
-    InvitedClientHandshake,
-    HandshakeRVKMismatch,
     HandshakeBadIdentity,
     HandshakeOrganizationExpired,
+    HandshakeRVKMismatch,
+    InvitationType,
+    InvitedClientHandshake,
+    OrganizationID,
+    packb,
+    unpackb,
 )
+from parsec.api.transport import Transport
+from parsec.api.version import API_VERSION, ApiVersion
 
 
 @pytest.mark.trio

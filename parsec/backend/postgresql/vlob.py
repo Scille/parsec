@@ -1,41 +1,41 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-import pendulum
-from triopg import UniqueViolationError
+from typing import Dict, List, Optional, Tuple
 from uuid import UUID
-from typing import List, Tuple, Dict, Optional
+
+import pendulum
 from pypika import Parameter
+from triopg import UniqueViolationError
 
-
-from parsec.backend.backend_events import BackendEvent
 from parsec.api.protocol import DeviceID, OrganizationID
+from parsec.backend.backend_events import BackendEvent
+from parsec.backend.postgresql.handler import PGHandler, retry_on_unique_violation, send_signal
+from parsec.backend.postgresql.realm_queries.maintenance import RealmNotFoundError, get_realm_status
+from parsec.backend.postgresql.tables import (
+    STR_TO_REALM_ROLE,
+    q_device,
+    q_device_internal_id,
+    q_organization_internal_id,
+    q_realm_in_maintenance,
+    q_realm_internal_id,
+    q_user_can_read_vlob,
+    q_user_internal_id,
+    q_vlob_atom,
+    q_vlob_encryption_revision_internal_id,
+    t_vlob_encryption_revision,
+)
+from parsec.backend.postgresql.utils import Query
 from parsec.backend.realm import RealmRole
 from parsec.backend.vlob import (
     BaseVlobComponent,
     VlobAccessError,
-    VlobVersionError,
-    VlobTimestampError,
-    VlobNotFoundError,
     VlobAlreadyExistsError,
     VlobEncryptionRevisionError,
     VlobInMaintenanceError,
+    VlobNotFoundError,
     VlobNotInMaintenanceError,
-)
-from parsec.backend.postgresql.handler import PGHandler, send_signal, retry_on_unique_violation
-from parsec.backend.postgresql.realm_queries.maintenance import get_realm_status, RealmNotFoundError
-from parsec.backend.postgresql.utils import Query
-from parsec.backend.postgresql.tables import (
-    STR_TO_REALM_ROLE,
-    t_vlob_encryption_revision,
-    q_device,
-    q_vlob_atom,
-    q_organization_internal_id,
-    q_realm_internal_id,
-    q_user_internal_id,
-    q_user_can_read_vlob,
-    q_device_internal_id,
-    q_realm_in_maintenance,
-    q_vlob_encryption_revision_internal_id,
+    VlobTimestampError,
+    VlobVersionError,
 )
 
 

@@ -2,15 +2,14 @@
 
 import enum
 
-from parsec.api.data import WorkspaceManifest, FileManifest, FolderManifest, Manifest
+from parsec.api.data import FileManifest, FolderManifest, Manifest, WorkspaceManifest
 from parsec.core.types import (
+    LocalFileManifest,
+    LocalFolderManifest,
+    LocalManifest,
     LocalUserManifest,
     LocalWorkspaceManifest,
-    LocalFolderManifest,
-    LocalFileManifest,
-    LocalManifest,
 )
-
 
 # Cross-plateform windows error enumeration
 

@@ -1,21 +1,21 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-from parsec.core.core_events import CoreEvent
-import trio
-from trio.hazmat import current_clock
 import math
-from structlog import get_logger
 
-from parsec.core.types import EntryID, WorkspaceRole
+import trio
+from structlog import get_logger
+from trio.hazmat import current_clock
+
+from parsec.core.backend_connection import BackendConnectionError, BackendNotAvailable
+from parsec.core.core_events import CoreEvent
 from parsec.core.fs import (
     FSBackendOfflineError,
-    FSWorkspaceNotFoundError,
-    FSWorkspaceNoReadAccess,
-    FSWorkspaceNoWriteAccess,
     FSWorkspaceInMaintenance,
+    FSWorkspaceNoReadAccess,
+    FSWorkspaceNotFoundError,
+    FSWorkspaceNoWriteAccess,
 )
-from parsec.core.backend_connection import BackendConnectionError, BackendNotAvailable
-
+from parsec.core.types import EntryID, WorkspaceRole
 
 logger = get_logger()
 

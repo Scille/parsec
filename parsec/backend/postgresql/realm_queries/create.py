@@ -3,18 +3,16 @@
 from pypika import Parameter
 from pypika.terms import ValueWrapper
 
-
+from parsec.api.protocol import OrganizationID, RealmRole
 from parsec.backend.backend_events import BackendEvent
-from parsec.api.protocol import RealmRole, OrganizationID
-from parsec.backend.realm import RealmGrantedRole, RealmAlreadyExistsError
 from parsec.backend.postgresql.handler import send_signal
-from parsec.backend.postgresql.utils import query
 from parsec.backend.postgresql.tables import (
+    q_device_internal_id,
     q_organization_internal_id,
     q_user_internal_id,
-    q_device_internal_id,
 )
-
+from parsec.backend.postgresql.utils import query
+from parsec.backend.realm import RealmAlreadyExistsError, RealmGrantedRole
 
 _q_insert_realm = """
 INSERT INTO realm (

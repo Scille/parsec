@@ -3,11 +3,10 @@
 import pytest
 from pendulum import Pendulum
 
-from parsec.api.protocol import message_get_serializer, APIEvent
+from parsec.api.protocol import APIEvent, message_get_serializer
 from parsec.backend.backend_events import BackendEvent
 from parsec.backend.config import PostgreSQLBlockStoreConfig
-
-from tests.backend.test_events import events_subscribe, events_listen, events_listen_nowait
+from tests.backend.test_events import events_listen, events_listen_nowait, events_subscribe
 
 
 async def message_get(sock, offset=0):

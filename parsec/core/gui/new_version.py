@@ -1,21 +1,21 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-import re
-import platform
-import trio
 import json
-from urllib.request import urlopen, Request
+import platform
+import re
+from urllib.request import Request, urlopen
 
-from PyQt5.QtCore import Qt, pyqtSignal, QSysInfo
+import trio
+from PyQt5.QtCore import QSysInfo, Qt, pyqtSignal
 from PyQt5.QtWidgets import QDialog, QWidget
 
 from parsec import __version__
 from parsec.core.gui import desktop
-from parsec.core.gui.trio_thread import ThreadSafeQtSignal
 from parsec.core.gui.lang import translate as _
+from parsec.core.gui.trio_thread import ThreadSafeQtSignal
+from parsec.core.gui.ui.new_version_available import Ui_NewVersionAvailable
 from parsec.core.gui.ui.new_version_dialog import Ui_NewVersionDialog
 from parsec.core.gui.ui.new_version_info import Ui_NewVersionInfo
-from parsec.core.gui.ui.new_version_available import Ui_NewVersionAvailable
 
 
 def _extract_version_tuple(raw):

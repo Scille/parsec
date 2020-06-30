@@ -3,13 +3,13 @@
 import pytest
 import trio
 
-from parsec.backend.backend_events import BackendEvent
 from parsec.api.protocol import RealmRole
+from parsec.backend.backend_events import BackendEvent
 from parsec.core.backend_connection import (
     BackendAuthenticatedConn,
+    BackendConnectionRefused,
     BackendConnStatus,
     BackendNotAvailable,
-    BackendConnectionRefused,
 )
 from parsec.core.core_events import CoreEvent
 

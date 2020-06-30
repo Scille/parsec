@@ -6,7 +6,6 @@ from hypothesis_trio.stateful import initialize, rule
 
 from tests.oracles import FileOracle
 
-
 BLOCK_SIZE = 16
 PLAYGROUND_SIZE = BLOCK_SIZE * 10
 

@@ -1,19 +1,16 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-from PyQt5.QtCore import QTimer, Qt, QCoreApplication, pyqtSignal
+from PyQt5.QtCore import QCoreApplication, Qt, QTimer, pyqtSignal
 from PyQt5.QtWidgets import QCompleter, QWidget
 
 from parsec.api.protocol import UserID
 from parsec.core.fs import FSError
-from parsec.core.types import WorkspaceRole
-
-from parsec.core.gui.trio_thread import JobResultError, ThreadSafeQtSignal, QtToTrioJob
-
-from parsec.core.gui.custom_dialogs import show_info, show_error, ask_question, GreyedDialog
+from parsec.core.gui.custom_dialogs import GreyedDialog, ask_question, show_error, show_info
 from parsec.core.gui.lang import translate as _
-from parsec.core.gui.ui.workspace_sharing_widget import Ui_WorkspaceSharingWidget
+from parsec.core.gui.trio_thread import JobResultError, QtToTrioJob, ThreadSafeQtSignal
 from parsec.core.gui.ui.sharing_widget import Ui_SharingWidget
-
+from parsec.core.gui.ui.workspace_sharing_widget import Ui_WorkspaceSharingWidget
+from parsec.core.types import WorkspaceRole
 
 _ROLES_TO_INDEX = {
     WorkspaceRole.READER: 0,

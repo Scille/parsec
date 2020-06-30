@@ -1,26 +1,27 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-import pytest
 from uuid import UUID, uuid4
-from pendulum import Pendulum, now as pendulum_now
+
+import pytest
 from async_generator import asynccontextmanager
+from pendulum import Pendulum
+from pendulum import now as pendulum_now
 
 from parsec.api.data import RealmRoleCertificateContent
 from parsec.api.protocol import (
+    APIV1_AdministrationClientHandshake,
+    APIV1_AnonymousClientHandshake,
+    APIV1_AuthenticatedClientHandshake,
+    AuthenticatedClientHandshake,
+    InvitationType,
+    InvitedClientHandshake,
     OrganizationID,
     RealmRole,
-    InvitationType,
-    AuthenticatedClientHandshake,
-    InvitedClientHandshake,
-    APIV1_AuthenticatedClientHandshake,
-    APIV1_AnonymousClientHandshake,
-    APIV1_AdministrationClientHandshake,
 )
 from parsec.api.transport import Transport
-from parsec.backend.realm import RealmGrantedRole
 from parsec.backend.backend_events import BackendEvent
+from parsec.backend.realm import RealmGrantedRole
 from parsec.core.types import LocalDevice
-
 from tests.common import FreezeTestOnTransportError
 
 

@@ -2,21 +2,21 @@
 
 import pytest
 
-from parsec.api.version import ApiVersion
-from parsec.api.transport import Transport
 from parsec.api.protocol import (
+    APIV1_AdministrationClientHandshake,
+    APIV1_AnonymousClientHandshake,
+    APIV1_AuthenticatedClientHandshake,
+    HandshakeBadAdministrationToken,
+    HandshakeBadIdentity,
+    HandshakeOrganizationExpired,
+    HandshakeRVKMismatch,
+    InvalidMessageError,
+    ServerHandshake,
     packb,
     unpackb,
-    ServerHandshake,
-    APIV1_AuthenticatedClientHandshake,
-    APIV1_AnonymousClientHandshake,
-    APIV1_AdministrationClientHandshake,
-    HandshakeRVKMismatch,
-    HandshakeBadIdentity,
-    HandshakeBadAdministrationToken,
-    HandshakeOrganizationExpired,
-    InvalidMessageError,
 )
+from parsec.api.transport import Transport
+from parsec.api.version import ApiVersion
 
 
 @pytest.fixture

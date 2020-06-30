@@ -1,11 +1,17 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-import trio
-from unittest.mock import Mock
-import pbr.version
-from uuid import UUID
 from functools import partial
+from unittest.mock import Mock
+from uuid import UUID
 
+import pbr.version
+import swiftclient
+import trio
+from swiftclient.exceptions import ClientException
+
+from parsec.api.protocol import OrganizationID
+from parsec.backend.block import BlockAlreadyExistsError, BlockNotFoundError, BlockTimeoutError
+from parsec.backend.blockstore import BaseBlockStoreComponent
 
 original_version_info = pbr.version.VersionInfo
 
@@ -19,13 +25,6 @@ def side_effect(key):
 
 
 pbr.version.VersionInfo = Mock(side_effect=side_effect)
-
-import swiftclient
-from swiftclient.exceptions import ClientException
-
-from parsec.api.protocol import OrganizationID
-from parsec.backend.blockstore import BaseBlockStoreComponent
-from parsec.backend.block import BlockAlreadyExistsError, BlockNotFoundError, BlockTimeoutError
 
 
 class SwiftBlockStoreComponent(BaseBlockStoreComponent):

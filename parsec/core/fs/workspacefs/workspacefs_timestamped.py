@@ -2,9 +2,9 @@
 
 import pendulum
 
-from parsec.core.types import WorkspaceRole
 from parsec.core.fs.workspacefs.sync_transactions import SyncTransactions
 from parsec.core.fs.workspacefs.workspacefs import WorkspaceFS
+from parsec.core.types import WorkspaceRole
 
 
 class WorkspaceFSTimestamped(WorkspaceFS):

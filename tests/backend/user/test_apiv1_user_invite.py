@@ -1,13 +1,13 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-from parsec.backend.backend_events import BackendEvent
-from parsec.event_bus import MetaEvent
 import pytest
 import trio
 from async_generator import asynccontextmanager
 
-from parsec.api.protocol import apiv1_user_invite_serializer, UserID
+from parsec.api.protocol import UserID, apiv1_user_invite_serializer
+from parsec.backend.backend_events import BackendEvent
 from parsec.backend.user import PEER_EVENT_MAX_WAIT, UserInvitation
+from parsec.event_bus import MetaEvent
 
 
 @asynccontextmanager

@@ -1,46 +1,47 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-from parsec.backend.backend_events import BackendEvent
-import trio
-import attr
 from typing import List, Optional, Tuple
-import pendulum
 
-from parsec.utils import timestamps_in_the_ballpark
-from parsec.crypto import VerifyKey, PublicKey
-from parsec.event_bus import EventBus
+import attr
+import pendulum
+import trio
+
 from parsec.api.data import (
-    UserProfile,
-    UserCertificateContent,
+    DataError,
     DeviceCertificateContent,
     RevokedUserCertificateContent,
-    DataError,
+    UserCertificateContent,
+    UserProfile,
 )
 from parsec.api.protocol import (
+    APIV1_HandshakeType,
+    DeviceID,
+    HandshakeType,
+    HumanHandle,
     OrganizationID,
     UserID,
-    DeviceID,
-    HumanHandle,
-    HandshakeType,
-    APIV1_HandshakeType,
-    user_get_serializer,
-    apiv1_user_find_serializer,
-    human_find_serializer,
-    apiv1_user_get_invitation_creator_serializer,
-    apiv1_user_invite_serializer,
-    apiv1_user_claim_serializer,
-    apiv1_user_cancel_invitation_serializer,
-    apiv1_user_create_serializer,
-    user_create_serializer,
-    user_revoke_serializer,
+    apiv1_device_cancel_invitation_serializer,
+    apiv1_device_claim_serializer,
+    apiv1_device_create_serializer,
     apiv1_device_get_invitation_creator_serializer,
     apiv1_device_invite_serializer,
-    apiv1_device_claim_serializer,
-    apiv1_device_cancel_invitation_serializer,
-    apiv1_device_create_serializer,
+    apiv1_user_cancel_invitation_serializer,
+    apiv1_user_claim_serializer,
+    apiv1_user_create_serializer,
+    apiv1_user_find_serializer,
+    apiv1_user_get_invitation_creator_serializer,
+    apiv1_user_invite_serializer,
     device_create_serializer,
+    human_find_serializer,
+    user_create_serializer,
+    user_get_serializer,
+    user_revoke_serializer,
 )
-from parsec.backend.utils import catch_protocol_errors, run_with_breathing_transport, api
+from parsec.backend.backend_events import BackendEvent
+from parsec.backend.utils import api, catch_protocol_errors, run_with_breathing_transport
+from parsec.crypto import PublicKey, VerifyKey
+from parsec.event_bus import EventBus
+from parsec.utils import timestamps_in_the_ballpark
 
 
 class UserError(Exception):

@@ -3,8 +3,8 @@
 import pytest
 from pendulum import Pendulum
 
-from parsec.core.types import FsPath
 from parsec.core.fs.exceptions import FSLocalMissError
+from parsec.core.types import FsPath
 
 
 @pytest.mark.trio

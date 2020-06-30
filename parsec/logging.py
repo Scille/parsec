@@ -1,13 +1,13 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-import re
-import structlog
 import logging
+import re
+
 import sentry_sdk
+import structlog
 from sentry_sdk.integrations.logging import LoggingIntegration
 
 from parsec import __version__
-
 
 _log_level = None
 

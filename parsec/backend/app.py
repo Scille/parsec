@@ -1,30 +1,30 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-from parsec.backend.backend_events import BackendEvent
-from typing import Optional
-import trio
-from structlog import get_logger
 from logging import DEBUG as LOG_LEVEL_DEBUG
-from async_generator import asynccontextmanager
+from typing import Optional
 
-from parsec.event_bus import EventBus
-from parsec.logging import get_log_level
-from parsec.api.transport import TransportError, TransportClosedByPeer, Transport
+import trio
+from async_generator import asynccontextmanager
+from structlog import get_logger
+
 from parsec.api.protocol import (
-    packb,
-    unpackb,
-    ProtocolError,
-    MessageSerializationError,
     InvalidMessageError,
     InvitationStatus,
+    MessageSerializationError,
+    ProtocolError,
+    packb,
+    unpackb,
 )
-from parsec.backend.utils import CancelledByNewRequest, collect_apis
-from parsec.backend.config import BackendConfig
+from parsec.api.transport import Transport, TransportClosedByPeer, TransportError
+from parsec.backend.backend_events import BackendEvent
 from parsec.backend.client_context import AuthenticatedClientContext, InvitedClientContext
+from parsec.backend.config import BackendConfig
 from parsec.backend.handshake import do_handshake
 from parsec.backend.memory import components_factory as mocked_components_factory
 from parsec.backend.postgresql import components_factory as postgresql_components_factory
-
+from parsec.backend.utils import CancelledByNewRequest, collect_apis
+from parsec.event_bus import EventBus
+from parsec.logging import get_log_level
 
 logger = get_logger()
 

@@ -1,19 +1,20 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
 import os
-import click
-from typing import List
 from functools import wraps
 from pathlib import Path
+from typing import List
 
-from parsec.logging import configure_logging, configure_sentry_logging
+import click
+
 from parsec.core.config import get_default_config_dir, load_config
 from parsec.core.local_device import (
     AvailableDevice,
+    LocalDeviceError,
     list_available_devices,
     load_device_with_password,
-    LocalDeviceError,
 )
+from parsec.logging import configure_logging, configure_sentry_logging
 
 
 def core_config_options(fn):

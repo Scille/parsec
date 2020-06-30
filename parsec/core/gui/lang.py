@@ -1,15 +1,13 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-import io
 import gettext
-import pendulum
+import io
 
+import pendulum
+from PyQt5.QtCore import QCoreApplication, QDataStream, QFile, QIODevice, QLocale
 from structlog import get_logger
 
-from PyQt5.QtCore import QCoreApplication, QIODevice, QFile, QDataStream, QLocale
-
 from parsec.core.gui.desktop import get_locale_language
-
 
 LANGUAGES = {"English": "en", "Français": "fr"}
 

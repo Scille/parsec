@@ -1,31 +1,29 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-from pathlib import Path
 from collections import defaultdict
-from typing import Dict, Tuple, Set, Optional
+from pathlib import Path
+from typing import Dict, Optional, Set, Tuple
 
 import trio
-from trio import hazmat
+from async_generator import asynccontextmanager
 from pendulum import Pendulum
 from structlog import get_logger
-from async_generator import asynccontextmanager
+from trio import hazmat
 
-from parsec.core.types import (
-    EntryID,
-    BlockID,
-    ChunkID,
-    LocalDevice,
-    FileDescriptor,
-    LocalManifest,
-    LocalFileManifest,
-)
-from parsec.core.fs.exceptions import FSError, FSLocalMissError, FSInvalidFileDescriptor
-
+from parsec.core.fs.exceptions import FSError, FSInvalidFileDescriptor, FSLocalMissError
+from parsec.core.fs.storage.chunk_storage import BlockStorage, ChunkStorage
 from parsec.core.fs.storage.local_database import LocalDatabase
 from parsec.core.fs.storage.manifest_storage import ManifestStorage
-from parsec.core.fs.storage.chunk_storage import ChunkStorage, BlockStorage
-from parsec.core.fs.storage.version import WORKSPACE_DATA_STORAGE_NAME, WORKSPACE_CACHE_STORAGE_NAME
-
+from parsec.core.fs.storage.version import WORKSPACE_CACHE_STORAGE_NAME, WORKSPACE_DATA_STORAGE_NAME
+from parsec.core.types import (
+    BlockID,
+    ChunkID,
+    EntryID,
+    FileDescriptor,
+    LocalDevice,
+    LocalFileManifest,
+    LocalManifest,
+)
 
 logger = get_logger()
 

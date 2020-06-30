@@ -1,22 +1,23 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-from pendulum import Pendulum
 from typing import List, Tuple
-from pypika import Parameter, Order, functions as fn
 
+from pendulum import Pendulum
+from pypika import Order, Parameter
+from pypika import functions as fn
+
+from parsec.api.protocol import DeviceID, OrganizationID, UserID
 from parsec.backend.backend_events import BackendEvent
-from parsec.api.protocol import UserID, DeviceID, OrganizationID
 from parsec.backend.message import BaseMessageComponent
-from parsec.backend.postgresql.handler import send_signal, PGHandler
-from parsec.backend.postgresql.utils import Query
+from parsec.backend.postgresql.handler import PGHandler, send_signal
 from parsec.backend.postgresql.tables import (
-    t_message,
-    q_user_internal_id,
-    q_device_internal_id,
     q_device,
+    q_device_internal_id,
     q_organization_internal_id,
+    q_user_internal_id,
+    t_message,
 )
-
+from parsec.backend.postgresql.utils import Query
 
 _q_insert_message = (
     Query.into(t_message)

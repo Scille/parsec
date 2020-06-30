@@ -11,12 +11,11 @@ Define all the FSError classes, using the following hierarchy:
 
 """
 
-import os
 import errno
+import os
 
-from parsec.core.types import EntryID
 from parsec.core.fs.utils import ntstatus
-
+from parsec.core.types import EntryID
 
 # Base classes for all file system errors
 

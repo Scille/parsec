@@ -4,12 +4,11 @@ import pytest
 import trio
 from pendulum import Pendulum
 
-from parsec.api.protocol import InvitationType, InvitationStatus, APIEvent
-
+from parsec.api.protocol import APIEvent, InvitationStatus, InvitationType
 from tests.backend.common import (
-    events_subscribe,
-    events_listen_wait,
     events_listen_nowait,
+    events_listen_wait,
+    events_subscribe,
     invite_list,
 )
 

@@ -1,20 +1,19 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-from parsec.backend.backend_events import BackendEvent
 from pypika import Parameter
 
-from parsec.api.protocol import OrganizationID, UserID, DeviceID
-from parsec.backend.user import UserError, UserNotFoundError, UserAlreadyExistsError, UserInvitation
+from parsec.api.protocol import DeviceID, OrganizationID, UserID
+from parsec.backend.backend_events import BackendEvent
 from parsec.backend.postgresql.handler import send_signal
-from parsec.backend.postgresql.utils import query
 from parsec.backend.postgresql.tables import (
-    q_user,
     q_device,
-    q_user_invitation,
     q_device_internal_id,
     q_organization_internal_id,
+    q_user,
+    q_user_invitation,
 )
-
+from parsec.backend.postgresql.utils import query
+from parsec.backend.user import UserAlreadyExistsError, UserError, UserInvitation, UserNotFoundError
 
 _q_user_exists = (
     q_user(organization_id=Parameter("$1"), user_id=Parameter("$2")).select(True).get_sql()

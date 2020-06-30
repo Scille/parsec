@@ -1,63 +1,60 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-from parsec.core.core_events import CoreEvent
-import trio
 from pathlib import Path
-from pendulum import Pendulum, now as pendulum_now
-from typing import List, Tuple, Optional, Union
+from typing import List, Optional, Tuple, Union
+
+import trio
+from async_generator import asynccontextmanager
+from pendulum import Pendulum
+from pendulum import now as pendulum_now
 from structlog import get_logger
 
-from async_generator import asynccontextmanager
-
-from parsec.event_bus import EventBus
-from parsec.crypto import SecretKey
 from parsec.api.data import (
     DataError,
-    RealmRoleCertificateContent,
     MessageContent,
+    PingMessageContent,
+    RealmRoleCertificateContent,
     SharingGrantedMessageContent,
     SharingReencryptedMessageContent,
     SharingRevokedMessageContent,
-    PingMessageContent,
     UserManifest,
 )
-from parsec.api.protocol import UserID, DeviceID, MaintenanceType
-from parsec.core.types import (
-    EntryID,
-    EntryName,
-    LocalDevice,
-    LocalWorkspaceManifest,
-    WorkspaceEntry,
-    WorkspaceRole,
-    LocalUserManifest,
-)
-
-# TODO: handle exceptions status...
+from parsec.api.protocol import DeviceID, MaintenanceType, UserID
 from parsec.core.backend_connection import (
     APIV1_BackendAuthenticatedCmds,
     BackendConnectionError,
     BackendNotAvailable,
 )
-from parsec.core.remote_devices_manager import (
-    RemoteDevicesManager,
-    RemoteDevicesManagerError,
-    RemoteDevicesManagerBackendOfflineError,
+from parsec.core.core_events import CoreEvent
+from parsec.core.fs.exceptions import (
+    FSBackendOfflineError,
+    FSError,
+    FSSharingNotAllowedError,
+    FSWorkspaceInMaintenance,
+    FSWorkspaceNoAccess,
+    FSWorkspaceNotFoundError,
+    FSWorkspaceNotInMaintenance,
 )
-
-from parsec.core.fs.workspacefs import WorkspaceFS
 from parsec.core.fs.remote_loader import RemoteLoader
 from parsec.core.fs.storage import UserStorage, WorkspaceStorage
 from parsec.core.fs.userfs.merging import merge_local_user_manifests, merge_workspace_entry
-from parsec.core.fs.exceptions import (
-    FSError,
-    FSWorkspaceNoAccess,
-    FSWorkspaceNotFoundError,
-    FSBackendOfflineError,
-    FSSharingNotAllowedError,
-    FSWorkspaceInMaintenance,
-    FSWorkspaceNotInMaintenance,
+from parsec.core.fs.workspacefs import WorkspaceFS
+from parsec.core.remote_devices_manager import (
+    RemoteDevicesManager,
+    RemoteDevicesManagerBackendOfflineError,
+    RemoteDevicesManagerError,
 )
-
+from parsec.core.types import (
+    EntryID,
+    EntryName,
+    LocalDevice,
+    LocalUserManifest,
+    LocalWorkspaceManifest,
+    WorkspaceEntry,
+    WorkspaceRole,
+)
+from parsec.crypto import SecretKey
+from parsec.event_bus import EventBus
 
 logger = get_logger()
 

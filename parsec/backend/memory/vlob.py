@@ -1,25 +1,25 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
+from collections import defaultdict
+from typing import Dict, List, Optional, Tuple
+from uuid import UUID
+
 import attr
 import pendulum
-from uuid import UUID
-from typing import List, Tuple, Dict, Optional
-from collections import defaultdict
 
+from parsec.api.protocol import DeviceID, OrganizationID, RealmRole
 from parsec.backend.backend_events import BackendEvent
-from parsec.api.protocol import DeviceID, OrganizationID
-from parsec.api.protocol import RealmRole
 from parsec.backend.realm import BaseRealmComponent, RealmNotFoundError
 from parsec.backend.vlob import (
     BaseVlobComponent,
     VlobAccessError,
-    VlobVersionError,
-    VlobTimestampError,
-    VlobNotFoundError,
     VlobAlreadyExistsError,
     VlobEncryptionRevisionError,
     VlobInMaintenanceError,
+    VlobNotFoundError,
     VlobNotInMaintenanceError,
+    VlobTimestampError,
+    VlobVersionError,
 )
 
 

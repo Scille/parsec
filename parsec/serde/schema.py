@@ -1,9 +1,11 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-from marshmallow import Schema, MarshalResult, UnmarshalResult, ValidationError, post_load
-from typing import Union, Dict
-
 from enum import Enum
+from typing import Dict, Union
+
+from marshmallow import MarshalResult, Schema, UnmarshalResult, ValidationError, post_load
+
+from parsec.serde.fields import String
 
 try:
     import toastedmarshmallow
@@ -15,8 +17,6 @@ try:
 
 except ImportError:
     BaseSchema = Schema
-
-from parsec.serde.fields import String
 
 
 class BaseCmdSchema(BaseSchema):

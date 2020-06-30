@@ -1,20 +1,21 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
 import os
-import click
-import pendulum
 from pathlib import Path
 
-from parsec.utils import trio_run
-from parsec.logging import configure_logging
-from parsec.cli_utils import spinner, operation, cli_exception_handler
-from parsec.crypto import SigningKey
-from parsec.api.data import UserCertificateContent, DeviceCertificateContent, UserProfile
+import click
+import pendulum
+
+from parsec.api.data import DeviceCertificateContent, UserCertificateContent, UserProfile
 from parsec.api.protocol import DeviceID
-from parsec.core.types import BackendOrganizationBootstrapAddr
-from parsec.core.config import get_default_config_dir
+from parsec.cli_utils import cli_exception_handler, operation, spinner
 from parsec.core.backend_connection import apiv1_backend_anonymous_cmds_factory
+from parsec.core.config import get_default_config_dir
 from parsec.core.local_device import generate_new_device, save_device_with_password
+from parsec.core.types import BackendOrganizationBootstrapAddr
+from parsec.crypto import SigningKey
+from parsec.logging import configure_logging
+from parsec.utils import trio_run
 
 
 async def _bootstrap_organization(

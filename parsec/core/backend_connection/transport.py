@@ -1,38 +1,38 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
 import os
-import trio
 import ssl
-from async_generator import asynccontextmanager
-from structlog import get_logger
 from typing import Optional, Union
 
-from parsec.crypto import SigningKey
-from parsec.api.transport import Transport, TransportError, TransportClosedByPeer
+import trio
+from async_generator import asynccontextmanager
+from structlog import get_logger
+
 from parsec.api.protocol import (
-    DeviceID,
-    ProtocolError,
-    HandshakeError,
-    BaseClientHandshake,
-    AuthenticatedClientHandshake,
-    InvitedClientHandshake,
+    APIV1_AdministrationClientHandshake,
     APIV1_AnonymousClientHandshake,
     APIV1_AuthenticatedClientHandshake,
-    APIV1_AdministrationClientHandshake,
+    AuthenticatedClientHandshake,
+    BaseClientHandshake,
+    DeviceID,
+    HandshakeError,
+    InvitedClientHandshake,
+    ProtocolError,
+)
+from parsec.api.transport import Transport, TransportClosedByPeer, TransportError
+from parsec.core.backend_connection.exceptions import (
+    BackendConnectionError,
+    BackendConnectionRefused,
+    BackendNotAvailable,
+    BackendProtocolError,
 )
 from parsec.core.types import (
     BackendAddr,
+    BackendInvitationAddr,
     BackendOrganizationAddr,
     BackendOrganizationBootstrapAddr,
-    BackendInvitationAddr,
 )
-from parsec.core.backend_connection.exceptions import (
-    BackendConnectionError,
-    BackendNotAvailable,
-    BackendConnectionRefused,
-    BackendProtocolError,
-)
-
+from parsec.crypto import SigningKey
 
 logger = get_logger()
 
