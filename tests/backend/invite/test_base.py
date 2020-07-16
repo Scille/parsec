@@ -13,6 +13,7 @@ from parsec.api.protocol import (
     InvitationDeletedReason,
     InvitationType,
     HandshakeBadIdentity,
+    HandshakeInvitationCancelledToken,
     APIEvent,
 )
 
@@ -235,7 +236,7 @@ async def test_delete(
     assert rep == {"status": "ok", "invitations": []}
 
     # Can no longer use this invitation to connect to the backend
-    with pytest.raises(HandshakeBadIdentity):
+    with pytest.raises(HandshakeInvitationCancelledToken):
         async with backend_invited_sock_factory(
             backend,
             organization_id=alice.organization_id,

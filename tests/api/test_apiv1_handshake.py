@@ -5,6 +5,7 @@ from unittest.mock import ANY
 
 from parsec.api.protocol.base import packb, unpackb, InvalidMessageError
 from parsec.api.protocol.handshake import (
+    HandshakeError,
     HandshakeFailedChallenge,
     HandshakeBadIdentity,
     HandshakeBadAdministrationToken,
@@ -418,15 +419,7 @@ def test_build_bad_outcomes(alice, method, expected_result):
 # 5) Client process result
 
 
-@pytest.mark.parametrize(
-    "req",
-    [
-        {},
-        {"handshake": "foo", "result": "ok"},
-        {"result": "ok"},
-        {"handshake": "result", "result": "error"},
-    ],
-)
+@pytest.mark.parametrize("req", [{}, {"handshake": "foo", "result": "ok"}, {"result": "ok"}])
 def test_process_result_req_bad_format(req):
     ch = BaseClientHandshake()
     with pytest.raises(InvalidMessageError):
@@ -441,7 +434,7 @@ def test_process_result_req_bad_format(req):
         ("rvk_mismatch", HandshakeRVKMismatch),
         ("revoked_device", HandshakeRevokedDevice),
         ("bad_admin_token", HandshakeBadAdministrationToken),
-        ("dummy", InvalidMessageError),
+        ("dummy", HandshakeError),  # Unknown result defaults to generic error
     ],
 )
 def test_process_result_req_bad_outcome(result, exc_cls):

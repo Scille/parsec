@@ -18,6 +18,8 @@ from parsec.backend.invite import (
     DeviceInvitation,
     InvitationNotFoundError,
     InvitationAlreadyDeletedError,
+    InvitationAlreadyClaimedError,
+    InvitationCancelledError,
     InvitationInvalidStateError,
 )
 
@@ -56,8 +58,17 @@ class MemoryInviteComponent(BaseInviteComponent):
         invitation = org.invitations.get(token)
         if not invitation or (expected_greeter and invitation.greeter_user_id != expected_greeter):
             raise InvitationNotFoundError(token)
-        if token in org.deleted_invitations:
-            raise InvitationAlreadyDeletedError(token)
+
+        deleted = org.deleted_invitations.get(token)
+        if deleted:
+            _, reason = deleted
+            if reason == InvitationDeletedReason.CANCELLED:
+                raise InvitationCancelledError(token)
+            elif reason == InvitationDeletedReason.FINISHED:
+                raise InvitationAlreadyClaimedError(token)
+            else:
+                raise InvitationAlreadyDeletedError(token)
+
         return invitation, org.conduits[token]
 
     async def _conduit_talk(

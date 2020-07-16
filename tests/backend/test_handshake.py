@@ -2,6 +2,7 @@
 
 import pytest
 from uuid import uuid4
+from pendulum import now as pendulum_now
 
 from parsec.api.protocol import packb, unpackb, OrganizationID
 from parsec.api.version import ApiVersion, API_VERSION
@@ -9,10 +10,13 @@ from parsec.api.transport import Transport
 from parsec.api.protocol import (
     AuthenticatedClientHandshake,
     InvitationType,
+    InvitationDeletedReason,
     InvitedClientHandshake,
     HandshakeRVKMismatch,
     HandshakeBadIdentity,
     HandshakeOrganizationExpired,
+    HandshakeInvitationAlreadyClaimedToken,
+    HandshakeInvitationCancelledToken,
 )
 
 
@@ -152,6 +156,56 @@ async def test_invited_handshake_bad_token(backend, server_factory, coolorg, inv
         await transport.send(answer_req)
         result_req = await transport.recv()
         with pytest.raises(HandshakeBadIdentity):
+            ch.process_result_req(result_req)
+
+
+@pytest.mark.trio
+@pytest.mark.parametrize("invitation_type", InvitationType)
+@pytest.mark.parametrize(
+    "deleted_reason,handshake_error_cls",
+    [
+        (InvitationDeletedReason.CANCELLED, HandshakeInvitationCancelledToken),
+        (InvitationDeletedReason.FINISHED, HandshakeInvitationAlreadyClaimedToken),
+        (InvitationDeletedReason.ROTTEN, HandshakeBadIdentity),
+    ],
+)
+async def test_invited_handshake_with_deleted_invitation(
+    backend, server_factory, alice, invitation_type, deleted_reason, handshake_error_cls
+):
+    if invitation_type == InvitationType.USER:
+        invitation = await backend.invite.new_for_user(
+            organization_id=alice.organization_id,
+            greeter_user_id=alice.user_id,
+            claimer_email="zack@example.com",
+        )
+    else:  # Claim device
+        invitation = await backend.invite.new_for_device(
+            organization_id=alice.organization_id, greeter_user_id=alice.user_id
+        )
+
+    await backend.invite.delete(
+        organization_id=alice.organization_id,
+        greeter=alice.user_id,
+        token=invitation.token,
+        on=pendulum_now(),
+        reason=deleted_reason,
+    )
+
+    ch = InvitedClientHandshake(
+        organization_id=alice.organization_id,
+        invitation_type=invitation_type,
+        token=invitation.token,
+    )
+    async with server_factory(backend.handle_client) as server:
+        stream = server.connection_factory()
+        transport = await Transport.init_for_client(stream, server.addr.hostname)
+
+        challenge_req = await transport.recv()
+        answer_req = ch.process_challenge_req(challenge_req)
+
+        await transport.send(answer_req)
+        result_req = await transport.recv()
+        with pytest.raises(handshake_error_cls):
             ch.process_result_req(result_req)
 
 

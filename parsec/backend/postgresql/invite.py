@@ -14,7 +14,10 @@ from parsec.api.protocol import (
 )
 from parsec.backend.backend_events import BackendEvent
 from parsec.backend.postgresql.handler import send_signal, PGHandler
-from parsec.backend.postgresql.tables import STR_TO_INVITATION_CONDUIT_STATE
+from parsec.backend.postgresql.tables import (
+    STR_TO_INVITATION_CONDUIT_STATE,
+    STR_TO_INVITATION_DELETED_REASON,
+)
 from parsec.backend.invite import (
     ConduitState,
     NEXT_CONDUIT_STATE,
@@ -25,6 +28,8 @@ from parsec.backend.invite import (
     DeviceInvitation,
     InvitationNotFoundError,
     InvitationAlreadyDeletedError,
+    InvitationAlreadyClaimedError,
+    InvitationCancelledError,
     InvitationInvalidStateError,
 )
 from parsec.backend.postgresql.queries import (
@@ -163,8 +168,7 @@ SELECT
     human_handle_per_user.label,
     claimer_email,
     created_on,
-    deleted_on,
-    deleted_reason
+    deleted_on
 FROM invitation LEFT JOIN human_handle_per_user on invitation.greeter = human_handle_per_user.user_
 WHERE
     organization = { q_organization_internal_id("$organization_id") }
@@ -546,7 +550,6 @@ class PGInviteComponent(BaseInviteComponent):
             claimer_email,
             created_on,
             deleted_on,
-            deleted_reason,
         ) in rows:
             if greeter_human_handle_email:
                 greeter_human_handle = HumanHandle(
@@ -602,7 +605,13 @@ class PGInviteComponent(BaseInviteComponent):
         ) = row
 
         if deleted_on:
-            raise InvitationAlreadyDeletedError(token)
+            deleted_reason = STR_TO_INVITATION_DELETED_REASON[deleted_reason]
+            if deleted_reason == InvitationDeletedReason.CANCELLED:
+                raise InvitationCancelledError(token)
+            elif deleted_reason == InvitationDeletedReason.FINISHED:
+                raise InvitationAlreadyClaimedError(token)
+            else:
+                raise InvitationAlreadyDeletedError(token)
 
         if greeter_human_handle_email:
             greeter_human_handle = HumanHandle(

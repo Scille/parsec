@@ -67,6 +67,14 @@ class InvitationAlreadyDeletedError(InvitationError):
     pass
 
 
+class InvitationCancelledError(InvitationAlreadyDeletedError):
+    pass
+
+
+class InvitationAlreadyClaimedError(InvitationAlreadyDeletedError):
+    pass
+
+
 class InvitationInvalidStateError(InvitationError):
     pass
 

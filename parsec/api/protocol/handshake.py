@@ -7,7 +7,7 @@ from secrets import token_bytes
 
 from parsec.crypto import SigningKey, VerifyKey, CryptoError
 from parsec.serde import BaseSchema, OneOfSchema, fields, validate
-from parsec.api.protocol.base import ProtocolError, InvalidMessageError, serializer_factory
+from parsec.api.protocol.base import ProtocolError, serializer_factory
 from parsec.api.protocol.types import OrganizationID, DeviceID, OrganizationIDField, DeviceIDField
 from parsec.api.protocol.invite import InvitationType, InvitationTypeField
 from parsec.api.version import ApiVersion, API_V1_VERSION, API_V2_VERSION
@@ -34,6 +34,14 @@ class HandshakeOrganizationExpired(HandshakeError):
 
 
 class HandshakeRVKMismatch(HandshakeError):
+    pass
+
+
+class HandshakeInvitationCancelledToken(HandshakeError):
+    pass
+
+
+class HandshakeInvitationAlreadyClaimedToken(HandshakeError):
     pass
 
 
@@ -295,6 +303,26 @@ class ServerHandshake:
             {"handshake": "result", "result": "bad_identity", "help": help}
         )
 
+    def build_already_claimed_invitation_result_req(
+        self, help="Invitation already claimed"
+    ) -> bytes:
+        if not self.state == "answer":
+            raise HandshakeError("Invalid state.")
+
+        self.state = "result"
+        return handshake_result_serializer.dumps(
+            {"handshake": "result", "result": "invitation_already_claimed", "help": help}
+        )
+
+    def build_cancelled_invitation_result_req(self, help="Invitation cancelled by author") -> bytes:
+        if not self.state == "answer":
+            raise HandshakeError("Invalid state.")
+
+        self.state = "result"
+        return handshake_result_serializer.dumps(
+            {"handshake": "result", "result": "invitation_cancelled", "help": help}
+        )
+
     def build_organization_expired_result_req(self, help="Trial organization has expired") -> bytes:
         if not self.state == "answer":
             raise HandshakeError("Invalid state.")
@@ -377,13 +405,17 @@ class BaseClientHandshake:
             elif data["result"] == "revoked_device":
                 raise HandshakeRevokedDevice(data["help"])
 
-            if data["result"] == "bad_admin_token":
+            elif data["result"] == "invitation_already_claimed":
+                raise HandshakeInvitationAlreadyClaimedToken(data["help"])
+
+            elif data["result"] == "invitation_cancelled":
+                raise HandshakeInvitationCancelledToken(data["help"])
+
+            elif data["result"] == "bad_admin_token":
                 raise HandshakeBadAdministrationToken(data["help"])
 
             else:
-                raise InvalidMessageError(
-                    f"Bad `result` handshake: {data['result']} ({data['help']})"
-                )
+                raise HandshakeError(f"Bad handshake: {data['result']} ({data['help']})")
 
 
 class AuthenticatedClientHandshake(BaseClientHandshake):

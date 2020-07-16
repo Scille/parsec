@@ -11,11 +11,11 @@ from parsec.api.protocol import (
     APIV1_AuthenticatedClientHandshake,
     APIV1_AnonymousClientHandshake,
     APIV1_AdministrationClientHandshake,
+    HandshakeError,
     HandshakeRVKMismatch,
     HandshakeBadIdentity,
     HandshakeBadAdministrationToken,
     HandshakeOrganizationExpired,
-    InvalidMessageError,
 )
 
 
@@ -271,7 +271,7 @@ async def test_authenticated_handshake_bad_versions(
         await transport.send(answer_req)
         result_req = await transport.recv()
 
-        with pytest.raises(InvalidMessageError) as context:
+        with pytest.raises(HandshakeError) as context:
             ch.process_result_req(result_req)
         assert "bad_protocol" in str(context.value)
         assert "{1.22}" in str(context.value)

@@ -10,6 +10,7 @@ from parsec.api.protocol import (
     unpackb,
     InvalidMessageError,
     InvitationType,
+    HandshakeError,
     HandshakeFailedChallenge,
     HandshakeBadIdentity,
     HandshakeBadAdministrationToken,
@@ -371,6 +372,8 @@ def test_build_result_req_bad_challenge(alice):
     [
         ("build_bad_protocol_result_req", "bad_protocol"),
         ("build_bad_identity_result_req", "bad_identity"),
+        ("build_already_claimed_invitation_result_req", "invitation_already_claimed"),
+        ("build_cancelled_invitation_result_req", "invitation_cancelled"),
         ("build_organization_expired_result_req", "organization_expired"),
         ("build_rvk_mismatch_result_req", "rvk_mismatch"),
         ("build_revoked_device_result_req", "revoked_device"),
@@ -397,15 +400,7 @@ def test_build_bad_outcomes(alice, method, expected_result):
 # 5) Client process result
 
 
-@pytest.mark.parametrize(
-    "req",
-    [
-        {},
-        {"handshake": "foo", "result": "ok"},
-        {"result": "ok"},
-        {"handshake": "result", "result": "error"},
-    ],
-)
+@pytest.mark.parametrize("req", [{}, {"handshake": "foo", "result": "ok"}, {"result": "ok"}])
 def test_process_result_req_bad_format(req):
     ch = BaseClientHandshake()
     with pytest.raises(InvalidMessageError):
@@ -420,7 +415,7 @@ def test_process_result_req_bad_format(req):
         ("rvk_mismatch", HandshakeRVKMismatch),
         ("revoked_device", HandshakeRevokedDevice),
         ("bad_admin_token", HandshakeBadAdministrationToken),
-        ("dummy", InvalidMessageError),
+        ("dummy", HandshakeError),  # Unknown result defaults to generic error
     ],
 )
 def test_process_result_req_bad_outcome(result, exc_cls):

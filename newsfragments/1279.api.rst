@@ -1,0 +1,2 @@
+Add specific handshake status for invitation already claimed or cancelled.
+Unknown handshake error status are no longer considered invalid (fallback to a default behavior for forward compatibility).
