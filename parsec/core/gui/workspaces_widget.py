@@ -8,26 +8,12 @@ from PyQt5.QtWidgets import QWidget, QLabel
 
 import pendulum
 
-from parsec.core.types import (
-    WorkspaceEntry,
-    FsPath,
-    EntryID,
-    EntryName,
-    BackendOrganizationFileLinkAddr,
-)
-from parsec.core.fs import WorkspaceFS, WorkspaceFSTimestamped, FSBackendOfflineError
-from parsec.core.mountpoint.exceptions import (
-    MountpointAlreadyMounted,
-    MountpointNotMounted,
-    MountpointError,
-)
+from parsec.core.types import WorkspaceEntry, FsPath, EntryID, BackendOrganizationFileLinkAddr
+from parsec.core.fs import WorkspaceFS, WorkspaceFSTimestamped
+from parsec.core.mountpoint.exceptions import MountpointError
 
-from parsec.core.gui.trio_thread import (
-    JobResultError,
-    ThreadSafeQtSignal,
-    QtToTrioJob,
-    JobSchedulerNotAvailable,
-)
+from parsec.core.gui.trio_thread import ThreadSafeQtSignal, QtToTrioJob, JobSchedulerNotAvailable
+
 from parsec.core.gui import desktop
 from parsec.core.gui.custom_dialogs import show_error, get_text_input, ask_question
 from parsec.core.gui.flow_layout import FlowLayout
@@ -36,79 +22,17 @@ from parsec.core.gui.workspace_button import WorkspaceButton
 from parsec.core.gui.timestamped_workspace_widget import TimestampedWorkspaceWidget
 from parsec.core.gui.ui.workspaces_widget import Ui_WorkspacesWidget
 from parsec.core.gui.workspace_sharing_widget import WorkspaceSharingWidget
-
-
-async def _get_reencryption_needs(workspace_fs):
-    try:
-        reenc_needs = await workspace_fs.get_reencryption_need()
-    except FSBackendOfflineError as exc:
-        raise JobResultError("offline") from exc
-    return workspace_fs.workspace_id, reenc_needs
-
-
-async def _do_workspace_create(core, workspace_name):
-    try:
-        workspace_name = EntryName(workspace_name)
-    except ValueError:
-        raise JobResultError("invalid-name")
-    workspace_id = await core.user_fs.workspace_create(workspace_name)
-    return workspace_id
-
-
-async def _do_workspace_rename(core, workspace_id, new_name, button):
-    try:
-        new_name = EntryName(new_name)
-    except ValueError:
-        raise JobResultError("invalid-name")
-    try:
-        await core.user_fs.workspace_rename(workspace_id, new_name)
-        return button, new_name
-    except Exception as exc:
-        raise JobResultError("rename-error") from exc
-
-
-async def _do_workspace_list(core):
-    workspaces = []
-
-    async def _add_workspacefs(workspace_fs, timestamped):
-        ws_entry = workspace_fs.get_workspace_entry()
-        try:
-            users_roles = await workspace_fs.get_user_roles()
-        except FSBackendOfflineError:
-            users_roles = {workspace_fs.device.user_id: ws_entry.role}
-
-        try:
-            root_info = await workspace_fs.path_info("/")
-            files = root_info["children"]
-        except FSBackendOfflineError:
-            files = []
-        workspaces.append((workspace_fs, ws_entry, users_roles, files, timestamped))
-
-    user_manifest = core.user_fs.get_user_manifest()
-    available_workspaces = [w for w in user_manifest.workspaces if w.role]
-    for count, workspace in enumerate(available_workspaces):
-        workspace_id = workspace.id
-        workspace_fs = core.user_fs.get_workspace(workspace_id)
-        await _add_workspacefs(workspace_fs, timestamped=False)
-    worspaces_timestamped_dict = await core.mountpoint_manager.get_timestamped_mounted()
-    for (workspace_id, timestamp), workspace_fs in worspaces_timestamped_dict.items():
-        await _add_workspacefs(workspace_fs, timestamped=True)
-
-    return workspaces
-
-
-async def _do_workspace_mount(core, workspace_id, timestamp: pendulum.Pendulum = None):
-    try:
-        await core.mountpoint_manager.mount_workspace(workspace_id, timestamp)
-    except MountpointAlreadyMounted:
-        pass
-
-
-async def _do_workspace_unmount(core, workspace_id, timestamp: pendulum.Pendulum = None):
-    try:
-        await core.mountpoint_manager.unmount_workspace(workspace_id, timestamp)
-    except MountpointNotMounted:
-        pass
+from parsec.core.gui.init_organization import InitOrganizationWidget
+from parsec.core.gui.jobs.workspace import (
+    _get_reencryption_needs,
+    _do_workspace_create,
+    _do_workspace_rename,
+    _do_workspace_list,
+    _do_workspace_mount,
+    _do_workspace_unmount,
+    handle_create_workspace_errors,
+    handle_rename_workspace_errors,
+)
 
 
 class WorkspacesWidget(QWidget, Ui_WorkspacesWidget):
@@ -142,10 +66,10 @@ class WorkspacesWidget(QWidget, Ui_WorkspacesWidget):
     ignore_success = pyqtSignal(QtToTrioJob)
     ignore_error = pyqtSignal(QtToTrioJob)
 
-    def __init__(self, core, jobs_ctx, event_bus, **kwargs):
+    def __init__(self, core, jobs_ctx, event_bus, parent, **kwargs):
         super().__init__(**kwargs)
         self.setupUi(self)
-
+        self.parent = parent
         self.core = core
         self.jobs_ctx = jobs_ctx
         self.event_bus = event_bus
@@ -184,6 +108,7 @@ class WorkspacesWidget(QWidget, Ui_WorkspacesWidget):
         self.workspace_reencryption_success.connect(self._on_workspace_reencryption_success)
         self.workspace_reencryption_error.connect(self._on_workspace_reencryption_error)
 
+        self.initial_list_workspaces = True
         self.reset_required = False
         self.reset_timer = QTimer()
         self.reset_timer.setInterval(self.RESET_TIMER_THRESHOLD)
@@ -271,30 +196,26 @@ class WorkspacesWidget(QWidget, Ui_WorkspacesWidget):
         pass
 
     def on_create_error(self, job):
-        if job.status == "invalid-name":
-            show_error(self, _("TEXT_WORKSPACE_CREATE_NEW_INVALID_NAME"), exception=job.exc)
-        else:
-            show_error(self, _("TEXT_WORKSPACE_CREATE_NEW_UNKNOWN_ERROR"), exception=job.exc)
+        show_error(self, handle_create_workspace_errors(job.status), exception=job.exc)
 
     def on_rename_success(self, job):
         workspace_button, workspace_name = job.ret
         workspace_button.reload_workspace_name(workspace_name)
 
     def on_rename_error(self, job):
-        if job.status == "invalid-name":
-            show_error(self, _("TEXT_WORKSPACE_RENAME_INVALID_NAME"), exception=job.exc)
-        else:
-            show_error(self, _("TEXT_WORKSPACE_RENAME_UNKNOWN_ERROR"), exception=job.exc)
+        show_error(self, handle_rename_workspace_errors(job.status), exception=job.exc)
 
     def on_list_success(self, job):
         self.layout_workspaces.clear()
         workspaces = job.ret
-
         if not workspaces:
             self.line_edit_search.hide()
             label = QLabel(_("TEXT_WORKSPACE_NO_WORKSPACES"))
             label.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
             self.layout_workspaces.addWidget(label)
+            if self.initial_list_workspaces and self.core.config.finalization_organization_enabled:
+                self.initial_list_workspaces = False
+                InitOrganizationWidget.exec_modal(self.jobs_ctx, self.core, self)
             return
 
         self.line_edit_search.show()

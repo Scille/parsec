@@ -681,13 +681,16 @@ async def running_backend(server_factory, backend_addr, backend, running_backend
 
 
 @pytest.fixture
-def core_config(tmpdir):
+def core_config(tmpdir, fixtures_customization):
     tmpdir = Path(tmpdir)
     return CoreConfig(
         config_dir=tmpdir / "config",
         cache_base_dir=tmpdir / "cache",
         data_base_dir=tmpdir / "data",
         mountpoint_base_dir=tmpdir / "mnt",
+        finalization_organization_enabled=fixtures_customization.get(
+            "finalization_organization_enabled", False
+        ),
     )
 
 

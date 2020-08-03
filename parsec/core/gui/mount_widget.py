@@ -13,10 +13,10 @@ class MountWidget(QWidget, Ui_MountWidget):
     widget_switched = pyqtSignal(list)
     folder_changed = pyqtSignal(str, str)
 
-    def __init__(self, core, jobs_ctx, event_bus, **kwargs):
+    def __init__(self, core, jobs_ctx, event_bus, parent, **kwargs):
         super().__init__(**kwargs)
         self.setupUi(self)
-
+        self.parent = parent
         self.core = core
         self.jobs_ctx = jobs_ctx
         self.event_bus = event_bus

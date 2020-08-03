@@ -11,9 +11,7 @@ from parsec.api.protocol import InvitationType
 from parsec.api.data import UserProfile
 from parsec.core.types import BackendInvitationAddr, UserInfo
 
-from parsec.core.backend_connection import BackendConnectionError, BackendNotAvailable
-
-from parsec.core.gui.trio_thread import JobResultError, ThreadSafeQtSignal, QtToTrioJob
+from parsec.core.gui.trio_thread import ThreadSafeQtSignal, QtToTrioJob
 from parsec.core.gui.custom_dialogs import show_error, show_info, ask_question, get_text_input
 from parsec.core.gui.custom_widgets import ensure_string_size
 from parsec.core.gui.flow_layout import FlowLayout
@@ -23,6 +21,13 @@ from parsec.core.gui.greet_user_widget import GreetUserWidget
 from parsec.core.gui.ui.user_button import Ui_UserButton
 from parsec.core.gui.ui.user_invitation_button import Ui_UserInvitationButton
 from parsec.core.gui.ui.users_widget import Ui_UsersWidget
+from parsec.core.gui.jobs.user import (
+    _do_revoke_user,
+    _do_list_users_and_invitations,
+    _do_cancel_invitation,
+    _do_invite_user,
+    handle_invite_errors,
+)
 
 
 class UserInvitationButton(QWidget, Ui_UserInvitationButton):
@@ -143,47 +148,6 @@ class UserButton(QWidget, Ui_UserButton):
 
     def revoke(self):
         self.revoke_clicked.emit(self.user_info)
-
-
-async def _do_revoke_user(core, user_info):
-    try:
-        await core.revoke_user(user_info.user_id)
-        user_info = await core.get_user_info(user_info.user_id)
-        return user_info
-    except BackendNotAvailable as exc:
-        raise JobResultError("offline") from exc
-    except BackendConnectionError as exc:
-        raise JobResultError("error") from exc
-
-
-async def _do_list_users_and_invitations(core):
-    try:
-        # TODO: handle pagination ! (currently we only display the first 100 users...)
-        users, total = await core.find_humans()
-        invitations = await core.list_invitations()
-        return users, [inv for inv in invitations if inv["type"] == InvitationType.USER]
-    except BackendNotAvailable as exc:
-        raise JobResultError("offline") from exc
-    except BackendConnectionError as exc:
-        raise JobResultError("error") from exc
-
-
-async def _do_cancel_invitation(core, token):
-    try:
-        await core.delete_invitation(token=token)
-    except BackendNotAvailable as exc:
-        raise JobResultError("offline") from exc
-    except BackendConnectionError as exc:
-        raise JobResultError("error") from exc
-
-
-async def _do_invite_user(core, email):
-    try:
-        return await core.new_user_invitation(email=email, send_email=True)
-    except BackendNotAvailable as exc:
-        raise JobResultError("offline") from exc
-    except BackendConnectionError as exc:
-        raise JobResultError("error") from exc
 
 
 class UsersWidget(QWidget, Ui_UsersWidget):
@@ -425,12 +389,7 @@ class UsersWidget(QWidget, Ui_UsersWidget):
         assert job.status != "ok"
 
         status = job.status
-        if status == "offline":
-            errmsg = _("TEXT_INVITE_USER_INVITE_OFFLINE")
-        else:
-            errmsg = _("TEXT_INVITE_USER_INVITE_ERROR")
-
-        show_error(self, errmsg, exception=job.exc)
+        show_error(self, handle_invite_errors(status), exception=job.exc)
 
     def reset(self):
         self.layout_users.clear()

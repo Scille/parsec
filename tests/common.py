@@ -240,6 +240,7 @@ _FIXTURES_CUSTOMIZATIONS = {
     "backend_over_ssl",
     "backend_spontaneous_organization_boostrap",
     "logged_gui_as_admin",
+    "finalization_organization_enabled",
 }
 
 

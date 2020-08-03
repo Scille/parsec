@@ -169,6 +169,7 @@ class ExtractTranslations(Command):
 
         self.announce("Generating ui translation files", level=distutils.log.INFO)
         ui_dir = pathlib.Path("parsec/core/gui")
+        jobs_dir = pathlib.Path("parsec/core/gui/jobs")
         tr_dir = ui_dir / "tr"
         os.makedirs(tr_dir, exist_ok=True)
 
@@ -176,7 +177,11 @@ class ExtractTranslations(Command):
         with patch("sys.argv", new_args):
             pylupdate_main()
 
-        files = [str(f) for f in ui_dir.iterdir() if f.is_file() and f.suffix == ".py"]
+        files = [
+            str(f)
+            for f in [*ui_dir.iterdir(), *jobs_dir.iterdir()]
+            if f.is_file() and f.suffix == ".py"
+        ]
         files.append(str(tr_dir / "parsec_en.ts"))
         args = [
             "_",

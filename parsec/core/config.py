@@ -68,6 +68,8 @@ class CoreConfig:
     sentry_url: Optional[str] = None
     telemetry_enabled: bool = True
 
+    finalization_organization_enabled: bool = True
+
     gui_last_device: Optional[str] = None
     gui_tray_enabled: bool = True
     gui_language: Optional[str] = None
