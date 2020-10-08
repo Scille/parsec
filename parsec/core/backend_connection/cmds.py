@@ -5,7 +5,7 @@ from uuid import UUID
 import pendulum
 from pendulum import Pendulum
 
-from parsec.crypto import VerifyKey, PublicKey
+from parsec.crypto import VerifyKey, PublicKey, SecretKey
 from parsec.api.transport import Transport, TransportError
 from parsec.api.protocol import (
     OrganizationID,
@@ -48,6 +48,7 @@ from parsec.api.protocol import (
     vlob_list_versions_serializer,
     vlob_maintenance_get_reencryption_batch_serializer,
     vlob_maintenance_save_reencryption_batch_serializer,
+    vlob_maintenance_backend_reencryption_serializer,
     realm_create_serializer,
     realm_status_serializer,
     realm_get_role_certificates_serializer,
@@ -237,6 +238,26 @@ async def vlob_maintenance_get_reencryption_batch(
         cmd="vlob_maintenance_get_reencryption_batch",
         realm_id=realm_id,
         encryption_revision=encryption_revision,
+        size=size,
+    )
+
+
+async def vlob_maintenance_backend_reencryption(
+    transport: Transport,
+    realm_id: UUID,
+    encryption_revision: int,
+    new_key: SecretKey,
+    old_key: SecretKey,
+    size: int,
+) -> dict:
+    return await _send_cmd(
+        transport,
+        vlob_maintenance_backend_reencryption_serializer,
+        cmd="vlob_maintenance_backend_reencryption",
+        realm_id=realm_id,
+        encryption_revision=encryption_revision,
+        new_key=new_key,
+        old_key=old_key,
         size=size,
     )
 

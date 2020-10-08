@@ -1,22 +1,28 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
+import os
+
 from typing import Tuple
 from base64 import b32decode, b32encode
 from hashlib import sha256
+from ctypes import cdll, c_size_t, c_uint8, byref, cast, POINTER
 
 from nacl.exceptions import CryptoError  # noqa: republishing
 from nacl.public import SealedBox, PrivateKey as _PrivateKey, PublicKey as _PublicKey
 from nacl.signing import SigningKey as _SigningKey, VerifyKey as _VerifyKey
-from nacl.secret import SecretBox
 from nacl.bindings import crypto_sign_BYTES, crypto_scalarmult
 from nacl.hash import blake2b, BLAKE2B_BYTES
 from nacl.pwhash import argon2i
 from nacl.utils import random
 from nacl.encoding import RawEncoder
 
+# from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+# from cryptography.exceptions import InvalidTag
 
 # Note to simplify things, we adopt `nacl.CryptoError` as our root error cls
 
+LibSgx = cdll.LoadLibrary(os.path.dirname(__file__) + "/sgxlib.so")
+LibSgx.initialize_enclave()
 
 __all__ = (
     # Exceptions
@@ -41,7 +47,8 @@ __all__ = (
 CRYPTO_OPSLIMIT = argon2i.OPSLIMIT_INTERACTIVE
 CRYPTO_MEMLIMIT = argon2i.MEMLIMIT_INTERACTIVE
 
-
+SGX_AESGCM_MAC_SIZE = 16
+SGX_AESGCM_IV_SIZE = 12
 # Types
 
 
@@ -50,27 +57,79 @@ class SecretKey(bytes):
 
     @classmethod
     def generate(cls) -> "SecretKey":
-        return cls(random(SecretBox.KEY_SIZE))
+        return cls(os.urandom(16))
 
     def __repr__(self):
         # Avoid leaking the key in logs
         return f"<{type(self).__module__}.{type(self).__qualname__} object at {hex(id(self))}>"
 
-    def encrypt(self, data: bytes) -> bytes:
-        """
-        Raises:
-            CryptoError: if key is invalid.
-        """
-        box = SecretBox(self)
-        return box.encrypt(data)
+    # Using AES with SGX enclave
+    def encrypt(self, data):
+        ecall_encryptMessage = LibSgx.ecall_encryptMessage
+        ecall_encryptMessage.restype = POINTER(c_uint8)
+        encMessageLen = c_size_t()
+        encrypted_ptr = ecall_encryptMessage(self, data, len(data), byref(encMessageLen))
+        encrypted_data = cast(encrypted_ptr, POINTER(c_uint8 * encMessageLen.value))
+        encrypted_data = bytes(list(encrypted_data.contents))
+        # print("ici")
+        # print()
+        # print()
+        # print("encrypted data = ", encrypted_data)
 
-    def decrypt(self, ciphered: bytes) -> bytes:
-        """
-        Raises:
-            CryptoError: if key is invalid.
-        """
-        box = SecretBox(self)
-        return box.decrypt(ciphered)
+        return encrypted_data
+
+    def decrypt(self, data):
+        data_len = len(data)
+        output_len = data_len - SGX_AESGCM_MAC_SIZE - SGX_AESGCM_IV_SIZE
+        ecall_decryptMessage = LibSgx.ecall_decryptMessage
+        ecall_decryptMessage.restype = POINTER(c_uint8 * output_len)
+        decrypted_data = bytes(list(ecall_decryptMessage(self, data, data_len).contents))
+        # print("la")
+        # print()
+        # print()
+        # print("decrypted data = ", decrypted_data)
+        return decrypted_data
+
+    # Using AES WITHOUT ENCLAVE
+    # def encrypt(self, data):
+    #     iv = os.urandom(16)
+    #     cipher = Cipher(algorithms.AES(self), modes.GCM(iv))
+    #     encryptor = cipher.encryptor()
+    #     ciphered = encryptor.update(data) + encryptor.finalize()
+    #     tag = encryptor.tag
+    #     token = iv + tag + ciphered
+    #     return token
+    # def decrypt(self, token):
+    #     iv = token[0:16]
+    #     tag = token[16:32]
+    #     ciphered = token[32:]
+    #     try:
+    #         cipher = Cipher(algorithms.AES(self), modes.GCM(iv, tag))
+    #         decryptor = cipher.decryptor()
+    #         decrypted_message = decryptor.update(ciphered) + decryptor.finalize()
+    #         print()
+    #         print()
+    #         print("decrypted_message = ", decrypted_message)
+    #         return decrypted_message
+    #     except (InvalidTag, ValueError) as exc:
+    #         raise CryptoError(str(exc)) from exc
+
+    # Using pyNaCl
+    # def encrypt(self, data: bytes) -> bytes:
+    #     """
+    #     Raises:
+    #         CryptoError: if key is invalid.
+    #     """
+    #     box = SecretBox(self)
+    #     return box.encrypt(data)
+
+    # def decrypt(self, ciphered: bytes) -> bytes:
+    #     """
+    #     Raises:
+    #         CryptoError: if key is invalid.
+    #     """
+    #     box = SecretBox(self)
+    #     return box.decrypt(ciphered)
 
     def hmac(self, data: bytes, digest_size=BLAKE2B_BYTES) -> bytes:
         return blake2b(data, digest_size=digest_size, key=self, encoder=RawEncoder)
@@ -185,11 +244,7 @@ def import_root_verify_key(raw: str) -> VerifyKey:
 def derivate_secret_key_from_password(password: str, salt: bytes = None) -> Tuple[SecretKey, bytes]:
     salt = salt or random(argon2i.SALTBYTES)
     rawkey = argon2i.kdf(
-        SecretBox.KEY_SIZE,
-        password.encode("utf8"),
-        salt,
-        opslimit=CRYPTO_OPSLIMIT,
-        memlimit=CRYPTO_MEMLIMIT,
+        32, password.encode("utf8"), salt, opslimit=CRYPTO_OPSLIMIT, memlimit=CRYPTO_MEMLIMIT
     )
     return SecretKey(rawkey), salt
 

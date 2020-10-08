@@ -76,6 +76,9 @@ class BackendAuthenticatedCmds:
     vlob_maintenance_save_reencryption_batch = expose_cmds_with_retrier(
         "vlob_maintenance_save_reencryption_batch"
     )
+    vlob_maintenance_backend_reencryption = expose_cmds_with_retrier(
+        "vlob_maintenance_backend_reencryption"
+    )
     realm_create = expose_cmds_with_retrier("realm_create")
     realm_status = expose_cmds_with_retrier("realm_status")
     realm_get_role_certificates = expose_cmds_with_retrier("realm_get_role_certificates")

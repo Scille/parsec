@@ -98,28 +98,12 @@ class ReencryptionJob:
 
         # Get the batch
         try:
-            rep = await self.backend_cmds.vlob_maintenance_get_reencryption_batch(
-                workspace_id, new_encryption_revision, size
-            )
-            if rep["status"] in ("not_in_maintenance", "bad_encryption_revision"):
-                raise FSWorkspaceNotInMaintenance(f"Reencryption job already finished: {rep}")
-            elif rep["status"] == "not_allowed":
-                raise FSWorkspaceNoAccess(
-                    f"Not allowed to do reencryption maintenance on workspace {workspace_id}: {rep}"
-                )
-            elif rep["status"] != "ok":
-                raise FSError(
-                    f"Cannot do reencryption maintenance on workspace {workspace_id}: {rep}"
-                )
-
-            donebatch = []
-            for item in rep["batch"]:
-                cleartext = self.old_workspace_entry.key.decrypt(item["blob"])
-                newciphered = self.new_workspace_entry.key.encrypt(cleartext)
-                donebatch.append((item["vlob_id"], item["version"], newciphered))
-
-            rep = await self.backend_cmds.vlob_maintenance_save_reencryption_batch(
-                workspace_id, new_encryption_revision, donebatch
+            rep = await self.backend_cmds.vlob_maintenance_backend_reencryption(
+                realm_id=workspace_id,
+                encryption_revision=new_encryption_revision,
+                new_key=self.new_workspace_entry.key,
+                old_key=self.old_workspace_entry.key,
+                size=size,
             )
             if rep["status"] in ("not_in_maintenance", "bad_encryption_revision"):
                 raise FSWorkspaceNotInMaintenance(f"Reencryption job already finished: {rep}")

@@ -13,6 +13,7 @@ __all__ = (
     "vlob_list_versions_serializer",
     "vlob_maintenance_get_reencryption_batch_serializer",
     "vlob_maintenance_save_reencryption_batch_serializer",
+    "vlob_maintenance_backend_reencryption_serializer",
 )
 
 
@@ -138,4 +139,22 @@ class VlobMaintenanceSaveReencryptionBatchRepSchema(BaseRepSchema):
 
 vlob_maintenance_save_reencryption_batch_serializer = CmdSerializer(
     VlobMaintenanceSaveReencryptionBatchReqSchema, VlobMaintenanceSaveReencryptionBatchRepSchema
+)
+
+
+class VlobMaintenanceBackendReencryptionReqSchema(BaseReqSchema):
+    realm_id = fields.UUID(required=True)
+    encryption_revision = fields.Integer(required=True)
+    old_key = fields.SecretKey(required=True)
+    new_key = fields.SecretKey(required=True)
+    size = fields.Integer(required=True)
+
+
+class VlobMaintenanceBackendReencryptionRepSchema(BaseRepSchema):
+    total = fields.Integer(required=True)
+    done = fields.Integer(required=True)
+
+
+vlob_maintenance_backend_reencryption_serializer = CmdSerializer(
+    VlobMaintenanceBackendReencryptionReqSchema, VlobMaintenanceBackendReencryptionRepSchema
 )

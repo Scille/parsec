@@ -340,3 +340,36 @@ class MemoryVlobComponent(BaseVlobComponent):
         total, done = changes.reencryption.save_batch(batch)
 
         return total, done
+
+    async def maintenance_backend_reencryption(
+        self,
+        organization_id: OrganizationID,
+        author: DeviceID,
+        realm_id: UUID,
+        encryption_revision: int,
+        old_key: bytes,
+        new_key: bytes,
+        size: int,
+    ) -> Tuple[int, int]:
+        self._check_realm_in_maintenance_access(
+            organization_id, realm_id, author.user_id, encryption_revision
+        )
+
+        changes = self._per_realm_changes[(organization_id, realm_id)]
+        assert changes.reencryption
+
+        batch = changes.reencryption.get_batch(size)
+        donebatch = []
+
+        batch = [
+            {"vlob_id": vlob_id, "version": version, "blob": blob}
+            for vlob_id, version, blob in batch
+        ]
+
+        for item in batch:
+            cleartext = old_key.decrypt(item["blob"])
+            newciphered = new_key.encrypt(cleartext)
+            donebatch.append((item["vlob_id"], item["version"], newciphered))
+
+        total, done = changes.reencryption.save_batch(donebatch)
+        return total, done
