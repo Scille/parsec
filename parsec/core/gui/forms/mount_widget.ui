@@ -48,6 +48,9 @@
      </property>
     </layout>
    </item>
+   <item>
+    <layout class="QHBoxLayout" name="status_layout"/>
+   </item>
   </layout>
  </widget>
  <resources/>
