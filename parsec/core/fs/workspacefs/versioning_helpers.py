@@ -18,11 +18,9 @@ concurrent downloads (which will be implemented in a next version).
 from heapq import heappush, heappop
 import attr
 import math
-import typing
-from functools import partial
-from typing import List, Tuple, NamedTuple, Optional, Union, cast, Dict, Awaitable
+from functools import partial, total_ordering
+from typing import List, Tuple, NamedTuple, Optional, Union, cast, Dict
 from pendulum import DateTime
-from collections import defaultdict
 
 from parsec.api.protocol import DeviceID
 from parsec.core.types import FsPath, EntryID
@@ -42,6 +40,22 @@ class ManifestCacheNotFound(Exception):
 
 
 class ManifestCacheDownloadLimitReached(Exception):
+    pass
+
+
+class HistoryInconsistent(Exception):
+    pass
+
+
+class ManifestCacheInconsistent(HistoryInconsistent):
+    pass
+
+
+class VersionsListInconsistent(HistoryInconsistent):
+    pass
+
+
+class VersionListerTaskListNodeMissingParent(Exception):
     pass
 
 
@@ -79,6 +93,49 @@ class ManifestDataAndPaths(NamedTuple):
     data: ManifestData
     source: Optional[FsPath]
     destination: Optional[FsPath]
+
+
+@total_ordering
+class TaskNode:
+    def __init__(self, callable, timestamp, parent=None, children=[], completed=False):
+        self.callable = callable
+        self.timestamp = timestamp
+        self.parent = parent
+        self.children = []
+        self.completed = False
+        if self.parent:
+            self.parent.children.append(self)
+
+    def mark_complete(self):
+        self.completed = True
+        if self.parent:
+            for brother in self.parent.children:
+                if not brother.completed:
+                    return
+            self.parent.mark_complete()
+
+    def get_earliest_completed_consecutive_timestamp(self):
+        if self.completed:
+            return self.timestamp
+        results = []
+        for child in self.children:
+            results.append((child.get_earliest_completed_consecutive_timestamp(), child.completed))
+        latest_invalid = max([r[0] for r in results if not r[1]], default=None)
+        if not latest_invalid:
+            return self.timestamp  # Special case where a job stopped before parent was updated
+        return min(
+            [r[0] for r in results if r[1] and r[0] > latest_invalid], default=latest_invalid
+        )
+
+    async def run(self):
+        await self.callable(parent=self)  # Add current TaskNode as parent of the child
+        for child in self.children:
+            if not child.completed:
+                return
+        self.mark_complete()
+
+    def __lt__(self, other):
+        return self.timestamp < other.timestamp
 
 
 @attr.s
@@ -178,28 +235,45 @@ class ManifestCache:
 
         Raises:
             ManifestCacheNotFound
+            ManifestCacheInconsistent
         """
         if manifest.id not in self._manifest_cache:
             self._manifest_cache[manifest.id] = {}
-        if manifest.version not in self._manifest_cache[manifest.id]:
-            self._manifest_cache[manifest.id][manifest.version] = CacheEntry(
-                timestamp, timestamp, manifest
-            )
+        cache_for_id = self._manifest_cache[manifest.id]
+        if manifest.version not in cache_for_id:
+            cache_for_id[manifest.version] = CacheEntry(timestamp, timestamp, manifest)
         elif timestamp:
             if (
-                self._manifest_cache[manifest.id][manifest.version].late is None
-                or timestamp > self._manifest_cache[manifest.id][manifest.version].late
+                cache_for_id[manifest.version].late is None
+                or timestamp > cache_for_id[manifest.version].late
             ):
-                self._manifest_cache[manifest.id][manifest.version] = CacheEntry(
-                    self._manifest_cache[manifest.id][manifest.version].early, timestamp, manifest
+                cache_for_id[manifest.version] = CacheEntry(
+                    cache_for_id[manifest.version].early, timestamp, manifest
                 )
             if (
-                self._manifest_cache[manifest.id][manifest.version].early is None
-                or timestamp < self._manifest_cache[manifest.id][manifest.version].early
+                cache_for_id[manifest.version].early is None
+                or timestamp < cache_for_id[manifest.version].early
             ):
-                self._manifest_cache[manifest.id][manifest.version] = CacheEntry(
-                    timestamp, self._manifest_cache[manifest.id][manifest.version].late, manifest
+                cache_for_id[manifest.version] = CacheEntry(
+                    timestamp, cache_for_id[manifest.version].late, manifest
                 )
+        # Check inconsistency
+        keys = sorted([*cache_for_id.keys()])
+        index = keys.index(manifest.version)
+        if (
+            index > 0
+            and cache_for_id[keys[index - 1]].late is not None
+            and cache_for_id[manifest.version].early is not None
+            and cache_for_id[keys[index - 1]].late > cache_for_id[manifest.version].early
+        ):
+            raise ManifestCacheInconsistent
+        if (
+            index < len(keys) - 1
+            and cache_for_id[keys[index + 1]].early is not None
+            and cache_for_id[manifest.version].late is not None
+            and cache_for_id[keys[index + 1]].early < cache_for_id[manifest.version].late
+        ):
+            raise ManifestCacheInconsistent
 
     async def load(
         self,
@@ -242,6 +316,7 @@ class ManifestCache:
             expected_backend_timestamp=expected_backend_timestamp,
         )
         self.update(manifest, entry_id, version=version, timestamp=timestamp)
+
         return (manifest, True)
 
     async def get_path_at_timestamp(self, entry_id: EntryID, timestamp: DateTime) -> FsPath:
@@ -311,13 +386,14 @@ class ManifestCacheCounter:
     async def load(
         self, entry_id: EntryID, version=None, timestamp=None, expected_backend_timestamp=None
     ) -> RemoteManifest:
-        if self.limit == self.counter:
+        if self.counter >= self.limit:
             raise ManifestCacheDownloadLimitReached
         manifest, was_downloaded = await self._manifest_cache.load(
             entry_id, version, timestamp, expected_backend_timestamp
         )
         if was_downloaded:
             self.counter += 1
+
         return manifest
 
     async def get_path_at_timestamp(self, entry_id: EntryID, timestamp: DateTime) -> FsPath:
@@ -358,36 +434,48 @@ class VersionListerTaskList:
     Enables prioritization of tasks, as it is better to be able to configure it that way
 
     This class uses both an heapq to enables us to always access the latest timestamp of the tasks
-    in linear time, and a dict containing lists of tasks with timestamp as keys
+    in linear time, and a tree to keep track of completed and uncompleted task
+    This tree is useful when the detection of the last valid date at which we can provide a
+    continuous list is required
     """
 
-    # TODO : use nursery for coroutines
     def __init__(self, manifest_cache, versions_list_cache):
-        self.tasks = defaultdict(list)
         self.heapq_tasks = []
+        self.task_tree = None
         self.manifest_cache = manifest_cache
         self.versions_list_cache = versions_list_cache
+        self.workers = 0
 
-    def add(self, timestamp: DateTime, task: typing.Callable[[], Awaitable[None]]):
-        if timestamp not in self.tasks:
-            heappush(self.heapq_tasks, timestamp)
-        self.tasks[timestamp].append(task)
+    def add(self, node_task):
+        heappush(self.heapq_tasks, node_task)
+        if not node_task.parent:
+            if self.task_tree:
+                raise VersionListerTaskListNodeMissingParent
+            self.task_tree = node_task
 
     def is_empty(self):
-        return not bool(self.tasks)
+        return self.heapq_tasks == []
 
     async def execute_one(self):
-        min = heappop(self.heapq_tasks)
-        task = self.tasks[min].pop()
-        if len(self.tasks[min]) == 0:
-            del self.tasks[min]
-        else:
-            heappush(self.heapq_tasks, min)
-        await task()
+        try:
+            task = heappop(self.heapq_tasks)
+        except IndexError:
+            return
+        await task.run()
 
-    async def execute(self, number: int = 1):
-        for i in range(number):
+    async def execute_worker(self, workers_limit, nursery):
+        if self.workers == workers_limit or self.is_empty():
+            return
+        self.workers += 1
+        while not self.is_empty():
+            if self.workers < workers_limit:
+                nursery.start_soon(self.execute_worker, workers_limit, nursery)
             await self.execute_one()
+        self.workers -= 1
+
+    async def execute(self, workers=1):
+        async with open_service_nursery() as nursery:
+            nursery.start_soon(self.execute_worker, workers, nursery)
 
 
 class VersionLister:
@@ -424,16 +512,20 @@ class VersionLister:
         starting_timestamp: Optional[DateTime] = None,
         ending_timestamp: Optional[DateTime] = None,
         max_manifest_queries: Optional[int] = None,
+        workers: int = 0,
     ) -> Tuple[List[TimestampBoundedData], bool]:
         """
         Returns:
             A tuple containing a list of TimestampBoundedData and a bool indicating wether the
             download limit has been reached
+            If workers is 0, start adaptive behaviour
         Raises:
             FSError
             FSBackendOfflineError
             FSWorkspaceInMaintenance
             FSRemoteManifestNotFound
+            ManifestCacheInconsistent
+            VersionsListInconsistent
         """
         version_lister_one_shot = VersionListerOneShot(
             self.workspace_fs, path, self.manifest_cache, self.versions_list_cache
@@ -444,6 +536,7 @@ class VersionLister:
             starting_timestamp=starting_timestamp,
             ending_timestamp=ending_timestamp,
             max_manifest_queries=max_manifest_queries,
+            workers=workers,
         )
 
 
@@ -470,41 +563,53 @@ class VersionListerOneShot:
         starting_timestamp: Optional[DateTime] = None,
         ending_timestamp: Optional[DateTime] = None,
         max_manifest_queries: Optional[int] = None,
+        workers: int = 0,
     ) -> Tuple[List[TimestampBoundedData], bool]:
         """
         Returns:
             A tuple containing a list of TimestampBoundedData and a bool indicating wether the
             download limit has been reached
+            If workers is 0, start adaptive behaviour
         Raises:
             FSError
             FSBackendOfflineError
             FSWorkspaceInMaintenance
             FSRemoteManifestNotFound
         """
+        if workers == 0:
+            distance = len(path.parts)
+            if distance < 2:
+                workers = 3
+            elif distance == 2:
+                workers = 5
+            else:
+                workers = 10
         root_manifest = await self.workspace_fs.transactions._get_manifest(
             self.workspace_fs.workspace_id
         )
         download_limit_reached = True
+        download_limit = None
         try:
             self.task_list = VersionListerTaskList(
                 ManifestCacheCounter(self.manifest_cache, max_manifest_queries),
                 self.versions_list_cache,
             )
             self.task_list.add(
-                starting_timestamp or root_manifest.created,
-                partial(
-                    self._populate_tree_list_versions,
-                    0,
-                    root_manifest.id,
+                TaskNode(
+                    partial(
+                        self._populate_tree_list_versions,
+                        0,
+                        root_manifest.id,
+                        starting_timestamp or root_manifest.created,
+                        ending_timestamp or DateTime.now(),
+                    ),
                     starting_timestamp or root_manifest.created,
-                    ending_timestamp or DateTime.now(),
-                ),
+                )
             )
-            while not self.task_list.is_empty():
-                await self.task_list.execute_one()
+            await self.task_list.execute(workers=workers)
         except ManifestCacheDownloadLimitReached:
-            # TODO : expose last timestamp for which we don't miss data
-            download_limit_reached = False
+            download_limit_reached = self.task_list.task_tree.completed
+            download_limit = self.task_list.task_tree.get_earliest_completed_consecutive_timestamp()
         versions_list = [
             TimestampBoundedData(
                 id=id,
@@ -522,6 +627,7 @@ class VersionListerOneShot:
                 self.return_dict.items(),
                 key=lambda item: (item[0].late, item[0].id, item[0].version),
             )
+            if download_limit_reached or (download_limit and early < download_limit)
         ]
         return (self._sanitize_list(versions_list, skip_minimal_sync), download_limit_reached)
 
@@ -580,6 +686,7 @@ class VersionListerOneShot:
         version_number: int,
         expected_timestamp: DateTime,
         next_version_number: int,
+        parent: TaskNode,
     ):
         if early > late:
             return
@@ -610,30 +717,38 @@ class VersionListerOneShot:
                 for child_name, child_id in manifest.children.items():
                     if child_name == self.target.parts[path_level]:
                         return await self._populate_tree_list_versions(
-                            path_level + 1, child_id, early, late
+                            path_level + 1, child_id, early, late, parent
                         )
 
     async def _populate_tree_list_versions(
-        self, path_level: int, entry_id: EntryID, early: DateTime, late: DateTime
+        self,
+        path_level: int,
+        entry_id: EntryID,
+        early: DateTime,
+        late: DateTime,
+        parent: Optional[TaskNode],
     ):
         # TODO : Check if directory, melt the same entries through different parent
         versions = await self.task_list.versions_list_cache.load(entry_id)
         for version, (timestamp, creator) in versions.items():
-            next_version = min(
-                (v for v in versions if v > version), default=None
-            )  # TODO : consistency
+            next_version = min((v for v in versions if v > version), default=None)
+            if next_version and next_version != version + 1:
+                raise VersionsListInconsistent
             self.task_list.add(
-                max(early, timestamp),
-                partial(
-                    self._populate_tree_load,
-                    path_level=path_level,
-                    entry_id=entry_id,
-                    early=max(early, timestamp),
-                    late=late
-                    if next_version not in versions
-                    else min(late, versions[next_version][0]),
-                    version_number=version,
-                    expected_timestamp=timestamp,
-                    next_version_number=next_version,
-                ),
+                TaskNode(
+                    partial(
+                        self._populate_tree_load,
+                        path_level=path_level,
+                        entry_id=entry_id,
+                        early=max(early, timestamp),
+                        late=late
+                        if next_version not in versions
+                        else min(late, versions[next_version][0]),
+                        version_number=version,
+                        expected_timestamp=timestamp,
+                        next_version_number=next_version,
+                    ),
+                    max(early, timestamp),
+                    parent=parent,
+                )
             )

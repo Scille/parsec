@@ -72,15 +72,18 @@ async def benchmark_file_writing(device, workspace):
     await trio.sleep(2)
 
 
-async def main():
+async def main(config_dir, complex_mode, user_display, password):
 
     # Config
     configure_logging(LOG_LEVEL)
-    config_dir = get_default_config_dir(os.environ)
+    config_dir = config_dir or get_default_config_dir(os.environ)
     config = load_config(config_dir)
     devices = list_available_devices(config_dir)
-    key_file = next(key_file for _, device_id, _, key_file in devices if device_id == DEVICE_ID)
-    device = load_device_with_password(key_file, PASSWORD)
+    key_file = next(
+        device.key_file_path for device in devices if device.user_display == user_display
+    )
+    print(f"Key file: {key_file}")
+    device = load_device_with_password(key_file, password)
 
     # Log in
     async with logged_core_factory(config, device) as core:
@@ -91,10 +94,12 @@ async def main():
         workspace = core.user_fs.get_workspace(workspace_entry.id)
 
         # await make_workspace_dir_inconsistent(device, workspace, "/bar")
-        await make_workspace_dir_simple_versions(device, workspace, "/foo")
-        # await make_workspace_dir_complex_versions(device, workspace, "/foo")
+        if complex_mode:
+            await make_workspace_dir_complex_versions(device, workspace, "/foo")
+        else:
+            await make_workspace_dir_simple_versions(device, workspace, "/foo")
         # await benchmark_file_writing(device, workspace)
 
 
 if __name__ == "__main__":
-    trio.run(main)
+    trio.run(main, None, False, DEVICE_ID, PASSWORD)

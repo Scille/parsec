@@ -8,6 +8,7 @@ from parsec.core.cli import invitation
 from parsec.core.cli import create_organization
 from parsec.core.cli import stats_organization
 from parsec.core.cli import create_workspace
+from parsec.core.cli import history
 from parsec.core.cli import share_workspace
 from parsec.core.cli import bootstrap_organization
 from parsec.core.cli import rsync
@@ -28,6 +29,7 @@ core_cmd.add_command(rsync.run_rsync, "rsync")
 core_cmd.add_command(create_workspace.create_workspace, "create_workspace")
 core_cmd.add_command(share_workspace.share_workspace, "share_workspace")
 core_cmd.add_command(list_devices.list_devices, "list_devices")
+core_cmd.add_command(history.history, "history")
 
 core_cmd.add_command(invitation.invite_user, "invite_user")
 core_cmd.add_command(invitation.invite_device, "invite_device")
