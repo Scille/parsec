@@ -19,7 +19,7 @@ from PyQt5.QtWidgets import (
     QGraphicsDropShadowEffect,
 )
 
-from parsec.core.types import WorkspaceRole
+from parsec.core.types import WorkspaceRole, FsPath
 
 from parsec.core.gui.lang import translate as _, format_datetime
 from parsec.core.gui.file_items import (
@@ -157,6 +157,15 @@ class FileTable(QTableWidget):
                 if self.paste_status.status == PasteStatus.Status.Enabled:
                     self.paste_clicked.emit()
 
+    def select_rows(self, select_rows):
+        for row in range(1, self.rowCount()):
+            item = self.item(row, Column.NAME)
+            if item:
+                if row in select_rows:
+                    item.setSelected(True)
+                else:
+                    item.setSelected(False)
+
     def selected_files(self):
         SelectedFile = namedtuple("SelectedFile", ["row", "type", "name", "uuid"])
 
@@ -272,6 +281,88 @@ class FileTable(QTableWidget):
                 elif file_type == FileType.File or file_type == FileType.Folder:
                     item.switch_icon()
         self.previous_selection = selected
+
+    def update_file_list(self, current_directory, files_stats, default_selection):
+        selection_found = False
+        if self.rowCount() == 0:
+            if current_directory == FsPath("/"):
+                self.add_parent_workspace()
+            else:
+                self.add_parent_folder()
+
+        to_remove = []
+        for row in range(1, self.rowCount()):
+            name_item = self.item(row, Column.NAME)
+            if not name_item:
+                continue
+            uuid = name_item.data(UUID_DATA_INDEX)
+            if uuid in files_stats:
+                name = str(files_stats[uuid]["name"])
+                # The file is in the list and also in stats, we update it
+                if default_selection and name == default_selection:
+                    selected = True
+                    selection_found = True
+                stats = files_stats[uuid]
+                icon_item = self.item(row, Column.ICON)
+                icon_item.is_synced = not stats["need_sync"]
+                icon_item.is_confined = bool(stats["confinement_point"])
+                name_item.setData(NAME_DATA_INDEX, name)
+                name_item.setToolTip("\n".join(name[i : i + 64] for i in range(0, len(name), 64)))
+                name_item.setText(name)
+
+                if stats["type"] == "file":
+                    created_item = self.item(row, Column.CREATED)
+                    created_item.setText(format_datetime(stats["created"]))
+                    created_item.setData(NAME_DATA_INDEX, stats["created"])
+
+                    updated_item = self.item(row, Column.UPDATED)
+                    updated_item.setText(format_datetime(stats["updated"]))
+                    updated_item.setData(NAME_DATA_INDEX, stats["updated"])
+
+                    size_item = self.item(row, Column.SIZE)
+                    size_item.setText(get_filesize(stats["size"]))
+                    size_item.setData(NAME_DATA_INDEX, stats["size"])
+
+                del files_stats[uuid]
+            else:
+                # The file is in the list but not in stats, we mark it for removal.
+                # We cannot immediately remove it since we're iterating over rowCount()
+                to_remove.append(uuid)
+
+        # Remove files marked for removal
+        # We doin' it old school because rowCount will change as we remove rows
+        row = 1
+        while row < self.rowCount():
+            if self.item(row, Column.NAME).data(UUID_DATA_INDEX) in to_remove:
+                self.removeRow(row)
+            else:
+                row += 1
+
+        # Add additional files that are in stats but not in the list
+        for uuid, stats in files_stats.items():
+            selected = False
+            confined = bool(stats["confinement_point"])
+            if default_selection and str(stats["name"]) == default_selection:
+                selected = True
+                selection_found = True
+            if stats["type"] == "inconsistency":
+                self.add_inconsistency(str(stats["name"]), uuid)
+            elif stats["type"] == "folder":
+                self.add_folder(
+                    str(stats["name"]), uuid, not stats["need_sync"], confined, selected
+                )
+            else:
+                self.add_file(
+                    str(stats["name"]),
+                    uuid,
+                    stats["size"],
+                    stats["created"],
+                    stats["updated"],
+                    not stats["need_sync"],
+                    confined,
+                    selected,
+                )
+        return selection_found
 
     def add_parent_folder(self):
         row_idx = self.rowCount()

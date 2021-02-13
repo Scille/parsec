@@ -135,7 +135,7 @@ async def logged_gui_with_files(
 
     await aqtbot.mouse_click(f_w.button_create_folder, QtCore.Qt.LeftButton)
 
-    await aqtbot.wait_until(_folder_ready)
+    await aqtbot.wait_until(_folder_ready, timeout=2000)
 
     d_w = await logged_gui.test_switch_to_devices_widget()
 

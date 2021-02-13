@@ -1,0 +1,1 @@
+Updated how the GUI displays the files (should avoid blinking and increase performances)

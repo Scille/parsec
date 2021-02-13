@@ -303,7 +303,7 @@ async def test_workspace_filter_user(
         assert isinstance(wk_button3, WorkspaceButton)
         assert not w_w.filter_remove_button.isVisible()
 
-    await aqtbot.wait_until(_workspace_listed, timeout=2000)
+    await aqtbot.wait_until(_workspace_listed, timeout=3000)
 
     u_w = await logged_gui.test_switch_to_users_widget()
 

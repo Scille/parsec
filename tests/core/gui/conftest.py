@@ -402,8 +402,9 @@ def testing_main_window_cls(aqtbot, qt_thread_gateway):
             mount_widget = self.test_get_mount_widget()
             return mount_widget.workspaces_widget
 
-        def test_get_files_widget(self):
+        def test_get_files_widget(self, timer=100):
             mount_widget = self.test_get_mount_widget()
+            mount_widget.files_widget.update_timer.setInterval(timer)
             return mount_widget.files_widget
 
         def test_get_core(self):
