@@ -69,6 +69,12 @@ SELECT
         WHERE user_.organization = { q_organization_internal_id("$organization_id") }
     ) users,
     (
+        SELECT COUNT(*)
+        FROM user_
+        WHERE user_.organization = { q_organization_internal_id("$organization_id") }
+        AND (user_.revoked_on IS NULL OR user_.revoked_on > $now)
+    ) actives_users,
+    (
         SELECT COALESCE(SUM(size), 0)
         FROM vlob_atom
         WHERE
@@ -175,6 +181,8 @@ class PGOrganizationComponent(BaseOrganizationComponent):
             users=result["users"],
             data_size=result["data_size"],
             metadata_size=result["metadata_size"],
+            actives_users=result["actives_users"],
+            revoked_users=result["users"] - result["actives_users"],
         )
 
     async def set_expiration_date(

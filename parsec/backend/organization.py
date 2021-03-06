@@ -77,6 +77,8 @@ class OrganizationStats:
     data_size: int
     metadata_size: int
     users: int
+    actives_users: Optional[int] = None
+    revoked_users: Optional[int] = None
 
 
 class BaseOrganizationComponent:

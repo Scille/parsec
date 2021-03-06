@@ -99,8 +99,16 @@ class MemoryOrganizationComponent(BaseOrganizationComponent):
                 data_size += blockmeta.size
 
         users = len(self._user_component._organizations[id].users)
-
-        return OrganizationStats(users=users, data_size=data_size, metadata_size=metadata_size)
+        actives_users = len(
+            [user for user in self._user_component._organizations[id].users if user is not False]
+        )
+        return OrganizationStats(
+            users=users,
+            actives_users=actives_users,
+            revoked_users=users - actives_users,
+            data_size=data_size,
+            metadata_size=metadata_size,
+        )
 
     async def set_expiration_date(
         self, id: OrganizationID, expiration_date: DateTime = None

@@ -102,6 +102,8 @@ class OrganizationStats:
     users: int
     data_size: int
     metadata_size: int
+    actives_users: int = None
+    revoked_users: int = None
 
 
 @attr.s(frozen=True, slots=True, auto_attribs=True)
