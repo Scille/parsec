@@ -10,7 +10,6 @@ from parsec.backend.postgresql.handler import PGHandler
 from parsec.backend.postgresql.realm_queries import (
     query_create,
     query_get_status,
-    query_get_stats,
     query_get_current_roles,
     query_get_role_certificates,
     query_get_realms_for_user,
@@ -21,8 +20,9 @@ from parsec.backend.postgresql.realm_queries import (
 
 
 class PGRealmComponent(BaseRealmComponent):
-    def __init__(self, dbh: PGHandler):
+    def __init__(self, dbh: PGHandler, *args, **kwargs):
         self.dbh = dbh
+        super().__init__(*args, **kwargs)
 
     async def create(
         self, organization_id: OrganizationID, self_granted_role: RealmGrantedRole
@@ -35,12 +35,6 @@ class PGRealmComponent(BaseRealmComponent):
     ) -> RealmStatus:
         async with self.dbh.pool.acquire() as conn:
             return await query_get_status(conn, organization_id, author, realm_id)
-
-    async def get_stats(
-        self, organization_id: OrganizationID, author: DeviceID, realm_id: UUID
-    ) -> RealmStatus:
-        async with self.dbh.pool.acquire() as conn:
-            return await query_get_stats(conn, organization_id, author, realm_id)
 
     async def get_current_roles(
         self, organization_id: OrganizationID, realm_id: UUID

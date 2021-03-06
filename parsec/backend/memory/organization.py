@@ -6,36 +6,34 @@ from pendulum import DateTime
 
 from parsec.api.protocol import OrganizationID
 from parsec.crypto import VerifyKey
-from parsec.backend.user import BaseUserComponent, UserError, User, Device
+from parsec.backend.user import UserError, User, Device
 from parsec.backend.organization import (
     BaseOrganizationComponent,
     Organization,
-    OrganizationStats,
     OrganizationAlreadyExistsError,
     OrganizationInvalidBootstrapTokenError,
     OrganizationAlreadyBootstrappedError,
     OrganizationNotFoundError,
     OrganizationFirstUserCreationError,
 )
-from parsec.backend.memory.vlob import MemoryVlobComponent
-from parsec.backend.memory.block import MemoryBlockComponent
+from parsec.backend import memory
 from parsec.backend.events import BackendEvent
 
 
 class MemoryOrganizationComponent(BaseOrganizationComponent):
     def __init__(self, send_event, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self._user_component = None
-        self._vlob_component = None
-        self._block_component = None
+        self._user_component: "memory.MemoryUserComponent"  # Defined in `register_components`
+        self._vlob_component: "memory.MemoryVlobComponent"  # Defined in `register_components`
+        self._block_component: "memory.MemoryBlockComponent"  # Defined in `register_components`
         self._organizations = {}
         self._send_event = send_event
 
     def register_components(
         self,
-        user: BaseUserComponent,
-        vlob: MemoryVlobComponent,
-        block: MemoryBlockComponent,
+        user: "memory.MemoryUserComponent",
+        vlob: "memory.MemoryVlobComponent",
+        block: "memory.MemoryBlockComponent",
         **other_components
     ):
         self._user_component = user
@@ -84,23 +82,6 @@ class MemoryOrganizationComponent(BaseOrganizationComponent):
         self._organizations[organization.organization_id] = organization.evolve(
             root_verify_key=root_verify_key
         )
-
-    async def stats(self, id: OrganizationID) -> OrganizationStats:
-        await self.get(id)
-
-        metadata_size = 0
-        for (vlob_organization_id, _), vlob in self._vlob_component._vlobs.items():
-            if vlob_organization_id == id:
-                metadata_size += sum(len(blob) for (blob, _, _) in vlob.data)
-
-        data_size = 0
-        for (vlob_organization_id, _), blockmeta in self._block_component._blockmetas.items():
-            if vlob_organization_id == id:
-                data_size += blockmeta.size
-
-        users = len(self._user_component._organizations[id].users)
-
-        return OrganizationStats(users=users, data_size=data_size, metadata_size=metadata_size)
 
     async def set_expiration_date(
         self, id: OrganizationID, expiration_date: DateTime = None

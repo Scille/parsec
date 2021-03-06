@@ -109,6 +109,7 @@ VALUES (
 _q_insert_device = Q(
     f"""
 INSERT INTO device (
+    last_connected_on,
     organization,
     user_,
     device_id,
@@ -119,6 +120,7 @@ INSERT INTO device (
     created_on
 )
 VALUES (
+    now(),
     { q_organization_internal_id("$organization_id") },
     { q_user_internal_id(organization_id="$organization_id", user_id="$user_id") },
     $device_id,

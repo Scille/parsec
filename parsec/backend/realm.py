@@ -22,6 +22,7 @@ from parsec.api.protocol import (
     realm_finish_reencryption_maintenance_serializer,
 )
 from parsec.backend.utils import catch_protocol_errors, api
+from parsec.backend.stats import BaseStatsComponent, StatsAccessError, StatsNotFoundError
 
 
 class RealmError(Exception):
@@ -81,12 +82,6 @@ class RealmStatus:
 
 
 @attr.s(slots=True, frozen=True, auto_attribs=True)
-class RealmStats:
-    blocks_size: int
-    vlobs_size: int
-
-
-@attr.s(slots=True, frozen=True, auto_attribs=True)
 class RealmGrantedRole:
     def __repr__(self):
         return f"{self.__class__.__name__}({self.user_id} {self.role})"
@@ -103,6 +98,9 @@ class RealmGrantedRole:
 
 
 class BaseRealmComponent:
+    def __init__(self, stats: BaseStatsComponent):
+        self._stats_component = stats
+
     @api("realm_create")
     @catch_protocol_errors
     async def api_realm_create(self, client_ctx, msg):
@@ -193,12 +191,14 @@ class BaseRealmComponent:
     async def api_realm_stats(self, client_ctx, msg):
         msg = realm_stats_serializer.req_load(msg)
         try:
-            stats = await self.get_stats(
-                client_ctx.organization_id, client_ctx.device_id, msg["realm_id"]
+            stats = await self._stats_component.realm_stats(
+                organization_id=client_ctx.organization_id,
+                realm_id=msg["realm_id"],
+                check_access=client_ctx.user_id,
             )
-        except RealmAccessError:
+        except StatsAccessError:
             return realm_status_serializer.rep_dump({"status": "not_allowed"})
-        except RealmNotFoundError as exc:
+        except StatsNotFoundError as exc:
             return realm_status_serializer.rep_dump({"status": "not_found", "reason": str(exc)})
         return realm_stats_serializer.rep_dump(
             {"status": "ok", "blocks_size": stats.blocks_size, "vlobs_size": stats.vlobs_size}
@@ -387,16 +387,6 @@ class BaseRealmComponent:
     async def get_status(
         self, organization_id: OrganizationID, author: DeviceID, realm_id: UUID
     ) -> RealmStatus:
-        """
-        Raises:
-            RealmNotFoundError
-            RealmAccessError
-        """
-        raise NotImplementedError()
-
-    async def get_stats(
-        self, organization_id: OrganizationID, author: DeviceID, realm_id: UUID
-    ) -> RealmStats:
         """
         Raises:
             RealmNotFoundError

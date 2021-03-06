@@ -7,6 +7,7 @@ from parsec.backend.postgresql.handler import (
     MigrationItem,
     MigrationResult,
 )
+from parsec.backend.postgresql.stats import PGStatsComponent
 from parsec.backend.postgresql.organization import PGOrganizationComponent
 from parsec.backend.postgresql.ping import PGPingComponent
 from parsec.backend.postgresql.user import PGUserComponent
@@ -23,6 +24,7 @@ __all__ = [
     "MigrationItem",
     "MigrationResult",
     "PGHandler",
+    "PGStatsComponent",
     "PGOrganizationComponent",
     "PGPingComponent",
     "PGUserComponent",

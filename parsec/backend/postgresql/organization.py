@@ -11,7 +11,6 @@ from parsec.backend.events import BackendEvent
 from parsec.backend.user import UserError, User, Device
 from parsec.backend.organization import (
     BaseOrganizationComponent,
-    OrganizationStats,
     Organization,
     OrganizationError,
     OrganizationAlreadyExistsError,
@@ -22,7 +21,7 @@ from parsec.backend.organization import (
 )
 from parsec.backend.postgresql.handler import PGHandler
 from parsec.backend.postgresql.user_queries.create import _create_user
-from parsec.backend.postgresql.utils import Q, q_organization_internal_id
+from parsec.backend.postgresql.utils import Q
 from parsec.backend.postgresql.handler import send_signal
 
 
@@ -56,30 +55,6 @@ WHERE
     organization_id = $organization_id
     AND bootstrap_token = $bootstrap_token
     AND root_verify_key IS NULL
-"""
-)
-
-
-_q_get_stats = Q(
-    f"""
-SELECT
-    (
-        SELECT COUNT(*)
-        FROM user_
-        WHERE user_.organization = { q_organization_internal_id("$organization_id") }
-    ) users,
-    (
-        SELECT COALESCE(SUM(size), 0)
-        FROM vlob_atom
-        WHERE
-            organization = { q_organization_internal_id("$organization_id") }
-    ) metadata_size,
-    (
-        SELECT COALESCE(SUM(size), 0)
-        FROM block
-        WHERE
-            organization = { q_organization_internal_id("$organization_id") }
-    ) data_size
 """
 )
 
@@ -166,16 +141,6 @@ class PGOrganizationComponent(BaseOrganizationComponent):
 
             if result != "UPDATE 1":
                 raise OrganizationError(f"Update error: {result}")
-
-    async def stats(self, id: OrganizationID) -> OrganizationStats:
-        async with self.dbh.pool.acquire() as conn, conn.transaction():
-            await self._get(conn, id)  # Check organization exists
-            result = await conn.fetchrow(*_q_get_stats(organization_id=id))
-        return OrganizationStats(
-            users=result["users"],
-            data_size=result["data_size"],
-            metadata_size=result["metadata_size"],
-        )
 
     async def set_expiration_date(
         self, id: OrganizationID, expiration_date: DateTime = None

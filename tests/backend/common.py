@@ -25,6 +25,8 @@ from parsec.api.protocol import (
     vlob_maintenance_save_reencryption_batch_serializer,
     events_subscribe_serializer,
     events_listen_serializer,
+    organization_stats_serializer,
+    apiv1_organization_stats_serializer,
     user_get_serializer,
     human_find_serializer,
     user_create_serializer,
@@ -281,6 +283,16 @@ async def events_listen_wait(sock):
 async def events_listen(sock):
     async with _events_listen.async_call(sock, wait=True) as box:
         yield box
+
+
+### Organization ###
+
+organization_stats = CmdSock("organization_stats", organization_stats_serializer)
+apiv1_organization_stats = CmdSock(
+    "apiv1_organization_stats",
+    apiv1_organization_stats_serializer,
+    parse_args=lambda self, organization_id: {"organization_id": organization_id},
+)
 
 
 ### User ###

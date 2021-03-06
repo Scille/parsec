@@ -22,7 +22,6 @@ from async_generator import asynccontextmanager
 import hypothesis
 from pathlib import Path
 import sqlite3
-import tempfile
 
 from parsec.monitoring import TaskMonitoringInstrument
 from parsec.core import CoreConfig
@@ -587,11 +586,12 @@ def backend_factory(
 
 
 @pytest.fixture
-async def backend(backend_factory, request, fixtures_customization, backend_addr):
+async def backend(backend_factory, request, fixtures_customization, backend_addr, tmpdir):
     populated = not fixtures_customization.get("backend_not_populated", False)
     config = {}
-    tmpdir = tempfile.mkdtemp(prefix="tmp-email-folder-")
-    config["email_config"] = MockedEmailConfig(sender="Parsec <no-reply@parsec.com>", tmpdir=tmpdir)
+    config["email_config"] = MockedEmailConfig(
+        sender="Parsec <no-reply@parsec.com>", tmpdir=Path(tmpdir)
+    )
     config["backend_addr"] = backend_addr
     if fixtures_customization.get("backend_spontaneous_organization_boostrap", False):
         config["spontaneous_organization_bootstrap"] = True

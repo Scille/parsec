@@ -1,12 +1,12 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-from parsec.backend.backend_events import BackendEvent
 import attr
 import pendulum
 from typing import Tuple, List, Dict, Optional
 from collections import defaultdict
 
 from parsec.api.protocol import OrganizationID, UserID, DeviceID, DeviceName, HumanHandle
+from parsec.backend.backend_events import BackendEvent
 from parsec.backend.user import (
     BaseUserComponent,
     User,
@@ -20,6 +20,7 @@ from parsec.backend.user import (
     UserAlreadyRevokedError,
     UserNotFoundError,
 )
+from parsec.backend import memory
 
 
 @attr.s
@@ -33,11 +34,12 @@ class OrganizationStore:
 class MemoryUserComponent(BaseUserComponent):
     def __init__(self, send_event, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self._stats_component: "memory.MemoryStatsComponent"  # Defined in `register_components`
         self._send_event = send_event
         self._organizations = defaultdict(OrganizationStore)
 
-    def register_components(self, **other_components):
-        pass
+    def register_components(self, stats: "memory.MemoryStatsComponent", **other_components):
+        self._stats_component = stats
 
     async def create_user(
         self, organization_id: OrganizationID, user: User, first_device: Device
@@ -56,6 +58,10 @@ class MemoryUserComponent(BaseUserComponent):
         org.devices[first_device.user_id][first_device.device_name] = first_device
         if user.human_handle:
             org.human_handle_to_user_id[user.human_handle] = user.user_id
+
+        await self._stats_component.update_last_connection(
+            organization_id=organization_id, device_id=first_device.device_id
+        )
 
         await self._send_event(
             BackendEvent.USER_CREATED,
@@ -77,6 +83,10 @@ class MemoryUserComponent(BaseUserComponent):
         user_devices = org.devices[device.user_id]
         if device.device_name in user_devices:
             raise UserAlreadyExistsError(f"Device `{device.device_id}` already exists")
+
+        await self._stats_component.update_last_connection(
+            organization_id=organization_id, device_id=device.device_id
+        )
 
         user_devices[device.device_name] = device
         await self._send_event(

@@ -5,7 +5,7 @@ import attr
 
 from parsec.api.protocol import DeviceID, OrganizationID
 from parsec.api.protocol import RealmRole
-from parsec.backend.realm import BaseRealmComponent, RealmNotFoundError
+from parsec.backend.realm import RealmNotFoundError
 from parsec.backend.blockstore import BaseBlockStoreComponent
 from parsec.backend.block import (
     BaseBlockComponent,
@@ -14,22 +14,27 @@ from parsec.backend.block import (
     BlockNotFoundError,
     BlockInMaintenanceError,
 )
+from parsec.backend import memory
 
 
 @attr.s(auto_attribs=True)
 class BlockMeta:
     realm_id: UUID
+    author: DeviceID
     size: int
 
 
 class MemoryBlockComponent(BaseBlockComponent):
     def __init__(self):
+        self._blockstore_component: BaseBlockStoreComponent  # Defined in `register_components`
+        self._realm_component: "memory.MemoryRealmComponent"  # Defined in `register_components`
         self._blockmetas = {}
-        self._blockstore_component = None
-        self._realm_component = None
 
     def register_components(
-        self, blockstore: BaseBlockStoreComponent, realm: BaseRealmComponent, **other_components
+        self,
+        blockstore: BaseBlockStoreComponent,
+        realm: "memory.MemoryRealmComponent",
+        **other_components,
     ):
         self._blockstore_component = blockstore
         self._realm_component = realm
@@ -83,7 +88,9 @@ class MemoryBlockComponent(BaseBlockComponent):
         self._check_realm_write_access(organization_id, realm_id, author.user_id)
 
         await self._blockstore_component.create(organization_id, block_id, block)
-        self._blockmetas[(organization_id, block_id)] = BlockMeta(realm_id, len(block))
+        self._blockmetas[(organization_id, block_id)] = BlockMeta(
+            realm_id=realm_id, author=author, size=len(block)
+        )
 
 
 class MemoryBlockStoreComponent(BaseBlockStoreComponent):

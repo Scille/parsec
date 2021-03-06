@@ -66,6 +66,7 @@ async def backend_app_factory(config: BackendConfig, event_bus: Optional[EventBu
             http=components["http"],
             user=components["user"],
             invite=components["invite"],
+            stats=components["stats"],
             organization=components["organization"],
             message=components["message"],
             realm=components["realm"],
@@ -86,6 +87,7 @@ class BackendApp:
         http,
         user,
         invite,
+        stats,
         organization,
         message,
         realm,
@@ -102,6 +104,7 @@ class BackendApp:
         self.http = http
         self.user = user
         self.invite = invite
+        self.stats = stats
         self.organization = organization
         self.message = message
         self.realm = realm
@@ -292,6 +295,9 @@ class BackendApp:
             selected_logger.info("Connection established")
 
             if isinstance(client_ctx, AuthenticatedClientContext):
+                await self.stats.update_last_connection(
+                    client_ctx.organization_id, client_ctx.device_id
+                )
                 with trio.CancelScope() as cancel_scope:
                     with self.event_bus.connection_context() as client_ctx.event_bus_ctx:
 

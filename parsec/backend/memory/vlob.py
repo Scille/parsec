@@ -9,7 +9,7 @@ from collections import defaultdict
 from parsec.backend.backend_events import BackendEvent
 from parsec.api.protocol import DeviceID, OrganizationID
 from parsec.api.protocol import RealmRole
-from parsec.backend.realm import BaseRealmComponent, RealmNotFoundError
+from parsec.backend.memory.realm import MemoryRealmComponent, RealmNotFoundError
 from parsec.backend.vlob import (
     BaseVlobComponent,
     VlobAccessError,
@@ -99,10 +99,10 @@ class MemoryVlobComponent(BaseVlobComponent):
     def __init__(self, send_event):
         self._send_event = send_event
         self._realm_component = None
-        self._vlobs = {}
+        self._vlobs: Dict[OrganizationID, UUID] = {}
         self._per_realm_changes = defaultdict(Changes)
 
-    def register_components(self, realm: BaseRealmComponent, **other_components):
+    def register_components(self, realm: MemoryRealmComponent, **other_components):
         self._realm_component = realm
 
     def _maintenance_reencryption_start_hook(self, organization_id, realm_id, encryption_revision):

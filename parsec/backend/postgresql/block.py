@@ -5,7 +5,6 @@ from uuid import UUID
 import pendulum
 
 from parsec.api.protocol import DeviceID, OrganizationID
-from parsec.backend.vlob import BaseVlobComponent
 from parsec.backend.blockstore import BaseBlockStoreComponent
 from parsec.backend.block import (
     BaseBlockComponent,
@@ -110,15 +109,9 @@ async def _check_realm(conn, organization_id, realm_id):
 
 
 class PGBlockComponent(BaseBlockComponent):
-    def __init__(
-        self,
-        dbh: PGHandler,
-        blockstore_component: BaseBlockStoreComponent,
-        vlob_component: BaseVlobComponent,
-    ):
+    def __init__(self, dbh: PGHandler, blockstore_component: BaseBlockStoreComponent):
         self.dbh = dbh
         self._blockstore_component = blockstore_component
-        self._vlob_component = vlob_component
 
     async def read(
         self, organization_id: OrganizationID, author: DeviceID, block_id: UUID
