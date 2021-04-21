@@ -1,7 +1,7 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
 import pytest
-from pendulum import now as pendulum_now
+from parsec.datetime import now as datetime_now
 import zlib
 
 from parsec.serde import packb, unpackb
@@ -36,7 +36,7 @@ def test_unsecure_read_user_certificate_bad_data():
 
 
 def test_build_user_certificate(alice, bob, mallory):
-    now = pendulum_now()
+    now = datetime_now()
     certif = UserCertificateContent(
         author=alice.device_id,
         timestamp=now,
@@ -83,7 +83,7 @@ def test_build_user_certificate(alice, bob, mallory):
 
 
 def test_user_certificate_supports_legacy_is_admin_field(alice, bob):
-    now = pendulum_now()
+    now = datetime_now()
     certif = UserCertificateContent(
         author=bob.device_id,
         timestamp=now,
@@ -121,7 +121,7 @@ def test_user_certificate_supports_legacy_is_admin_field(alice, bob):
 
 
 def test_build_device_certificate(alice, bob, mallory):
-    now = pendulum_now()
+    now = datetime_now()
     certif = DeviceCertificateContent(
         author=alice.device_id,
         timestamp=now,
@@ -166,7 +166,7 @@ def test_build_device_certificate(alice, bob, mallory):
 
 
 def test_build_revoked_user_certificate(alice, bob, mallory):
-    now = pendulum_now()
+    now = datetime_now()
     certif = RevokedUserCertificateContent(
         author=alice.device_id, timestamp=now, user_id=bob.user_id
     ).dump_and_sign(alice.signing_key)

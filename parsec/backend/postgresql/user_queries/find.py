@@ -1,5 +1,5 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
-from pendulum import now as pendulum_now
+from parsec.datetime import now as datetime_now
 from functools import lru_cache
 from typing import Tuple, List, Optional
 
@@ -150,7 +150,7 @@ async def query_find(
         if omit_revoked:
             args = q(
                 organization_id=organization_id,
-                now=pendulum_now(),
+                now=datetime_now(),
                 query=query,
                 offset=offset,
                 limit=per_page,
@@ -160,7 +160,7 @@ async def query_find(
     else:
         if omit_revoked:
             args = q(
-                organization_id=organization_id, now=pendulum_now(), offset=offset, limit=per_page
+                organization_id=organization_id, now=datetime_now(), offset=offset, limit=per_page
             )
         else:
             args = q(organization_id=organization_id, offset=offset, limit=per_page)
@@ -178,7 +178,7 @@ async def query_retrieve_active_human_by_email(
 ) -> Optional[UserID]:
     result = await conn.fetchrow(
         *_q_retrieve_active_human_by_email(
-            organization_id=organization_id, now=pendulum_now(), email=email
+            organization_id=organization_id, now=datetime_now(), email=email
         )
     )
     if result:
@@ -207,13 +207,13 @@ async def query_find_humans(
     if query:
         args = q(
             organization_id=organization_id,
-            now=pendulum_now(),
+            now=datetime_now(),
             query=query,
             offset=offset,
             limit=per_page,
         )
     else:
-        args = q(organization_id=organization_id, now=pendulum_now(), offset=offset, limit=per_page)
+        args = q(organization_id=organization_id, now=datetime_now(), offset=offset, limit=per_page)
 
     raw_results = await conn.fetch(*args)
     total = raw_results[0]["total"]

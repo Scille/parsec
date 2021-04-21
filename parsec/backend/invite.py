@@ -11,7 +11,7 @@ from enum import Enum
 from uuid import UUID, uuid4
 from collections import defaultdict
 from typing import Dict, List, Optional, Union, Set, cast
-from pendulum import DateTime, now as pendulum_now
+from parsec.datetime import DateTime, now as datetime_now
 from email.message import Message
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
@@ -120,7 +120,7 @@ class UserInvitation:
     greeter_human_handle: Optional[HumanHandle]
     claimer_email: str
     token: UUID = attr.ib(factory=uuid4)
-    created_on: DateTime = attr.ib(factory=pendulum_now)
+    created_on: DateTime = attr.ib(factory=datetime_now)
     status: InvitationStatus = InvitationStatus.IDLE
 
     def evolve(self, **kwargs):
@@ -133,7 +133,7 @@ class DeviceInvitation:
     greeter_user_id: UserID
     greeter_human_handle: Optional[HumanHandle]
     token: UUID = attr.ib(factory=uuid4)
-    created_on: DateTime = attr.ib(factory=pendulum_now)
+    created_on: DateTime = attr.ib(factory=datetime_now)
     status: InvitationStatus = InvitationStatus.IDLE
 
     def evolve(self, **kwargs):
@@ -346,7 +346,7 @@ class BaseInviteComponent:
                 organization_id=client_ctx.organization_id,
                 greeter=client_ctx.user_id,
                 token=msg["token"],
-                on=pendulum_now(),
+                on=datetime_now(),
                 reason=msg["reason"],
             )
 

@@ -1,6 +1,6 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-from pendulum import DateTime, now as pendulum_now
+from parsec.datetime import DateTime, now as datetime_now
 from uuid import UUID, uuid4
 from typing import List, Optional
 
@@ -477,7 +477,7 @@ class PGInviteComponent(BaseInviteComponent):
         """
         Raise: InvitationAlreadyMemberError
         """
-        created_on = created_on or pendulum_now()
+        created_on = created_on or datetime_now()
         async with self.dbh.pool.acquire() as conn, conn.transaction():
             user_id = await query_retrieve_active_human_by_email(
                 conn, organization_id, claimer_email
@@ -508,7 +508,7 @@ class PGInviteComponent(BaseInviteComponent):
         """
         Raise: Nothing
         """
-        created_on = created_on or pendulum_now()
+        created_on = created_on or datetime_now()
         async with self.dbh.pool.acquire() as conn, conn.transaction():
             token = await _do_new_user_invitation(
                 conn,

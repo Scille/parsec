@@ -1,6 +1,6 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-import pendulum
+from parsec.datetime import DateTime
 from uuid import UUID
 from typing import Dict, List, Optional
 
@@ -49,11 +49,7 @@ class PGRealmComponent(BaseRealmComponent):
             return await query_get_current_roles(conn, organization_id, realm_id)
 
     async def get_role_certificates(
-        self,
-        organization_id: OrganizationID,
-        author: DeviceID,
-        realm_id: UUID,
-        since: pendulum.DateTime,
+        self, organization_id: OrganizationID, author: DeviceID, realm_id: UUID, since: DateTime
     ) -> List[bytes]:
         async with self.dbh.pool.acquire() as conn:
             return await query_get_role_certificates(conn, organization_id, author, realm_id, since)
@@ -80,7 +76,7 @@ class PGRealmComponent(BaseRealmComponent):
         realm_id: UUID,
         encryption_revision: int,
         per_participant_message: Dict[UserID, bytes],
-        timestamp: pendulum.DateTime,
+        timestamp: DateTime,
     ) -> None:
         async with self.dbh.pool.acquire() as conn:
             await query_start_reencryption_maintenance(

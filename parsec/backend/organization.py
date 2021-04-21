@@ -1,11 +1,10 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
 import attr
-import pendulum
 from typing import Optional
 from secrets import token_hex
 
-from pendulum import DateTime
+from parsec.datetime import DateTime, now as datetime_now
 
 from parsec.utils import timestamps_in_the_ballpark
 from parsec.crypto import VerifyKey
@@ -66,7 +65,7 @@ class Organization:
 
     @property
     def is_expired(self):
-        return self.expiration_date is not None and self.expiration_date <= DateTime.now()
+        return self.expiration_date is not None and self.expiration_date <= datetime_now()
 
     def evolve(self, **kwargs):
         return attr.evolve(self, **kwargs)
@@ -242,7 +241,7 @@ class BaseOrganizationComponent:
                 "reason": "Device and user must have the same user ID.",
             }
 
-        now = pendulum.now()
+        now = datetime_now()
         if not timestamps_in_the_ballpark(u_data.timestamp, now):
             return {
                 "status": "invalid_certification",

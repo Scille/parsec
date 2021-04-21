@@ -1,6 +1,6 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-import pendulum
+from parsec.datetime import DateTime
 from typing import Tuple, List, Optional
 
 from parsec.api.protocol import UserID, DeviceID, OrganizationID
@@ -180,7 +180,7 @@ class PGUserComponent(BaseUserComponent):
         user_id: UserID,
         revoked_user_certificate: bytes,
         revoked_user_certifier: DeviceID,
-        revoked_on: Optional[pendulum.DateTime] = None,
+        revoked_on: Optional[DateTime] = None,
     ) -> None:
         async with self.dbh.pool.acquire() as conn:
             return await query_revoke_user(

@@ -3,7 +3,7 @@
 from itertools import count
 from typing import Optional, List, Dict, AsyncIterator, Tuple, Union, Pattern
 
-from pendulum import now as pendulum_now
+from parsec.datetime import now as datetime_now
 
 from parsec.api.protocol import DeviceID
 from parsec.core.core_events import CoreEvent
@@ -220,7 +220,7 @@ class SyncTransactions(EntryTransactions):
         manifest = await self.local_storage.get_manifest(entry_id)
         if not manifest.is_placeholder:
             return None
-        return manifest.base.evolve(author=self.local_author, timestamp=pendulum_now(), version=1)
+        return manifest.base.evolve(author=self.local_author, timestamp=datetime_now(), version=1)
 
     # Atomic transactions
 
@@ -326,7 +326,7 @@ class SyncTransactions(EntryTransactions):
                 return None
 
             # Produce the new remote manifest to upload
-            return new_local_manifest.to_remote(self.local_author, pendulum_now())
+            return new_local_manifest.to_remote(self.local_author, datetime_now())
 
     async def file_reshape(self, entry_id: EntryID) -> None:
 

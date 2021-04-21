@@ -2,7 +2,7 @@
 
 import pytest
 from uuid import uuid4
-from pendulum import datetime
+from parsec.datetime import DateTime
 from unittest.mock import ANY
 
 from parsec.api.data import UserManifest
@@ -34,7 +34,7 @@ async def test_create_workspace(initial_user_manifest_state, alice_user_fs, alic
     expected_um = LocalUserManifest(
         base=expected_base_um,
         need_sync=True,
-        updated=datetime(2000, 1, 2),
+        updated=DateTime(2000, 1, 2),
         last_processed_message=expected_base_um.last_processed_message,
         workspaces=(
             WorkspaceEntry(
@@ -42,8 +42,8 @@ async def test_create_workspace(initial_user_manifest_state, alice_user_fs, alic
                 id=wid,
                 key=ANY,
                 encryption_revision=1,
-                encrypted_on=datetime(2000, 1, 2),
-                role_cached_on=datetime(2000, 1, 2),
+                encrypted_on=DateTime(2000, 1, 2),
+                role_cached_on=DateTime(2000, 1, 2),
                 role=WorkspaceRole.OWNER,
             ),
         ),
@@ -52,7 +52,7 @@ async def test_create_workspace(initial_user_manifest_state, alice_user_fs, alic
 
     w_manifest = await alice_user_fs.get_workspace(wid).local_storage.get_manifest(wid)
     expected_w_manifest = LocalWorkspaceManifest.new_placeholder(
-        alice.device_id, id=w_manifest.id, now=datetime(2000, 1, 2)
+        alice.device_id, id=w_manifest.id, now=DateTime(2000, 1, 2)
     )
     assert w_manifest == expected_w_manifest
 
@@ -78,7 +78,7 @@ async def test_rename_workspace(initial_user_manifest_state, alice_user_fs, alic
     expected_um = LocalUserManifest(
         base=expected_base_um,
         need_sync=True,
-        updated=datetime(2000, 1, 3),
+        updated=DateTime(2000, 1, 3),
         last_processed_message=expected_base_um.last_processed_message,
         workspaces=(
             WorkspaceEntry(
@@ -86,8 +86,8 @@ async def test_rename_workspace(initial_user_manifest_state, alice_user_fs, alic
                 id=wid,
                 key=ANY,
                 encryption_revision=1,
-                encrypted_on=datetime(2000, 1, 2),
-                role_cached_on=datetime(2000, 1, 2),
+                encrypted_on=DateTime(2000, 1, 2),
+                role_cached_on=DateTime(2000, 1, 2),
                 role=WorkspaceRole.OWNER,
             ),
         ),
@@ -119,7 +119,7 @@ async def test_create_workspace_same_name(alice_user_fs):
         w2id = await alice_user_fs.workspace_create("w")
 
     um = alice_user_fs.get_user_manifest()
-    assert um.updated == datetime(2000, 1, 3)
+    assert um.updated == DateTime(2000, 1, 3)
     assert len(um.workspaces) == 2
     assert [(x.id, x.name) for x in um.workspaces] == [(w1id, "w"), (w2id, "w")]
 
@@ -145,11 +145,11 @@ async def test_sync(running_backend, alice2_user_fs, alice2):
     um = alice2_user_fs.get_user_manifest()
     expected_base_um = UserManifest(
         author=alice2.device_id,
-        timestamp=datetime(2000, 1, 3),
+        timestamp=DateTime(2000, 1, 3),
         id=alice2.user_manifest_id,
         version=2,
-        created=datetime(2000, 1, 1),
-        updated=datetime(2000, 1, 2),
+        created=DateTime(2000, 1, 1),
+        updated=DateTime(2000, 1, 2),
         last_processed_message=0,
         workspaces=(
             WorkspaceEntry(
@@ -157,8 +157,8 @@ async def test_sync(running_backend, alice2_user_fs, alice2):
                 id=wid,
                 key=ANY,
                 encryption_revision=1,
-                encrypted_on=datetime(2000, 1, 2),
-                role_cached_on=datetime(2000, 1, 2),
+                encrypted_on=DateTime(2000, 1, 2),
+                role_cached_on=DateTime(2000, 1, 2),
                 role=WorkspaceRole.OWNER,
             ),
         ),
@@ -190,11 +190,11 @@ async def test_sync_under_concurrency(
 
     expected_base_um = UserManifest(
         author=alice2.device_id,
-        timestamp=datetime(2000, 1, 5),
+        timestamp=DateTime(2000, 1, 5),
         id=alice2.user_manifest_id,
         version=3,
-        created=datetime(2000, 1, 1),
-        updated=datetime(2000, 1, 3),
+        created=DateTime(2000, 1, 1),
+        updated=DateTime(2000, 1, 3),
         last_processed_message=0,
         workspaces=(
             WorkspaceEntry(
@@ -202,8 +202,8 @@ async def test_sync_under_concurrency(
                 id=waid,
                 key=ANY,
                 encryption_revision=1,
-                encrypted_on=datetime(2000, 1, 2),
-                role_cached_on=datetime(2000, 1, 2),
+                encrypted_on=DateTime(2000, 1, 2),
+                role_cached_on=DateTime(2000, 1, 2),
                 role=WorkspaceRole.OWNER,
             ),
             WorkspaceEntry(
@@ -211,8 +211,8 @@ async def test_sync_under_concurrency(
                 id=wa2id,
                 key=ANY,
                 encryption_revision=1,
-                encrypted_on=datetime(2000, 1, 3),
-                role_cached_on=datetime(2000, 1, 3),
+                encrypted_on=DateTime(2000, 1, 3),
+                role_cached_on=DateTime(2000, 1, 3),
                 role=WorkspaceRole.OWNER,
             ),
         ),
@@ -237,15 +237,15 @@ async def test_modify_user_manifest_placeholder(
         um = user_fs.get_user_manifest()
 
         expected_um = um_v0.evolve(
-            updated=datetime(2000, 1, 2),
+            updated=DateTime(2000, 1, 2),
             workspaces=(
                 WorkspaceEntry(
                     name="w1",
                     id=wid,
                     key=ANY,
                     encryption_revision=1,
-                    encrypted_on=datetime(2000, 1, 2),
-                    role_cached_on=datetime(2000, 1, 2),
+                    encrypted_on=DateTime(2000, 1, 2),
+                    role_cached_on=DateTime(2000, 1, 2),
                     role=WorkspaceRole.OWNER,
                 ),
             ),
@@ -279,15 +279,15 @@ async def test_sync_placeholder(
                 wid = await user_fs.workspace_create("w1")
             um = user_fs.get_user_manifest()
             expected_um = um_v0.evolve(
-                updated=datetime(2000, 1, 2),
+                updated=DateTime(2000, 1, 2),
                 workspaces=(
                     WorkspaceEntry(
                         name="w1",
                         id=wid,
                         key=ANY,
                         encryption_revision=1,
-                        encrypted_on=datetime(2000, 1, 2),
-                        role_cached_on=datetime(2000, 1, 2),
+                        encrypted_on=DateTime(2000, 1, 2),
+                        role_cached_on=DateTime(2000, 1, 2),
                         role=WorkspaceRole.OWNER,
                     ),
                 ),
@@ -299,7 +299,7 @@ async def test_sync_placeholder(
         um = user_fs.get_user_manifest()
         expected_base_um = UserManifest(
             author=device.device_id,
-            timestamp=datetime(2000, 1, 2),
+            timestamp=DateTime(2000, 1, 2),
             id=device.user_manifest_id,
             version=1,
             created=expected_um.created,
@@ -355,10 +355,10 @@ async def test_concurrent_sync_placeholder(
             expected_base_um = UserManifest(
                 author=device2.device_id,
                 id=device2.user_manifest_id,
-                timestamp=datetime(2000, 1, 4),
+                timestamp=DateTime(2000, 1, 4),
                 version=2,
                 created=um_created_v0_fs1,
-                updated=datetime(2000, 1, 2),
+                updated=DateTime(2000, 1, 2),
                 last_processed_message=0,
                 workspaces=(
                     WorkspaceEntry(
@@ -366,8 +366,8 @@ async def test_concurrent_sync_placeholder(
                         id=w1id,
                         key=ANY,
                         encryption_revision=1,
-                        encrypted_on=datetime(2000, 1, 1),
-                        role_cached_on=datetime(2000, 1, 1),
+                        encrypted_on=DateTime(2000, 1, 1),
+                        role_cached_on=DateTime(2000, 1, 1),
                         role=WorkspaceRole.OWNER,
                     ),
                     WorkspaceEntry(
@@ -375,8 +375,8 @@ async def test_concurrent_sync_placeholder(
                         id=w2id,
                         key=ANY,
                         encryption_revision=1,
-                        encrypted_on=datetime(2000, 1, 2),
-                        role_cached_on=datetime(2000, 1, 2),
+                        encrypted_on=DateTime(2000, 1, 2),
+                        role_cached_on=DateTime(2000, 1, 2),
                         role=WorkspaceRole.OWNER,
                     ),
                 ),
@@ -384,7 +384,7 @@ async def test_concurrent_sync_placeholder(
             expected_um = LocalUserManifest(
                 base=expected_base_um,
                 need_sync=False,
-                updated=datetime(2000, 1, 2),
+                updated=DateTime(2000, 1, 2),
                 last_processed_message=0,
                 workspaces=expected_base_um.workspaces,
             )
@@ -392,11 +392,11 @@ async def test_concurrent_sync_placeholder(
         else:
             expected_base_um = UserManifest(
                 author=device1.device_id,
-                timestamp=datetime(2000, 1, 3),
+                timestamp=DateTime(2000, 1, 3),
                 id=device1.user_manifest_id,
                 version=1,
                 created=um_created_v0_fs1,
-                updated=datetime(2000, 1, 1),
+                updated=DateTime(2000, 1, 1),
                 last_processed_message=0,
                 workspaces=(
                     WorkspaceEntry(
@@ -404,8 +404,8 @@ async def test_concurrent_sync_placeholder(
                         id=w1id,
                         key=ANY,
                         encryption_revision=1,
-                        encrypted_on=datetime(2000, 1, 1),
-                        role_cached_on=datetime(2000, 1, 1),
+                        encrypted_on=DateTime(2000, 1, 1),
+                        role_cached_on=DateTime(2000, 1, 1),
                         role=WorkspaceRole.OWNER,
                     ),
                 ),
@@ -413,7 +413,7 @@ async def test_concurrent_sync_placeholder(
             expected_um = LocalUserManifest(
                 base=expected_base_um,
                 need_sync=False,
-                updated=datetime(2000, 1, 1),
+                updated=DateTime(2000, 1, 1),
                 last_processed_message=0,
                 workspaces=expected_base_um.workspaces,
             )
@@ -448,11 +448,11 @@ async def test_sync_remote_changes(running_backend, alice_user_fs, alice2_user_f
 
     expected_base_um = UserManifest(
         author=alice2.device_id,
-        timestamp=datetime(2000, 1, 3),
+        timestamp=DateTime(2000, 1, 3),
         id=alice2.user_manifest_id,
         version=2,
-        created=datetime(2000, 1, 1),
-        updated=datetime(2000, 1, 2),
+        created=DateTime(2000, 1, 1),
+        updated=DateTime(2000, 1, 2),
         last_processed_message=0,
         workspaces=(
             WorkspaceEntry(
@@ -460,8 +460,8 @@ async def test_sync_remote_changes(running_backend, alice_user_fs, alice2_user_f
                 id=wid,
                 key=ANY,
                 encryption_revision=1,
-                encrypted_on=datetime(2000, 1, 2),
-                role_cached_on=datetime(2000, 1, 2),
+                encrypted_on=DateTime(2000, 1, 2),
+                role_cached_on=DateTime(2000, 1, 2),
                 role=WorkspaceRole.OWNER,
             ),
         ),
@@ -469,7 +469,7 @@ async def test_sync_remote_changes(running_backend, alice_user_fs, alice2_user_f
     expected_um = LocalUserManifest(
         base=expected_base_um,
         need_sync=False,
-        updated=datetime(2000, 1, 2),
+        updated=DateTime(2000, 1, 2),
         last_processed_message=0,
         workspaces=expected_base_um.workspaces,
     )

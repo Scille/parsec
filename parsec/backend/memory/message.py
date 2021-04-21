@@ -2,7 +2,7 @@
 
 from typing import List, Tuple
 from collections import defaultdict
-from pendulum import DateTime
+from parsec.datetime import DateTime
 
 from parsec.backend.backend_events import BackendEvent
 from parsec.api.protocol import UserID, DeviceID, OrganizationID

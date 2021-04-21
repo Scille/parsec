@@ -1,14 +1,14 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
 import pytest
-from pendulum import datetime, now
 
+from parsec.datetime import DateTime, now, timedelta
 from parsec.core.types import FsPath
 from parsec.core.fs import FSError
 
 
 def _day(d):
-    return datetime(2000, 1, d)
+    return DateTime(2000, 1, d)
 
 
 @pytest.mark.trio
@@ -318,7 +318,7 @@ async def test_versions_backend_timestamp_not_matching(alice_workspace, alice):
 
     async def mocked_vlob_read(*args, **kwargs):
         r = await original_vlob_read(*args, **kwargs)
-        r["timestamp"] = r["timestamp"].add(seconds=1)
+        r["timestamp"] = r["timestamp"] + timedelta(seconds=1)
         vlob_id.append(args[1])
         return r
 
@@ -332,5 +332,5 @@ async def test_versions_backend_timestamp_not_matching(alice_workspace, alice):
     value = exc.value.args[0]
     assert (
         value == f"Backend returned invalid expected timestamp for vlob {vlob_id.pop()} at version"
-        " 1 (expecting 2000-01-01T00:00:00+00:00, got 2000-01-01T00:00:01+00:00)"
+        " 1 (expecting 2000-01-01T00:00:00Z, got 2000-01-01T00:00:01Z)"
     )

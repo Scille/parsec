@@ -1,7 +1,7 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
 import pytest
-from pendulum import datetime
+from parsec.datetime import DateTime
 
 from parsec.core.types import FsPath
 from parsec.core.fs.exceptions import FSLocalMissError
@@ -16,8 +16,8 @@ async def test_root_entry_info(alice_workspace_t2, alice_workspace_t4):
         "base_version": 1,
         "is_placeholder": False,
         "need_sync": False,
-        "created": datetime(1999, 12, 31),
-        "updated": datetime(1999, 12, 31),
+        "created": DateTime(1999, 12, 31),
+        "updated": DateTime(1999, 12, 31),
         "children": ["foo"],
         "confinement_point": None,
     }
@@ -29,8 +29,8 @@ async def test_root_entry_info(alice_workspace_t2, alice_workspace_t4):
         "base_version": 2,
         "is_placeholder": False,
         "need_sync": False,
-        "created": datetime(1999, 12, 31),
-        "updated": datetime(2000, 1, 4),
+        "created": DateTime(1999, 12, 31),
+        "updated": DateTime(2000, 1, 4),
         "children": ["files", "foo"],
         "confinement_point": None,
     }

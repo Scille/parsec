@@ -3,7 +3,7 @@
 from parsec.core.core_events import CoreEvent
 import pytest
 from unittest.mock import ANY
-from pendulum import datetime
+from parsec.datetime import DateTime
 
 from parsec.api.data import UserManifest, WorkspaceEntry
 from parsec.core.types import WorkspaceRole, LocalUserManifest, EntryID
@@ -77,8 +77,8 @@ async def test_share_ok(running_backend, alice_user_fs, bob_user_fs, alice, bob,
                 id=wid,
                 key=ANY,
                 encryption_revision=1,
-                encrypted_on=datetime(2000, 1, 2),
-                role_cached_on=datetime(2000, 1, 3),
+                encrypted_on=DateTime(2000, 1, 2),
+                role_cached_on=DateTime(2000, 1, 3),
                 role=WorkspaceRole.MANAGER,
             ),
             "previous_entry": None,
@@ -158,8 +158,8 @@ async def test_unshare_ok(running_backend, alice_user_fs, bob_user_fs, alice, bo
                 id=wid,
                 key=ANY,
                 encryption_revision=1,
-                encrypted_on=datetime(2000, 1, 2),
-                role_cached_on=datetime(2000, 1, 3),
+                encrypted_on=DateTime(2000, 1, 2),
+                role_cached_on=DateTime(2000, 1, 3),
                 role=None,
             ),
             "previous_entry": WorkspaceEntry(
@@ -167,8 +167,8 @@ async def test_unshare_ok(running_backend, alice_user_fs, bob_user_fs, alice, bo
                 id=wid,
                 key=ANY,
                 encryption_revision=1,
-                encrypted_on=datetime(2000, 1, 2),
-                role_cached_on=datetime(2000, 1, 2),
+                encrypted_on=DateTime(2000, 1, 2),
+                role_cached_on=DateTime(2000, 1, 2),
                 role=WorkspaceRole.OWNER,
             ),
         },
@@ -241,8 +241,8 @@ async def test_reshare_workspace(running_backend, alice_user_fs, bob_user_fs, al
                 id=wid,
                 key=ANY,
                 encryption_revision=1,
-                encrypted_on=datetime(2000, 1, 2),
-                role_cached_on=datetime(2000, 1, 5),
+                encrypted_on=DateTime(2000, 1, 2),
+                role_cached_on=DateTime(2000, 1, 5),
                 role=WorkspaceRole.MANAGER,
             ),
             "previous_entry": WorkspaceEntry(
@@ -250,8 +250,8 @@ async def test_reshare_workspace(running_backend, alice_user_fs, bob_user_fs, al
                 id=wid,
                 key=ANY,
                 encryption_revision=1,
-                encrypted_on=datetime(2000, 1, 2),
-                role_cached_on=datetime(2000, 1, 4),
+                encrypted_on=DateTime(2000, 1, 2),
+                role_cached_on=DateTime(2000, 1, 4),
                 role=None,
             ),
         },
@@ -321,7 +321,7 @@ async def test_share_no_manager_right(running_backend, alice_user_fs, alice, bob
             certificate=b"<dummy>",
             role=RealmRole.OWNER,
             granted_by=alice.device_id,
-            granted_on=datetime(2000, 1, 3),
+            granted_on=DateTime(2000, 1, 3),
         ),
     )
     await running_backend.backend.realm.update_roles(
@@ -332,7 +332,7 @@ async def test_share_no_manager_right(running_backend, alice_user_fs, alice, bob
             certificate=b"<dummy>",
             role=RealmRole.CONTRIBUTOR,
             granted_by=bob.device_id,
-            granted_on=datetime(2000, 1, 4),
+            granted_on=DateTime(2000, 1, 4),
         ),
     )
 
@@ -370,8 +370,8 @@ async def test_share_with_sharing_name_already_taken(
                 id=awid,
                 key=ANY,
                 encryption_revision=1,
-                encrypted_on=datetime(2000, 1, 1),
-                role_cached_on=datetime(2000, 1, 2),
+                encrypted_on=DateTime(2000, 1, 1),
+                role_cached_on=DateTime(2000, 1, 2),
                 role=WorkspaceRole.MANAGER,
             ),
             "previous_entry": None,
@@ -421,12 +421,12 @@ async def test_share_workspace_then_conflict_on_rights(
     if first_to_sync == "alice":
         first = alice_user_fs
         second = alice2_user_fs
-        synced_timestamp = datetime(2000, 1, 7)
+        synced_timestamp = DateTime(2000, 1, 7)
         synced_version = 3
     else:
         first = alice2_user_fs
         second = alice_user_fs
-        synced_timestamp = datetime(2000, 1, 6)
+        synced_timestamp = DateTime(2000, 1, 6)
         synced_version = 2
 
     # Finally Alice devices try to reconciliate
@@ -445,8 +445,8 @@ async def test_share_workspace_then_conflict_on_rights(
         timestamp=synced_timestamp,
         id=alice2.user_manifest_id,
         version=synced_version,
-        created=datetime(2000, 1, 1),
-        updated=datetime(2000, 1, 5),
+        created=DateTime(2000, 1, 1),
+        updated=DateTime(2000, 1, 5),
         last_processed_message=2,
         workspaces=(
             WorkspaceEntry(
@@ -454,8 +454,8 @@ async def test_share_workspace_then_conflict_on_rights(
                 id=wid,
                 key=ANY,
                 encryption_revision=1,
-                encrypted_on=datetime(2000, 1, 1),
-                role_cached_on=datetime(2000, 1, 5),
+                encrypted_on=DateTime(2000, 1, 1),
+                role_cached_on=DateTime(2000, 1, 5),
                 role=WorkspaceRole.CONTRIBUTOR,
             ),
         ),
@@ -497,8 +497,8 @@ async def test_share_workspace_then_conflict_on_rights(
         id=wid,
         key=ANY,
         encryption_revision=1,
-        encrypted_on=datetime(2000, 1, 1),
-        role_cached_on=datetime(2000, 1, 5),
+        encrypted_on=DateTime(2000, 1, 1),
+        role_cached_on=DateTime(2000, 1, 5),
         role=WorkspaceRole.CONTRIBUTOR,
     )
     assert a2_w_entry == a_w_entry
@@ -519,8 +519,8 @@ async def test_sharing_events_triggered_on_sync(
         id=wid,
         key=ANY,
         encryption_revision=1,
-        encrypted_on=datetime(2000, 1, 2),
-        role_cached_on=datetime(2000, 1, 2),
+        encrypted_on=DateTime(2000, 1, 2),
+        role_cached_on=DateTime(2000, 1, 2),
         role=WorkspaceRole.MANAGER,
     )
     spy.assert_event_occured(
@@ -540,8 +540,8 @@ async def test_sharing_events_triggered_on_sync(
         id=wid,
         key=ANY,
         encryption_revision=1,
-        encrypted_on=datetime(2000, 1, 2),
-        role_cached_on=datetime(2000, 1, 3),
+        encrypted_on=DateTime(2000, 1, 2),
+        role_cached_on=DateTime(2000, 1, 3),
         role=WorkspaceRole.OWNER,
     )
     spy.assert_event_occured(
@@ -562,8 +562,8 @@ async def test_sharing_events_triggered_on_sync(
         id=wid,
         key=ANY,
         encryption_revision=1,
-        encrypted_on=datetime(2000, 1, 2),
-        role_cached_on=datetime(2000, 1, 4),
+        encrypted_on=DateTime(2000, 1, 2),
+        role_cached_on=DateTime(2000, 1, 4),
         role=None,
     )
     spy.assert_event_occured(
@@ -602,8 +602,8 @@ async def test_sharing_event_on_sync_if_same_role(
         id=wid,
         key=ANY,
         encryption_revision=1,
-        encrypted_on=datetime(2000, 1, 2),
-        role_cached_on=datetime(2000, 1, 2),
+        encrypted_on=DateTime(2000, 1, 2),
+        role_cached_on=DateTime(2000, 1, 2),
         role=WorkspaceRole.MANAGER,
     )
 
@@ -617,7 +617,7 @@ async def test_sharing_event_on_sync_if_same_role(
     await bob_user_fs.workspace_share(wid, alice.user_id, WorkspaceRole.MANAGER)
     with freeze_time("2000-01-04"):
         await alice_user_fs.process_last_messages()
-    expected_entry_v3 = expected_entry_v1.evolve(role_cached_on=datetime(2000, 1, 4))
+    expected_entry_v3 = expected_entry_v1.evolve(role_cached_on=DateTime(2000, 1, 4))
     await alice_user_fs.sync()
 
     # A single sharing event should be triggered

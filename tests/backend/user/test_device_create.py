@@ -2,7 +2,7 @@
 
 from parsec.backend.backend_events import BackendEvent
 import pytest
-import pendulum
+from parsec.datetime import DateTime, now as datetime_now, timedelta
 
 from parsec.api.data import DeviceCertificateContent, UserProfile
 from parsec.backend.user import INVITATION_VALIDITY, Device
@@ -24,7 +24,7 @@ def alice_nd(local_device_factory, alice):
 async def test_device_create_ok(
     backend, backend_sock_factory, alice_backend_sock, alice, alice_nd, with_labels
 ):
-    now = pendulum.now()
+    now = datetime_now()
     device_certificate = DeviceCertificateContent(
         author=alice.device_id,
         timestamp=now,
@@ -78,7 +78,7 @@ async def test_device_create_ok(
 
 @pytest.mark.trio
 async def test_device_create_invalid_certified(alice_backend_sock, alice, bob, alice_nd):
-    now = pendulum.now()
+    now = datetime_now()
     good_device_certificate = DeviceCertificateContent(
         author=alice.device_id,
         timestamp=now,
@@ -119,7 +119,7 @@ async def test_device_create_invalid_certified(alice_backend_sock, alice, bob, a
 
 @pytest.mark.trio
 async def test_device_create_already_exists(alice_backend_sock, alice, alice2):
-    now = pendulum.now()
+    now = datetime_now()
     device_certificate = DeviceCertificateContent(
         author=alice.device_id,
         timestamp=now,
@@ -141,7 +141,7 @@ async def test_device_create_already_exists(alice_backend_sock, alice, alice2):
 
 @pytest.mark.trio
 async def test_device_create_not_own_user(bob_backend_sock, bob, alice_nd):
-    now = pendulum.now()
+    now = datetime_now()
     device_certificate = DeviceCertificateContent(
         author=bob.device_id,
         timestamp=now,
@@ -160,7 +160,7 @@ async def test_device_create_not_own_user(bob_backend_sock, bob, alice_nd):
 
 @pytest.mark.trio
 async def test_device_create_certify_too_old(alice_backend_sock, alice, alice_nd):
-    now = pendulum.datetime(2000, 1, 1)
+    now = DateTime(2000, 1, 1)
     device_certificate = DeviceCertificateContent(
         author=alice.device_id,
         timestamp=now,
@@ -169,7 +169,7 @@ async def test_device_create_certify_too_old(alice_backend_sock, alice, alice_nd
         verify_key=alice_nd.verify_key,
     ).dump_and_sign(alice.signing_key)
 
-    with freeze_time(now.add(seconds=INVITATION_VALIDITY + 1)):
+    with freeze_time(now + timedelta(seconds=INVITATION_VALIDITY + 1)):
         rep = await device_create(
             alice_backend_sock,
             device_certificate=device_certificate,
@@ -183,7 +183,7 @@ async def test_device_create_certify_too_old(alice_backend_sock, alice, alice_nd
 
 @pytest.mark.trio
 async def test_device_create_bad_redacted_device_certificate(alice_backend_sock, alice, alice_nd):
-    now = pendulum.now()
+    now = datetime_now()
     device_certificate = DeviceCertificateContent(
         author=alice.device_id,
         timestamp=now,
@@ -194,7 +194,7 @@ async def test_device_create_bad_redacted_device_certificate(alice_backend_sock,
     good_redacted_device_certificate = device_certificate.evolve(device_label=None)
     device_certificate = device_certificate.dump_and_sign(alice.signing_key)
     for bad_redacted_device_certificate in (
-        good_redacted_device_certificate.evolve(timestamp=now.add(seconds=1)),
+        good_redacted_device_certificate.evolve(timestamp=now + timedelta(seconds=1)),
         good_redacted_device_certificate.evolve(device_id=alice.device_id),
         good_redacted_device_certificate.evolve(verify_key=alice.verify_key),
     ):
@@ -225,7 +225,7 @@ async def test_device_create_bad_redacted_device_certificate(alice_backend_sock,
 async def test_redacted_certificates_cannot_contain_sensitive_data(
     alice_backend_sock, alice, alice_nd
 ):
-    now = pendulum.now()
+    now = datetime_now()
     device_certificate = DeviceCertificateContent(
         author=alice.device_id,
         timestamp=now,

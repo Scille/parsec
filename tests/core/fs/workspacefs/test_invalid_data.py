@@ -1,7 +1,7 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
 import pytest
-from pendulum import datetime
+from parsec.datetime import DateTime
 
 from parsec.core.fs import FSError
 from parsec.core.types import WorkspaceRole
@@ -27,8 +27,8 @@ async def testbed(running_backend, alice_user_fs, alice, bob):
                 "blob": None,
                 "signed_author": alice.device_id,
                 "backend_author": alice.device_id,
-                "signed_timestamp": datetime(2000, 1, 2),
-                "backend_timestamp": datetime(2000, 1, 2),
+                "signed_timestamp": DateTime(2000, 1, 2),
+                "backend_timestamp": DateTime(2000, 1, 2),
                 "author_signkey": alice.signing_key,
                 "key": workspace.get_workspace_entry().key,
             }
@@ -93,21 +93,21 @@ async def test_invalid_author(testbed, alice2):
 
 @pytest.mark.trio
 async def test_invalid_timestamp(testbed, alice, alice2):
-    bad_timestamp = datetime(2000, 1, 3)
+    bad_timestamp = DateTime(2000, 1, 3)
 
     # Invalid timestamp field in manifest
-    exc_msg = "Cannot decrypt vlob: Invalid timestamp: expected `2000-01-02T00:00:00+00:00`, got `2000-01-03T00:00:00+00:00`"
+    exc_msg = "Cannot decrypt vlob: Invalid timestamp: expected `2000-01-02T00:00:00Z`, got `2000-01-03T00:00:00Z`"
     await testbed.run(signed_timestamp=bad_timestamp, exc_msg=exc_msg)
 
     # Invalid expected timestamp stored in backend
-    exc_msg = "Cannot decrypt vlob: Invalid timestamp: expected `2000-01-03T00:00:00+00:00`, got `2000-01-02T00:00:00+00:00`"
+    exc_msg = "Cannot decrypt vlob: Invalid timestamp: expected `2000-01-03T00:00:00Z`, got `2000-01-02T00:00:00Z`"
     await testbed.run(backend_timestamp=bad_timestamp, exc_msg=exc_msg)
 
 
 @pytest.mark.trio
 async def test_no_user_certif(testbed, alice, bob):
     # Data created before workspace manifest access
-    exc_msg = "Manifest was created at 2000-01-02T00:00:00+00:00 by `bob@dev1` which had no right to access the workspace at that time"
+    exc_msg = "Manifest was created at 2000-01-02T00:00:00Z by `bob@dev1` which had no right to access the workspace at that time"
     await testbed.run(
         backend_author=bob.device_id,
         signed_author=bob.device_id,

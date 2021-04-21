@@ -3,7 +3,7 @@
 import pytest
 import trio
 from unittest.mock import ANY
-from pendulum import datetime
+from parsec.datetime import DateTime
 
 from parsec.backend.backend_events import BackendEvent
 from parsec.api.transport import TransportError
@@ -36,13 +36,13 @@ async def test_user_create_and_info(
         other_device_invitation = await backend.invite.new_for_device(
             organization_id=alice.organization_id,
             greeter_user_id=alice.user_id,
-            created_on=datetime(2000, 1, 2),
+            created_on=DateTime(2000, 1, 2),
         )
         other_user_invitation = await backend.invite.new_for_user(
             organization_id=alice.organization_id,
             greeter_user_id=alice.user_id,
             claimer_email="other@example.com",
-            created_on=datetime(2000, 1, 3),
+            created_on=DateTime(2000, 1, 3),
         )
         await spy.wait_multiple_with_timeout(
             [BackendEvent.INVITE_STATUS_CHANGED, BackendEvent.INVITE_STATUS_CHANGED]
@@ -73,20 +73,20 @@ async def test_user_create_and_info(
             {
                 "type": InvitationType.DEVICE,
                 "token": other_device_invitation.token,
-                "created_on": datetime(2000, 1, 2),
+                "created_on": DateTime(2000, 1, 2),
                 "status": InvitationStatus.IDLE,
             },
             {
                 "type": InvitationType.USER,
                 "token": other_user_invitation.token,
-                "created_on": datetime(2000, 1, 3),
+                "created_on": DateTime(2000, 1, 3),
                 "claimer_email": "other@example.com",
                 "status": InvitationStatus.IDLE,
             },
             {
                 "type": InvitationType.USER,
                 "token": token,
-                "created_on": datetime(2000, 1, 4),
+                "created_on": DateTime(2000, 1, 4),
                 "claimer_email": "zack@example.com",
                 "status": InvitationStatus.IDLE,
             },
@@ -119,7 +119,7 @@ async def test_device_create_and_info(
             organization_id=alice.organization_id,
             greeter_user_id=alice.user_id,
             claimer_email="other@example.com",
-            created_on=datetime(2000, 1, 2),
+            created_on=DateTime(2000, 1, 2),
         )
         await spy.wait_multiple_with_timeout([BackendEvent.INVITE_STATUS_CHANGED])
 
@@ -146,14 +146,14 @@ async def test_device_create_and_info(
             {
                 "type": InvitationType.USER,
                 "token": other_user_invitation.token,
-                "created_on": datetime(2000, 1, 2),
+                "created_on": DateTime(2000, 1, 2),
                 "claimer_email": "other@example.com",
                 "status": InvitationStatus.IDLE,
             },
             {
                 "type": InvitationType.DEVICE,
                 "token": token,
-                "created_on": datetime(2000, 1, 3),
+                "created_on": DateTime(2000, 1, 3),
                 "status": InvitationStatus.IDLE,
             },
         ],
@@ -294,7 +294,7 @@ async def test_delete(
         invitation = await backend.invite.new_for_device(
             organization_id=alice.organization_id,
             greeter_user_id=alice.user_id,
-            created_on=datetime(2000, 1, 2),
+            created_on=DateTime(2000, 1, 2),
         )
         await spy.wait_multiple_with_timeout([BackendEvent.INVITE_STATUS_CHANGED])
 
@@ -357,7 +357,7 @@ async def test_user_invitation_double_create(alice, backend, alice_backend_sock)
         organization_id=alice.organization_id,
         claimer_email=claimer_email,
         greeter_user_id=alice.user_id,
-        created_on=datetime(2000, 1, 2),
+        created_on=DateTime(2000, 1, 2),
     )
 
     # Calling invite_new should be idempotent
@@ -379,7 +379,7 @@ async def test_user_invitation_double_create(alice, backend, alice_backend_sock)
             {
                 "type": InvitationType.USER,
                 "token": invitation.token,
-                "created_on": datetime(2000, 1, 2),
+                "created_on": DateTime(2000, 1, 2),
                 "claimer_email": claimer_email,
                 "status": InvitationStatus.IDLE,
             }
@@ -394,7 +394,7 @@ async def test_device_invitation_double_create(
     invitation = await backend.invite.new_for_device(
         organization_id=alice.organization_id,
         greeter_user_id=alice.user_id,
-        created_on=datetime(2000, 1, 2),
+        created_on=DateTime(2000, 1, 2),
     )
 
     # Calling invite_new should be idempotent
@@ -412,7 +412,7 @@ async def test_device_invitation_double_create(
             {
                 "type": InvitationType.DEVICE,
                 "token": invitation.token,
-                "created_on": datetime(2000, 1, 2),
+                "created_on": DateTime(2000, 1, 2),
                 "status": InvitationStatus.IDLE,
             }
         ],
@@ -428,13 +428,13 @@ async def test_user_invitation_recreate_deleted(
         organization_id=alice.organization_id,
         claimer_email=claimer_email,
         greeter_user_id=alice.user_id,
-        created_on=datetime(2000, 1, 2),
+        created_on=DateTime(2000, 1, 2),
     )
     await backend.invite.delete(
         organization_id=alice.organization_id,
         greeter=invitation.greeter_user_id,
         token=invitation.token,
-        on=datetime(2000, 1, 3),
+        on=DateTime(2000, 1, 3),
         reason=InvitationDeletedReason.FINISHED,
     )
 
@@ -455,7 +455,7 @@ async def test_user_invitation_recreate_deleted(
             {
                 "type": InvitationType.USER,
                 "token": new_token,
-                "created_on": datetime(2000, 1, 4),
+                "created_on": DateTime(2000, 1, 4),
                 "claimer_email": claimer_email,
                 "status": InvitationStatus.IDLE,
             }
@@ -470,13 +470,13 @@ async def test_device_invitation_recreate_deleted(
     invitation = await backend.invite.new_for_device(
         organization_id=alice.organization_id,
         greeter_user_id=alice.user_id,
-        created_on=datetime(2000, 1, 2),
+        created_on=DateTime(2000, 1, 2),
     )
     await backend.invite.delete(
         organization_id=alice.organization_id,
         greeter=invitation.greeter_user_id,
         token=invitation.token,
-        on=datetime(2000, 1, 3),
+        on=DateTime(2000, 1, 3),
         reason=InvitationDeletedReason.FINISHED,
     )
 
@@ -495,7 +495,7 @@ async def test_device_invitation_recreate_deleted(
             {
                 "type": InvitationType.DEVICE,
                 "token": new_token,
-                "created_on": datetime(2000, 1, 4),
+                "created_on": DateTime(2000, 1, 4),
                 "status": InvitationStatus.IDLE,
             }
         ],
@@ -538,7 +538,7 @@ async def test_delete_invitation_while_claimer_connected(
                 organization_id=alice.organization_id,
                 greeter=alice.user_id,
                 token=invitation.token,
-                on=datetime(2000, 1, 2),
+                on=DateTime(2000, 1, 2),
                 reason=InvitationDeletedReason.ROTTEN,
             )
 
@@ -567,7 +567,7 @@ async def test_already_deleted(alice, backend, alice_backend_sock, backend_invit
         organization_id=alice.organization_id,
         greeter=alice.user_id,
         token=invitation.token,
-        on=datetime(2000, 1, 2),
+        on=DateTime(2000, 1, 2),
         reason=InvitationDeletedReason.ROTTEN,
     )
 

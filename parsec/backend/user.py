@@ -4,8 +4,8 @@ from parsec.backend.backend_events import BackendEvent
 import trio
 import attr
 from typing import List, Optional, Tuple
-import pendulum
 
+from parsec.datetime import DateTime, now as datetime_now
 from parsec.utils import timestamps_in_the_ballpark
 from parsec.crypto import VerifyKey, PublicKey
 from parsec.event_bus import EventBus
@@ -88,7 +88,7 @@ class Device:
     device_certificate: bytes
     redacted_device_certificate: bytes
     device_certifier: Optional[DeviceID]
-    created_on: pendulum.DateTime = attr.ib(factory=pendulum.now)
+    created_on: DateTime = attr.ib(factory=datetime_now)
 
 
 @attr.s(slots=True, frozen=True, repr=False, auto_attribs=True)
@@ -100,7 +100,7 @@ class User:
         return attr.evolve(self, **kwargs)
 
     def is_revoked(self):
-        return self.revoked_on and self.revoked_on <= pendulum.now()
+        return self.revoked_on and self.revoked_on <= datetime_now()
 
     @property
     def public_key(self) -> PublicKey:
@@ -112,8 +112,8 @@ class User:
     redacted_user_certificate: bytes
     user_certifier: Optional[DeviceID]
     profile: UserProfile = UserProfile.STANDARD
-    created_on: pendulum.DateTime = attr.ib(factory=pendulum.now)
-    revoked_on: Optional[pendulum.DateTime] = None
+    created_on: DateTime = attr.ib(factory=datetime_now)
+    revoked_on: Optional[DateTime] = None
     revoked_user_certificate: Optional[bytes] = None
     revoked_user_certifier: Optional[DeviceID] = None
 
@@ -149,10 +149,10 @@ class UserInvitation:
 
     user_id: UserID
     creator: DeviceID
-    created_on: pendulum.DateTime = attr.ib(factory=pendulum.now)
+    created_on: DateTime = attr.ib(factory=datetime_now)
 
     def is_valid(self) -> bool:
-        return (pendulum.now() - self.created_on).total_seconds() < INVITATION_VALIDITY
+        return (datetime_now() - self.created_on).total_seconds() < INVITATION_VALIDITY
 
 
 @attr.s(slots=True, frozen=True, repr=False, auto_attribs=True)
@@ -162,10 +162,10 @@ class DeviceInvitation:
 
     device_id: DeviceID
     creator: DeviceID
-    created_on: pendulum.DateTime = attr.ib(factory=pendulum.now)
+    created_on: DateTime = attr.ib(factory=datetime_now)
 
     def is_valid(self) -> bool:
-        return (pendulum.now() - self.created_on).total_seconds() < INVITATION_VALIDITY
+        return (datetime_now() - self.created_on).total_seconds() < INVITATION_VALIDITY
 
 
 class BaseUserComponent:
@@ -471,7 +471,7 @@ class BaseUserComponent:
                 "reason": "Device and User certificates must have the same timestamp.",
             }
 
-        now = pendulum.now()
+        now = datetime_now()
         if not timestamps_in_the_ballpark(u_data.timestamp, now):
             return {
                 "status": "invalid_certification",
@@ -557,7 +557,7 @@ class BaseUserComponent:
                 "reason": f"Invalid certification data ({exc}).",
             }
 
-        if not timestamps_in_the_ballpark(data.timestamp, pendulum.now()):
+        if not timestamps_in_the_ballpark(data.timestamp, datetime_now()):
             return {
                 "status": "invalid_certification",
                 "reason": f"Invalid timestamp in certification.",
@@ -754,7 +754,7 @@ class BaseUserComponent:
                 "reason": f"Invalid certification data ({exc}).",
             }
 
-        if not timestamps_in_the_ballpark(data.timestamp, pendulum.now()):
+        if not timestamps_in_the_ballpark(data.timestamp, datetime_now()):
             return {
                 "status": "invalid_certification",
                 "reason": f"Invalid timestamp in certification.",
@@ -812,7 +812,7 @@ class BaseUserComponent:
                 "reason": f"Invalid certification data ({exc}).",
             }
 
-        if not timestamps_in_the_ballpark(data.timestamp, pendulum.now()):
+        if not timestamps_in_the_ballpark(data.timestamp, datetime_now()):
             return {
                 "status": "invalid_certification",
                 "reason": f"Invalid timestamp in certification.",
@@ -875,7 +875,7 @@ class BaseUserComponent:
         user_id: UserID,
         revoked_user_certificate: bytes,
         revoked_user_certifier: DeviceID,
-        revoked_on: Optional[pendulum.DateTime] = None,
+        revoked_on: Optional[DateTime] = None,
     ) -> None:
         """
         Raises:

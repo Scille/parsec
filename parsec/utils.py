@@ -3,7 +3,7 @@
 
 import attr
 import trio
-from pendulum import DateTime
+from parsec.datetime import DateTime
 from structlog import get_logger
 from async_generator import asynccontextmanager
 

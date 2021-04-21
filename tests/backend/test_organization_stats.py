@@ -3,7 +3,7 @@
 import pytest
 from uuid import uuid4
 from unittest.mock import ANY
-from pendulum import now as pendulum_now
+from parsec.datetime import now as datetime_now
 
 from parsec.core.backend_connection import BackendConnectionError
 from parsec.core.logged_core import OrganizationStats
@@ -22,7 +22,7 @@ async def test_organization_stats(
         organization_id=alice.organization_id,
         author=alice.device_id,
         encryption_revision=1,
-        timestamp=pendulum_now(),
+        timestamp=datetime_now(),
         realm_id=realm,
         vlob_id=uuid4(),
         blob=b"1234",

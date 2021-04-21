@@ -1,7 +1,7 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
 import pytest
-import pendulum
+from parsec.datetime import DateTime, now as datetime_now, timedelta
 from unittest.mock import ANY
 
 from parsec.api.data import UserCertificateContent, DeviceCertificateContent, UserProfile
@@ -208,7 +208,7 @@ async def test_organization_with_expiration_date_create_and_bootstrap(
 
     with freeze_time("2000-01-01"):
 
-        expiration_date = pendulum.datetime(2000, 1, 2)
+        expiration_date = DateTime(2000, 1, 2)
         rep = await organization_create(
             administration_backend_sock, neworg.organization_id, expiration_date=expiration_date
         )
@@ -268,7 +268,7 @@ async def test_organization_expired_create_and_bootstrap(
     # 1) Create organization, note this means `neworg.bootstrap_token`
     # will contain an invalid token
 
-    expiration_date = pendulum.now().subtract(days=1)
+    expiration_date = datetime_now() - timedelta(days=1)
 
     rep = await organization_create(
         administration_backend_sock, neworg.organization_id, expiration_date=expiration_date
@@ -325,8 +325,8 @@ async def test_organization_bootstrap_bad_data(
     public_key = newalice.public_key
     verify_key = newalice.verify_key
 
-    now = pendulum.now()
-    bad_now = now.subtract(seconds=1)
+    now = datetime_now()
+    bad_now = now - timedelta(seconds=1)
 
     good_cu = UserCertificateContent(
         author=None,
@@ -556,7 +556,7 @@ async def test_organization_spontaneous_bootstrap(
         # Administration explicitly created an organization,
         # we shouldn't be able to overwrite it
         step1_token = "123"
-        step1_expiration_date = pendulum.now().add(days=1)
+        step1_expiration_date = datetime_now() + timedelta(days=1)
     if flavour != "no_create":
         await backend.organization.create(
             id=neworg.organization_id,

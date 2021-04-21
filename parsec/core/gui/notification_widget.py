@@ -1,6 +1,6 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-import pendulum
+from parsec.datetime import now as datetime_now
 
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QWidget, QStyle, QStyleOption
@@ -16,7 +16,7 @@ class NotificationWidget(QWidget, Ui_NotificationWidget):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.setupUi(self)
-        now = pendulum.now()
+        now = datetime_now()
         self.label_date.setText(format_datetime(now))
         self.button_close.clicked.connect(self.emit_close_clicked)
 

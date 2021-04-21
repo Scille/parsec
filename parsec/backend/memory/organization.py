@@ -2,7 +2,7 @@
 
 from typing import Optional
 
-from pendulum import DateTime
+from parsec.datetime import DateTime
 
 from parsec.api.protocol import OrganizationID
 from parsec.crypto import VerifyKey

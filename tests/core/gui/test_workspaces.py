@@ -4,9 +4,9 @@ import pytest
 from PyQt5 import QtCore
 
 from uuid import UUID
-import pendulum
 from unittest.mock import ANY, Mock
 
+from parsec.datetime import now as datetime_now
 from parsec.api.data import WorkspaceEntry
 from parsec.core.types import WorkspaceRole
 from parsec.core.core_events import CoreEvent
@@ -172,7 +172,7 @@ async def test_event_bus_internal_connection(aqtbot, running_backend, logged_gui
             CoreEvent.MOUNTPOINT_STARTED,
             mountpoint=None,
             workspace_id=uuid,
-            timestamp=pendulum.now(),
+            timestamp=datetime_now(),
         )
 
     assert not autoclose_dialog.dialogs
@@ -181,7 +181,7 @@ async def test_event_bus_internal_connection(aqtbot, running_backend, logged_gui
             CoreEvent.MOUNTPOINT_STOPPED,
             mountpoint=None,
             workspace_id=uuid,
-            timestamp=pendulum.now(),
+            timestamp=datetime_now(),
         )
     assert autoclose_dialog.dialogs == [
         (

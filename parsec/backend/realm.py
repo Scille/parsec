@@ -2,9 +2,9 @@
 
 from typing import Dict, List, Optional
 from uuid import UUID
-import pendulum
 import attr
 
+from parsec.datetime import DateTime, now as datetime_now
 from parsec.utils import timestamps_in_the_ballpark
 from parsec.api.data import DataError, RealmRoleCertificateContent, UserProfile
 from parsec.api.protocol import (
@@ -71,7 +71,7 @@ class RealmMaintenanceError(RealmError):
 @attr.s(slots=True, frozen=True, auto_attribs=True)
 class RealmStatus:
     maintenance_type: Optional[MaintenanceType]
-    maintenance_started_on: Optional[pendulum.DateTime]
+    maintenance_started_on: Optional[DateTime]
     maintenance_started_by: Optional[DeviceID]
     encryption_revision: int
 
@@ -107,7 +107,7 @@ class RealmGrantedRole:
     user_id: UserID
     role: Optional[RealmRole]
     granted_by: Optional[DeviceID]
-    granted_on: pendulum.DateTime = attr.ib(factory=pendulum.now)
+    granted_on: DateTime = attr.ib(factory=datetime_now)
 
 
 class BaseRealmComponent:
@@ -132,7 +132,7 @@ class BaseRealmComponent:
                 "reason": f"Invalid certification data ({exc}).",
             }
 
-        now = pendulum.now()
+        now = datetime_now()
         if not timestamps_in_the_ballpark(data.timestamp, now):
             return {
                 "status": "invalid_certification",
@@ -251,7 +251,7 @@ class BaseRealmComponent:
                 "reason": f"Invalid certification data ({exc}).",
             }
 
-        now = pendulum.now()
+        now = datetime_now()
         if not timestamps_in_the_ballpark(data.timestamp, now):
             return {
                 "status": "invalid_certification",
@@ -303,7 +303,7 @@ class BaseRealmComponent:
     async def api_realm_start_reencryption_maintenance(self, client_ctx, msg):
         msg = realm_start_reencryption_maintenance_serializer.req_load(msg)
 
-        now = pendulum.now()
+        now = datetime_now()
         if not timestamps_in_the_ballpark(msg["timestamp"], now):
             return {"status": "bad_timestamp", "reason": "Timestamp is out of date."}
 
@@ -422,11 +422,7 @@ class BaseRealmComponent:
         raise NotImplementedError()
 
     async def get_role_certificates(
-        self,
-        organization_id: OrganizationID,
-        author: DeviceID,
-        realm_id: UUID,
-        since: pendulum.DateTime,
+        self, organization_id: OrganizationID, author: DeviceID, realm_id: UUID, since: DateTime
     ) -> List[bytes]:
         """
         Raises:
@@ -457,7 +453,7 @@ class BaseRealmComponent:
         realm_id: UUID,
         encryption_revision: int,
         per_participant_message: Dict[UserID, bytes],
-        timestamp: pendulum.DateTime,
+        timestamp: DateTime,
     ) -> None:
         """
         Raises:

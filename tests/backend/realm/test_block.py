@@ -3,10 +3,10 @@
 import trio
 import pytest
 from unittest.mock import ANY
-import pendulum
 from uuid import UUID, uuid4
 from hypothesis import given, strategies as st
 
+from parsec.datetime import now as datetime_now
 from parsec.backend.block import BlockTimeoutError
 from parsec.backend.realm import RealmGrantedRole
 from parsec.backend.raid5_blockstore import (
@@ -407,7 +407,7 @@ async def test_access_during_maintenance(backend, alice, alice_backend_sock, rea
         realm,
         2,
         {alice.user_id: b"whatever"},
-        pendulum.now(),
+        datetime_now(),
     )
     rep = await block_create(alice_backend_sock, BLOCK_ID, realm, BLOCK_DATA, check_rep=False)
     assert rep == {"status": "in_maintenance"}

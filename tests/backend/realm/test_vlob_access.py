@@ -2,8 +2,8 @@
 
 import pytest
 from uuid import UUID, uuid4
-from pendulum import datetime
 
+from parsec.datetime import DateTime, timedelta
 from parsec.api.protocol import (
     packb,
     RealmRole,
@@ -33,16 +33,16 @@ async def test_create_and_read(alice, alice_backend_sock, alice2_backend_sock, r
         "version": 1,
         "blob": blob,
         "author": alice.device_id,
-        "timestamp": datetime(2000, 1, 2),
+        "timestamp": DateTime(2000, 1, 2),
     }
 
 
 @pytest.mark.trio
 async def test_create_bad_timestamp(alice, alice_backend_sock, realm):
     blob = b"Initial commit."
-    d1 = datetime(2000, 1, 1)
+    d1 = DateTime(2000, 1, 1)
     with freeze_time(d1):
-        d2 = d1.add(seconds=3600)
+        d2 = d1 + timedelta(seconds=3600)
         rep = await vlob_create(
             alice_backend_sock, realm, VLOB_ID, blob, timestamp=d2, check_rep=False
         )
@@ -144,7 +144,7 @@ async def test_read_ok(alice, alice_backend_sock, vlobs):
         "blob": b"r:A b:1 v:2",
         "version": 2,
         "author": alice.device_id,
-        "timestamp": datetime(2000, 1, 3),
+        "timestamp": DateTime(2000, 1, 3),
     }
 
 
@@ -156,61 +156,61 @@ async def test_read_ok_v1(alice, alice_backend_sock, vlobs):
         "blob": b"r:A b:1 v:1",
         "version": 1,
         "author": alice.device_id,
-        "timestamp": datetime(2000, 1, 2),
+        "timestamp": DateTime(2000, 1, 2),
     }
 
 
 @pytest.mark.trio
 async def test_read_ok_timestamp_after_v2(alice, alice_backend_sock, vlobs):
-    rep = await vlob_read(alice_backend_sock, vlobs[0], timestamp=datetime(2000, 1, 4))
+    rep = await vlob_read(alice_backend_sock, vlobs[0], timestamp=DateTime(2000, 1, 4))
     assert rep == {
         "status": "ok",
         "blob": b"r:A b:1 v:2",
         "version": 2,
         "author": alice.device_id,
-        "timestamp": datetime(2000, 1, 3),
+        "timestamp": DateTime(2000, 1, 3),
     }
 
 
 @pytest.mark.trio
 async def test_read_ok_timestamp_is_v2(alice, alice_backend_sock, vlobs):
-    rep = await vlob_read(alice_backend_sock, vlobs[0], timestamp=datetime(2000, 1, 3))
+    rep = await vlob_read(alice_backend_sock, vlobs[0], timestamp=DateTime(2000, 1, 3))
     assert rep == {
         "status": "ok",
         "blob": b"r:A b:1 v:2",
         "version": 2,
         "author": alice.device_id,
-        "timestamp": datetime(2000, 1, 3),
+        "timestamp": DateTime(2000, 1, 3),
     }
 
 
 @pytest.mark.trio
 async def test_read_ok_timestamp_between_v1_and_v2(alice, alice_backend_sock, vlobs):
-    rep = await vlob_read(alice_backend_sock, vlobs[0], timestamp=datetime(2000, 1, 2, 10))
+    rep = await vlob_read(alice_backend_sock, vlobs[0], timestamp=DateTime(2000, 1, 2, 10))
     assert rep == {
         "status": "ok",
         "blob": b"r:A b:1 v:1",
         "version": 1,
         "author": alice.device_id,
-        "timestamp": datetime(2000, 1, 2),
+        "timestamp": DateTime(2000, 1, 2),
     }
 
 
 @pytest.mark.trio
 async def test_read_ok_timestamp_is_v1(alice, alice_backend_sock, vlobs):
-    rep = await vlob_read(alice_backend_sock, vlobs[0], timestamp=datetime(2000, 1, 2))
+    rep = await vlob_read(alice_backend_sock, vlobs[0], timestamp=DateTime(2000, 1, 2))
     assert rep == {
         "status": "ok",
         "blob": b"r:A b:1 v:1",
         "version": 1,
         "author": alice.device_id,
-        "timestamp": datetime(2000, 1, 2),
+        "timestamp": DateTime(2000, 1, 2),
     }
 
 
 @pytest.mark.trio
 async def test_read_before_v1(alice_backend_sock, vlobs):
-    rep = await vlob_read(alice_backend_sock, vlobs[0], timestamp=datetime(2000, 1, 1))
+    rep = await vlob_read(alice_backend_sock, vlobs[0], timestamp=DateTime(2000, 1, 1))
     assert rep == {"status": "bad_version"}
 
 
@@ -296,9 +296,9 @@ async def test_update_ok(alice_backend_sock, vlobs):
 @pytest.mark.trio
 async def test_update_bad_timestamp(alice, alice_backend_sock, vlobs):
     blob = b"Initial commit."
-    d1 = datetime(2000, 1, 1)
+    d1 = DateTime(2000, 1, 1)
     with freeze_time(d1):
-        d2 = d1.add(seconds=3600)
+        d2 = d1 + timedelta(seconds=3600)
         rep = await vlob_update(
             alice_backend_sock, vlobs[0], version=3, blob=blob, timestamp=d2, check_rep=False
         )
@@ -444,8 +444,8 @@ async def test_list_versions_ok(alice, alice_backend_sock, vlobs):
     assert rep == {
         "status": "ok",
         "versions": {
-            1: (datetime(2000, 1, 2, 00, 00, 00), alice.device_id),
-            2: (datetime(2000, 1, 3, 00, 00, 00), alice.device_id),
+            1: (DateTime(2000, 1, 2, 00, 00, 00), alice.device_id),
+            2: (DateTime(2000, 1, 3, 00, 00, 00), alice.device_id),
         },
     }
 
@@ -538,7 +538,7 @@ async def test_access_during_maintenance(backend, alice, alice_backend_sock, rea
         realm,
         2,
         {alice.user_id: b"whatever"},
-        datetime(2000, 1, 2),
+        DateTime(2000, 1, 2),
     )
 
     rep = await vlob_create(

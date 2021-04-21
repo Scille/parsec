@@ -4,7 +4,7 @@ from parsec.backend.backend_events import BackendEvent
 from parsec.event_bus import MetaEvent
 import pytest
 import trio
-from pendulum import datetime
+from parsec.datetime import DateTime
 from async_generator import asynccontextmanager
 
 from parsec.api.protocol import (
@@ -20,7 +20,7 @@ from tests.common import freeze_time
 
 @pytest.fixture
 async def mallory_invitation(backend, alice, mallory):
-    invitation = UserInvitation(mallory.user_id, alice.device_id, datetime(2000, 1, 2))
+    invitation = UserInvitation(mallory.user_id, alice.device_id, DateTime(2000, 1, 2))
     await backend.user.create_user_invitation(alice.organization_id, invitation)
     return invitation
 

@@ -4,7 +4,7 @@ import attr
 from typing import Tuple, Optional
 from hashlib import sha256
 from marshmallow import ValidationError
-from pendulum import DateTime, now as pendulum_now
+from parsec.datetime import DateTime, now as datetime_now
 
 from parsec.crypto import SecretKey, PrivateKey, SigningKey
 from parsec.serde import fields, post_load
@@ -162,7 +162,7 @@ class UserInfo:
 
     @property
     def is_revoked(self):
-        return pendulum_now() >= self.revoked_on if self.revoked_on else False
+        return datetime_now() >= self.revoked_on if self.revoked_on else False
 
     def __repr__(self):
         return f"<UserInfo {self.user_display}>"

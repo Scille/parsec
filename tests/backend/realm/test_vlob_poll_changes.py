@@ -2,7 +2,7 @@
 
 import pytest
 from uuid import UUID
-from pendulum import datetime, now as pendulum_now
+from parsec.datetime import DateTime, now as datetime_now
 
 from parsec.api.data import RealmRoleCertificateContent
 from parsec.api.protocol import RealmRole
@@ -10,7 +10,7 @@ from parsec.api.protocol import RealmRole
 from tests.backend.common import realm_update_roles, vlob_update, vlob_poll_changes
 
 
-NOW = datetime(2000, 1, 1)
+NOW = DateTime(2000, 1, 1)
 VLOB_ID = UUID("00000000000000000000000000000001")
 OTHER_VLOB_ID = UUID("00000000000000000000000000000002")
 YET_ANOTHER_VLOB_ID = UUID("00000000000000000000000000000003")
@@ -22,7 +22,7 @@ async def _realm_generate_certif_and_update_roles_or_fail(
 ):
     certif = RealmRoleCertificateContent(
         author=author.device_id,
-        timestamp=pendulum_now(),
+        timestamp=datetime_now(),
         realm_id=realm_id,
         user_id=user_id,
         role=role,
@@ -155,7 +155,7 @@ async def test_vlob_poll_changes_during_maintenance(backend, alice, alice_backen
         realm,
         2,
         {alice.user_id: b"whatever"},
-        datetime(2000, 1, 2),
+        DateTime(2000, 1, 2),
     )
 
     # It's ok to poll changes while the workspace is being reencrypted

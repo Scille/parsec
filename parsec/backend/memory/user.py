@@ -2,10 +2,10 @@
 
 from parsec.backend.backend_events import BackendEvent
 import attr
-import pendulum
 from typing import Tuple, List, Dict, Optional
 from collections import defaultdict
 
+from parsec.datetime import DateTime, now as datetime_now
 from parsec.api.protocol import OrganizationID, UserID, DeviceID, DeviceName, HumanHandle
 from parsec.backend.user import (
     BaseUserComponent,
@@ -233,7 +233,7 @@ class MemoryUserComponent(BaseUserComponent):
             results = users.keys()
 
         if omit_revoked:
-            now = pendulum.now()
+            now = datetime_now()
 
             def _user_is_revoked(user_id):
                 revoked_on = org.users[user_id].revoked_on
@@ -287,7 +287,7 @@ class MemoryUserComponent(BaseUserComponent):
             ),
             *[res for res in users if not res.human_handle],
         ]
-        now = pendulum.now()
+        now = datetime_now()
         results = [
             HumanFindResultItem(
                 user_id=user.user_id,
@@ -408,7 +408,7 @@ class MemoryUserComponent(BaseUserComponent):
         user_id: UserID,
         revoked_user_certificate: bytes,
         revoked_user_certifier: DeviceID,
-        revoked_on: Optional[pendulum.DateTime] = None,
+        revoked_on: Optional[DateTime] = None,
     ) -> None:
         org = self._organizations[organization_id]
 
@@ -422,7 +422,7 @@ class MemoryUserComponent(BaseUserComponent):
             raise UserAlreadyRevokedError()
 
         org.users[user_id] = user.evolve(
-            revoked_on=revoked_on or pendulum.now(),
+            revoked_on=revoked_on or datetime_now(),
             revoked_user_certificate=revoked_user_certificate,
             revoked_user_certifier=revoked_user_certifier,
         )

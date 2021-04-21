@@ -1,7 +1,7 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
 from typing import Optional
-from pendulum import now as pendulum_now
+from parsec.datetime import now as datetime_now
 
 from parsec.crypto import SigningKey
 from parsec.api.data import UserCertificateContent, DeviceCertificateContent, UserProfile
@@ -52,7 +52,7 @@ async def bootstrap_organization(
         device_label=device_label,
     )
 
-    now = pendulum_now()
+    now = datetime_now()
     user_certificate = UserCertificateContent(
         author=None,
         timestamp=now,

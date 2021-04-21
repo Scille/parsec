@@ -7,8 +7,8 @@ from contextlib import ExitStack, contextmanager
 
 import trio
 import attr
-import pendulum
 
+from parsec.datetime import from_isoformat, test_freeze_time
 from parsec.core.types import WorkspaceRole
 from parsec.core.logged_core import LoggedCore
 from parsec.core.fs import UserFS
@@ -27,8 +27,8 @@ def addr_with_device_subdomain(addr, device_id):
 @contextmanager
 def freeze_time(time):
     if isinstance(time, str):
-        time = pendulum.parse(time)
-    with pendulum.test(time):
+        time = from_isoformat(time)
+    with test_freeze_time(time):
         yield time
 
 

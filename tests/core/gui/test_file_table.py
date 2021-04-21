@@ -1,7 +1,7 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
 import pytest
-import pendulum
+from parsec.datetime import DateTime
 import uuid
 
 from PyQt5 import QtCore
@@ -61,20 +61,14 @@ def test_file_table_sort(qtbot, core_config):
     w.add_parent_workspace()
     w.add_folder("Dir1", uuid.uuid4(), True, False)
     w.add_file(
-        "File1.txt",
-        uuid.uuid4(),
-        100,
-        pendulum.datetime(2000, 1, 15),
-        pendulum.datetime(2000, 1, 20),
-        True,
-        False,
+        "File1.txt", uuid.uuid4(), 100, DateTime(2000, 1, 15), DateTime(2000, 1, 20), True, False
     )
     w.add_file(
         "AnotherFile.txt",
         uuid.uuid4(),
         80,
-        pendulum.datetime(2000, 1, 10),
-        pendulum.datetime(2000, 1, 25),
+        DateTime(2000, 1, 10),
+        DateTime(2000, 1, 25),
         True,
         False,
     )

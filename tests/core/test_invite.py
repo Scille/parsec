@@ -3,7 +3,7 @@
 import pytest
 import trio
 
-from pendulum import now as pendulum_now
+from parsec.datetime import now as datetime_now
 from parsec.api.data import UserProfile
 from parsec.api.protocol import HumanHandle, InvitationType, InvitationDeletedReason
 
@@ -401,7 +401,7 @@ async def test_claimer_handle_cancel_event(
             organization_id=alice.organization_id,
             greeter=alice.user_id,
             token=invitation_addr.token,
-            on=pendulum_now(),
+            on=datetime_now(),
             reason=InvitationDeletedReason.CANCELLED,
         )
 
@@ -508,7 +508,7 @@ async def test_claimer_handle_command_failure(
             organization_id=alice.organization_id,
             greeter=alice.user_id,
             token=invitation_addr.token,
-            on=pendulum_now(),
+            on=datetime_now(),
             reason=InvitationDeletedReason.CANCELLED,
         )
 

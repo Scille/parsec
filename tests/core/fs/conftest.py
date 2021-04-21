@@ -2,7 +2,7 @@
 
 import pytest
 from pathlib import Path
-from pendulum import datetime
+from parsec.datetime import DateTime
 
 from hypothesis_trio.stateful import run_state_machine_as_test, TrioAsyncioRuleBasedStateMachine
 
@@ -28,7 +28,7 @@ def transactions_factory(event_bus, remote_devices_manager_factory):
 
         workspace_entry = WorkspaceEntry.new("test")
         workspace_manifest = LocalWorkspaceManifest.new_placeholder(
-            device.device_id, id=workspace_entry.id, now=datetime(2000, 1, 1)
+            device.device_id, id=workspace_entry.id, now=DateTime(2000, 1, 1)
         )
         async with local_storage.lock_entry_id(workspace_entry.id):
             await local_storage.set_manifest(workspace_entry.id, workspace_manifest)

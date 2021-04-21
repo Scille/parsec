@@ -4,7 +4,7 @@ import attr
 import trio
 from collections import defaultdict
 from typing import List, Dict, Tuple, AsyncIterator, cast, Pattern, Callable, Optional, Awaitable
-from pendulum import DateTime, now as pendulum_now
+from parsec.datetime import DateTime, now as datetime_now
 
 from parsec.event_bus import EventBus
 from parsec.api.data import BaseManifest as BaseRemoteManifest
@@ -604,7 +604,7 @@ class WorkspaceFS:
                 await self._upload_blocks(cast(RemoteFileManifest, new_remote_manifest))
 
             # Restamp the remote manifest
-            new_remote_manifest = new_remote_manifest.evolve(timestamp=pendulum_now())
+            new_remote_manifest = new_remote_manifest.evolve(timestamp=datetime_now())
 
             # Upload the new manifest containing the latest changes
             try:

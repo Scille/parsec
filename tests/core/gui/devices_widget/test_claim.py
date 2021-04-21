@@ -2,7 +2,7 @@
 
 import pytest
 import trio
-from pendulum import now as pendulum_now
+from parsec.datetime import now as datetime_now
 from PyQt5 import QtCore
 from async_generator import asynccontextmanager
 from functools import partial
@@ -467,7 +467,7 @@ async def test_claim_device_invitation_cancelled(
                 organization_id=self.author.organization_id,
                 greeter=self.author.user_id,
                 token=self.invitation_addr.token,
-                on=pendulum_now(),
+                on=datetime_now(),
                 reason=InvitationDeletedReason.CANCELLED,
             )
 
@@ -564,7 +564,7 @@ async def test_claim_device_already_deleted(
         organization_id=alice.organization_id,
         greeter=alice.user_id,
         token=invitation_addr.token,
-        on=pendulum_now(),
+        on=datetime_now(),
         reason=InvitationDeletedReason.CANCELLED,
     )
 

@@ -6,7 +6,7 @@ from typing import Dict, Tuple, Set, Optional, Union, AsyncIterator, NoReturn, P
 
 import trio
 from trio import lowlevel
-from pendulum import DateTime
+from parsec.datetime import DateTime
 from structlog import get_logger
 from async_generator import asynccontextmanager
 

@@ -2,7 +2,7 @@
 
 import pytest
 from uuid import UUID
-from pendulum import datetime
+from parsec.datetime import DateTime
 
 from parsec.api.protocol import RealmRole, APIEvent
 from parsec.backend.realm import RealmGrantedRole
@@ -11,7 +11,7 @@ from parsec.backend.backend_events import BackendEvent
 from tests.backend.common import events_subscribe, events_listen_nowait
 
 
-NOW = datetime(2000, 1, 1)
+NOW = DateTime(2000, 1, 1)
 VLOB_ID = UUID("00000000000000000000000000000001")
 OTHER_VLOB_ID = UUID("00000000000000000000000000000002")
 YET_ANOTHER_VLOB_ID = UUID("00000000000000000000000000000003")
@@ -250,7 +250,7 @@ async def test_vlobs_updated_event_realm_created_after_subscribe(
                 certificate=b"<dummy>",
                 role=RealmRole.OWNER,
                 granted_by=realm_creator.device_id,
-                granted_on=datetime(2000, 1, 2),
+                granted_on=DateTime(2000, 1, 2),
             ),
         )
         # Create vlob in realm

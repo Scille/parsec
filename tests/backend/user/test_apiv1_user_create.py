@@ -2,7 +2,7 @@
 
 from parsec.backend.backend_events import BackendEvent
 import pytest
-import pendulum
+from parsec.datetime import DateTime, now as datetime_now, timedelta
 
 from parsec.backend.user import INVITATION_VALIDITY, User, Device
 from parsec.api.data import UserCertificateContent, DeviceCertificateContent, UserProfile
@@ -22,7 +22,7 @@ async def user_create(sock, **kwargs):
 @pytest.mark.trio
 @pytest.mark.parametrize("profile", UserProfile)
 async def test_user_create_ok(backend, apiv1_backend_sock_factory, alice, mallory, profile):
-    now = pendulum.now()
+    now = datetime_now()
     user_certificate = UserCertificateContent(
         author=alice.device_id,
         timestamp=now,
@@ -90,7 +90,7 @@ async def test_user_create_ok(backend, apiv1_backend_sock_factory, alice, mallor
 async def test_user_create_invalid_certificate(
     backend, apiv1_backend_sock_factory, alice, bob, mallory
 ):
-    now = pendulum.now()
+    now = datetime_now()
     good_user_certificate = UserCertificateContent(
         author=alice.device_id,
         timestamp=now,
@@ -139,7 +139,7 @@ async def test_user_create_invalid_certificate(
 async def test_user_create_not_matching_user_device(
     backend, apiv1_backend_sock_factory, alice, bob, mallory
 ):
-    now = pendulum.now()
+    now = datetime_now()
     user_certificate = UserCertificateContent(
         author=alice.device_id,
         timestamp=now,
@@ -168,7 +168,7 @@ async def test_user_create_not_matching_user_device(
 
 @pytest.mark.trio
 async def test_user_create_already_exists(backend, apiv1_backend_sock_factory, alice, bob):
-    now = pendulum.now()
+    now = datetime_now()
     user_certificate = UserCertificateContent(
         author=alice.device_id,
         timestamp=now,
@@ -196,7 +196,7 @@ async def test_user_create_already_exists(backend, apiv1_backend_sock_factory, a
 async def test_user_create_human_handle_not_allowed(
     backend, apiv1_backend_sock_factory, alice, mallory
 ):
-    now = pendulum.now()
+    now = datetime_now()
     user_certificate = UserCertificateContent(
         author=alice.device_id,
         timestamp=now,
@@ -227,7 +227,7 @@ async def test_user_create_human_handle_not_allowed(
 async def test_user_create_device_label_not_allowed(
     backend, apiv1_backend_sock_factory, alice, mallory
 ):
-    now = pendulum.now()
+    now = datetime_now()
     user_certificate = UserCertificateContent(
         author=alice.device_id,
         timestamp=now,
@@ -258,8 +258,8 @@ async def test_user_create_device_label_not_allowed(
 async def test_user_create_not_matching_certified_on(
     backend, apiv1_backend_sock_factory, alice, mallory
 ):
-    date1 = pendulum.datetime(2000, 1, 1)
-    date2 = date1.add(seconds=1)
+    date1 = DateTime(2000, 1, 1)
+    date2 = date1 + timedelta(seconds=1)
     cu = UserCertificateContent(
         author=alice.device_id,
         timestamp=date1,
@@ -286,8 +286,8 @@ async def test_user_create_not_matching_certified_on(
 
 @pytest.mark.trio
 async def test_user_create_certify_too_old(backend, apiv1_backend_sock_factory, alice, mallory):
-    too_old = pendulum.datetime(2000, 1, 1)
-    now = too_old.add(seconds=INVITATION_VALIDITY + 1)
+    too_old = DateTime(2000, 1, 1)
+    now = too_old + timedelta(seconds=INVITATION_VALIDITY + 1)
     cu = UserCertificateContent(
         author=alice.device_id,
         timestamp=too_old,
@@ -316,7 +316,7 @@ async def test_user_create_certify_too_old(backend, apiv1_backend_sock_factory, 
 @pytest.mark.trio
 async def test_user_create_author_not_admin(backend, apiv1_backend_sock_factory, bob, mallory):
     # Unlike alice, bob is not admin
-    now = pendulum.now()
+    now = datetime_now()
     user_certificate = UserCertificateContent(
         author=bob.device_id,
         timestamp=now,

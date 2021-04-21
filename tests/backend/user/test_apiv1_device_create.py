@@ -2,7 +2,7 @@
 
 from parsec.backend.backend_events import BackendEvent
 import pytest
-import pendulum
+from parsec.datetime import DateTime, now as datetime_now, timedelta
 
 from parsec.api.data import DeviceCertificateContent, UserProfile
 from parsec.api.protocol import apiv1_device_create_serializer
@@ -31,7 +31,7 @@ def alice_nd(local_device_factory, alice):
 async def test_device_create_ok(
     backend, apiv1_backend_sock_factory, apiv1_alice_backend_sock, alice, alice_nd
 ):
-    now = pendulum.now()
+    now = datetime_now()
     device_certificate = DeviceCertificateContent(
         author=alice.device_id,
         timestamp=now,
@@ -80,7 +80,7 @@ async def test_device_create_ok(
 
 @pytest.mark.trio
 async def test_device_create_invalid_certified(apiv1_alice_backend_sock, alice, bob, alice_nd):
-    now = pendulum.now()
+    now = datetime_now()
     device_certificate = DeviceCertificateContent(
         author=bob.device_id,
         timestamp=now,
@@ -100,7 +100,7 @@ async def test_device_create_invalid_certified(apiv1_alice_backend_sock, alice, 
 
 @pytest.mark.trio
 async def test_device_create_already_exists(apiv1_alice_backend_sock, alice, alice2):
-    now = pendulum.now()
+    now = datetime_now()
     device_certificate = DeviceCertificateContent(
         author=alice.device_id,
         timestamp=now,
@@ -120,7 +120,7 @@ async def test_device_create_already_exists(apiv1_alice_backend_sock, alice, ali
 
 @pytest.mark.trio
 async def test_device_create_not_own_user(apiv1_bob_backend_sock, bob, alice_nd):
-    now = pendulum.now()
+    now = datetime_now()
     device_certificate = DeviceCertificateContent(
         author=bob.device_id,
         timestamp=now,
@@ -137,7 +137,7 @@ async def test_device_create_not_own_user(apiv1_bob_backend_sock, bob, alice_nd)
 
 @pytest.mark.trio
 async def test_device_create_certify_too_old(apiv1_alice_backend_sock, alice, alice_nd):
-    now = pendulum.datetime(2000, 1, 1)
+    now = DateTime(2000, 1, 1)
     device_certificate = DeviceCertificateContent(
         author=alice.device_id,
         timestamp=now,
@@ -146,7 +146,7 @@ async def test_device_create_certify_too_old(apiv1_alice_backend_sock, alice, al
         verify_key=alice_nd.verify_key,
     ).dump_and_sign(alice.signing_key)
 
-    with freeze_time(now.add(seconds=INVITATION_VALIDITY + 1)):
+    with freeze_time(now + timedelta(seconds=INVITATION_VALIDITY + 1)):
         rep = await device_create(
             apiv1_alice_backend_sock,
             device_certificate=device_certificate,
@@ -162,7 +162,7 @@ async def test_device_create_certify_too_old(apiv1_alice_backend_sock, alice, al
 async def test_device_create_certificate_with_device_label_not_allowed(
     apiv1_alice_backend_sock, alice, alice_nd
 ):
-    now = pendulum.now()
+    now = datetime_now()
     device_certificate = DeviceCertificateContent(
         author=alice.device_id,
         timestamp=now,

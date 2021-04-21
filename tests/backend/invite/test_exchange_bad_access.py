@@ -3,7 +3,7 @@
 import pytest
 import trio
 from uuid import uuid4
-from pendulum import datetime
+from parsec.datetime import DateTime
 from functools import partial
 
 from parsec.crypto import PrivateKey
@@ -39,7 +39,7 @@ async def test_greeter_exchange_bad_access(alice, backend, alice_backend_sock, t
             organization_id=alice.organization_id,
             greeter=alice.user_id,
             token=invitation.token,
-            on=datetime(2000, 1, 2),
+            on=DateTime(2000, 1, 2),
             reason=InvitationDeletedReason.ROTTEN,
         )
         token = invitation.token
@@ -100,7 +100,7 @@ async def test_invited_connection_closed_on_invitation_deletion(
             organization_id=alice.organization_id,
             greeter=alice.user_id,
             token=invitation.token,
-            on=datetime(2000, 1, 2),
+            on=DateTime(2000, 1, 2),
             reason=InvitationDeletedReason.ROTTEN,
         )
         with pytest.raises(TransportError):
@@ -169,7 +169,7 @@ async def test_claimer_exchange_bad_access(alice, backend, backend_invited_sock_
             organization_id=alice.organization_id,
             greeter=alice.user_id,
             token=invitation.token,
-            on=datetime(2000, 1, 2),
+            on=DateTime(2000, 1, 2),
             reason=InvitationDeletedReason.ROTTEN,
         )
         with pytest.raises(TransportError):

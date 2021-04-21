@@ -7,7 +7,7 @@ from string import ascii_lowercase
 from contextlib import contextmanager
 import attr
 import pytest
-from pendulum import datetime
+from parsec.datetime import DateTime
 from hypothesis_trio.stateful import (
     TrioAsyncioRuleBasedStateMachine,
     initialize,
@@ -34,8 +34,8 @@ async def test_root_entry_info(alice_entry_transactions):
         "base_version": 0,
         "is_placeholder": True,
         "need_sync": True,
-        "created": datetime(2000, 1, 1),
-        "updated": datetime(2000, 1, 1),
+        "created": DateTime(2000, 1, 1),
+        "updated": DateTime(2000, 1, 1),
         "children": [],
         "confinement_point": None,
     }
@@ -58,8 +58,8 @@ async def test_file_create(alice_entry_transactions, alice_file_transactions, al
         "base_version": 0,
         "is_placeholder": True,
         "need_sync": True,
-        "created": datetime(2000, 1, 1),
-        "updated": datetime(2000, 1, 2),
+        "created": DateTime(2000, 1, 1),
+        "updated": DateTime(2000, 1, 2),
         "children": ["foo.txt"],
         "confinement_point": None,
     }
@@ -71,8 +71,8 @@ async def test_file_create(alice_entry_transactions, alice_file_transactions, al
         "base_version": 0,
         "is_placeholder": True,
         "need_sync": True,
-        "created": datetime(2000, 1, 2),
-        "updated": datetime(2000, 1, 2),
+        "created": DateTime(2000, 1, 2),
+        "updated": DateTime(2000, 1, 2),
         "size": 0,
         "confinement_point": None,
     }
@@ -192,8 +192,8 @@ async def test_access_not_loaded_entry(alice, bob, alice_entry_transactions):
     assert entry_info == {
         "type": "folder",
         "id": entry_id,
-        "created": datetime(2000, 1, 1),
-        "updated": datetime(2000, 1, 1),
+        "created": DateTime(2000, 1, 1),
+        "updated": DateTime(2000, 1, 1),
         "base_version": 0,
         "is_placeholder": True,
         "need_sync": True,

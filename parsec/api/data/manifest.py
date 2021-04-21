@@ -2,7 +2,7 @@
 
 import attr
 from typing import Optional, Tuple, Dict, Any, Type, TypeVar
-from pendulum import DateTime, now as pendulum_now
+from parsec.datetime import DateTime, now as datetime_now
 
 from parsec.types import UUID4, FrozenDict
 from parsec.crypto import SecretKey, HashDigest
@@ -85,7 +85,7 @@ class WorkspaceEntry(BaseData):
 
     @classmethod
     def new(cls: Type[WorkspaceEntryTypeVar], name: str) -> "WorkspaceEntry":
-        now = pendulum_now()
+        now = datetime_now()
         return WorkspaceEntry(
             name=EntryName(name),
             id=EntryID.new(),

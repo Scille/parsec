@@ -3,7 +3,7 @@
 import attr
 import functools
 from typing import Optional, Tuple, TypeVar, Type, Union, NoReturn, FrozenSet, Pattern, Dict
-from pendulum import DateTime, now as pendulum_now
+from parsec.datetime import DateTime, now as datetime_now
 
 from parsec.types import UUID4, FrozenDict
 from parsec.crypto import SecretKey, HashDigest
@@ -258,7 +258,7 @@ class BaseLocalManifest(BaseLocalData):
 
     def evolve_and_mark_updated(self: LocalManifestTypeVar, **data) -> LocalManifestTypeVar:
         if "updated" not in data:
-            data["updated"] = pendulum_now()
+            data["updated"] = datetime_now()
         data.setdefault("need_sync", True)
         return self.evolve(**data)
 
@@ -366,7 +366,7 @@ class LocalFileManifest(BaseLocalManifest):
         now: DateTime = None,
         blocksize=DEFAULT_BLOCK_SIZE,
     ) -> "LocalFileManifest":
-        now = now or pendulum_now()
+        now = now or datetime_now()
         blocks = ()
         return cls(
             base=RemoteFileManifest(
@@ -456,7 +456,7 @@ class LocalFileManifest(BaseLocalManifest):
 
         return RemoteFileManifest(
             author=author,
-            timestamp=timestamp or pendulum_now(),
+            timestamp=timestamp or datetime_now(),
             id=self.id,
             parent=self.parent,
             version=self.base_version + 1,
@@ -638,7 +638,7 @@ class LocalFolderManifest(BaseLocalManifest, LocalFolderishManifestMixin):
     def new_placeholder(
         cls, author: DeviceID, parent: EntryID, id: EntryID = None, now: DateTime = None
     ) -> "LocalFolderManifest":
-        now = now or pendulum_now()
+        now = now or datetime_now()
         children = FrozenDict()
         return cls(
             base=RemoteFolderManifest(
@@ -706,7 +706,7 @@ class LocalFolderManifest(BaseLocalManifest, LocalFolderishManifestMixin):
         # Create remote manifest
         return RemoteFolderManifest(
             author=author,
-            timestamp=timestamp or pendulum_now(),
+            timestamp=timestamp or datetime_now(),
             id=self.id,
             parent=self.parent,
             version=self.base_version + 1,
@@ -751,7 +751,7 @@ class LocalWorkspaceManifest(BaseLocalManifest, LocalFolderishManifestMixin):
     def new_placeholder(
         cls, author: DeviceID, id: EntryID = None, now: DateTime = None
     ) -> "LocalWorkspaceManifest":
-        now = now or pendulum_now()
+        now = now or datetime_now()
         children = FrozenDict()
         return cls(
             base=RemoteWorkspaceManifest(
@@ -814,7 +814,7 @@ class LocalWorkspaceManifest(BaseLocalManifest, LocalFolderishManifestMixin):
         # Create remote manifest
         return RemoteWorkspaceManifest(
             author=author,
-            timestamp=timestamp or pendulum_now(),
+            timestamp=timestamp or datetime_now(),
             id=self.id,
             version=self.base_version + 1,
             created=self.created,
@@ -848,7 +848,7 @@ class LocalUserManifest(BaseLocalManifest):
         cls, author: DeviceID, id: EntryID = None, now: DateTime = None
     ) -> "LocalUserManifest":
         workspaces = ()
-        now = now or pendulum_now()
+        now = now or datetime_now()
         return cls(
             base=RemoteUserManifest(
                 author=author,
@@ -896,7 +896,7 @@ class LocalUserManifest(BaseLocalManifest):
     def to_remote(self, author: DeviceID, timestamp: DateTime = None) -> RemoteUserManifest:
         return RemoteUserManifest(
             author=author,
-            timestamp=timestamp or pendulum_now(),
+            timestamp=timestamp or datetime_now(),
             id=self.id,
             version=self.base_version + 1,
             created=self.created,

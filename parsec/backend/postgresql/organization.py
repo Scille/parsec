@@ -2,7 +2,7 @@
 
 from typing import Optional
 
-from pendulum import DateTime
+from parsec.datetime import DateTime, now as datetime_now
 from triopg import UniqueViolationError
 
 from parsec.api.protocol import OrganizationID
@@ -199,5 +199,5 @@ class PGOrganizationComponent(BaseOrganizationComponent):
             if result != "UPDATE 1":
                 raise OrganizationError(f"Update error: {result}")
 
-            if expiration_date is not None and expiration_date <= DateTime.now():
+            if expiration_date is not None and expiration_date <= datetime_now():
                 await send_signal(conn, BackendEvent.ORGANIZATION_EXPIRED, organization_id=id)

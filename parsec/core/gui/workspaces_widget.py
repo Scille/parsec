@@ -2,14 +2,11 @@
 
 from parsec.core.core_events import CoreEvent
 from uuid import UUID
-
+from contextlib import contextmanager
 from PyQt5.QtCore import pyqtSignal, QTimer, Qt
 from PyQt5.QtWidgets import QWidget, QLabel
 
-import pendulum
-
-from contextlib import contextmanager
-
+from parsec.datetime import DateTime, from_timestamp, from_localtime
 from parsec.core.types import (
     WorkspaceEntry,
     UserInfo,
@@ -107,7 +104,7 @@ async def _do_workspace_list(core):
                 # so we have to set it with a dummy value :'(
                 # However it's more a hack than an issue given this field is
                 # not used here.
-                created_on=pendulum.from_timestamp(0),
+                created_on=from_timestamp(0),
             )
             users_roles[user_info.user_id] = (ws_entry.role, user_info)
 
@@ -146,14 +143,14 @@ async def _do_workspace_list(core):
     return workspaces
 
 
-async def _do_workspace_mount(core, workspace_id, timestamp: pendulum.DateTime = None):
+async def _do_workspace_mount(core, workspace_id, timestamp: DateTime = None):
     try:
         await core.mountpoint_manager.mount_workspace(workspace_id, timestamp)
     except MountpointAlreadyMounted:
         pass
 
 
-async def _do_workspace_unmount(core, workspace_id, timestamp: pendulum.DateTime = None):
+async def _do_workspace_unmount(core, workspace_id, timestamp: DateTime = None):
     try:
         await core.mountpoint_manager.unmount_workspace(workspace_id, timestamp)
     except MountpointNotMounted:
@@ -539,8 +536,13 @@ class WorkspacesWidget(QWidget, Ui_WorkspacesWidget):
             if not date or not time:
                 return
 
-            datetime = pendulum.local(
-                date.year(), date.month(), date.day(), time.hour(), time.minute(), time.second()
+            datetime = from_localtime(
+                year=date.year(),
+                month=date.month(),
+                day=date.day(),
+                hour=time.hour(),
+                minute=time.minute(),
+                second=time.second(),
             )
             self.mount_workspace(workspace_fs.workspace_id, datetime)
 

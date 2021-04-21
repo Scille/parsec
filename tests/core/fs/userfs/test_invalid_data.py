@@ -1,7 +1,7 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
 import pytest
-from pendulum import datetime
+from parsec.datetime import DateTime
 
 from parsec.core.fs import FSError
 
@@ -16,8 +16,8 @@ def testbed(running_backend, alice_user_fs, alice):
                 "blob": None,
                 "signed_author": alice.device_id,
                 "backend_author": alice.device_id,
-                "signed_timestamp": datetime(2000, 1, 2),
-                "backend_timestamp": datetime(2000, 1, 2),
+                "signed_timestamp": DateTime(2000, 1, 2),
+                "backend_timestamp": DateTime(2000, 1, 2),
                 "author_signkey": alice.signing_key,
                 "user_manifest_key": alice.user_manifest_key,
             }
@@ -81,13 +81,13 @@ async def test_invalid_author(testbed, alice2):
 
 @pytest.mark.trio
 async def test_invalid_timestamp(testbed, alice, alice2):
-    bad_timestamp = datetime(2000, 1, 3)
+    bad_timestamp = DateTime(2000, 1, 3)
     # Invalid timestamp field in manifest
     with pytest.raises(FSError) as exc:
         await testbed.run(signed_timestamp=bad_timestamp)
     assert (
         str(exc.value)
-        == "Invalid user manifest: Invalid timestamp: expected `2000-01-02T00:00:00+00:00`, got `2000-01-03T00:00:00+00:00`"
+        == "Invalid user manifest: Invalid timestamp: expected `2000-01-02T00:00:00Z`, got `2000-01-03T00:00:00Z`"
     )
 
     # Invalid expected timestamp stored in backend
@@ -95,7 +95,7 @@ async def test_invalid_timestamp(testbed, alice, alice2):
         await testbed.run(backend_timestamp=bad_timestamp)
     assert (
         str(exc.value)
-        == "Invalid user manifest: Invalid timestamp: expected `2000-01-03T00:00:00+00:00`, got `2000-01-02T00:00:00+00:00`"
+        == "Invalid user manifest: Invalid timestamp: expected `2000-01-03T00:00:00Z`, got `2000-01-02T00:00:00Z`"
     )
 
 

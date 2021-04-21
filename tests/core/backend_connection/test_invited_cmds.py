@@ -96,7 +96,7 @@ async def test_handshake_unknown_organization(running_backend, coolorg):
 
 
 from parsec.api.protocol import InvitationDeletedReason
-from pendulum import now as pendulum_now
+from parsec.datetime import now as datetime_now
 
 
 @pytest.mark.trio
@@ -105,7 +105,7 @@ async def test_handshake_already_used_invitation(running_backend, coolorg, invit
         organization_id=alice.organization_id,
         greeter=alice.user_id,
         token=invitation_addr.token,
-        on=pendulum_now(),
+        on=datetime_now(),
         reason=InvitationDeletedReason.CANCELLED,
     )
 

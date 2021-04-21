@@ -3,7 +3,7 @@
 from parsec.backend.backend_events import BackendEvent
 import pytest
 import trio
-from pendulum import datetime
+from parsec.datetime import DateTime
 
 from parsec.crypto import PrivateKey
 from parsec.api.protocol import InvitationType
@@ -29,7 +29,7 @@ async def invitation(backend, alice):
     invitation = await backend.invite.new_for_device(
         organization_id=alice.organization_id,
         greeter_user_id=alice.user_id,
-        created_on=datetime(2000, 1, 2),
+        created_on=DateTime(2000, 1, 2),
     )
     return invitation
 

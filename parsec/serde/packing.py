@@ -1,7 +1,7 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
 from uuid import UUID
-from pendulum import from_timestamp
+from parsec.datetime import DateTime, from_timestamp
 from datetime import datetime
 from struct import pack as struct_pack, unpack as struct_unpack
 from msgpack import (
@@ -25,9 +25,9 @@ def packb(data: dict, exc_cls=SerdePackingError) -> bytes:
     """
 
     def _default(obj):
-        # TODO: we should be only testing against pendulum.DateTime, but
+        # TODO: we should be only testing against DateTime, but
         # asyncpg returns datetime
-        if isinstance(obj, datetime):
+        if isinstance(obj, (DateTime, datetime)):
             return ExtType(1, struct_pack("!d", obj.timestamp()))
         elif isinstance(obj, UUID):
             return ExtType(2, obj.bytes)

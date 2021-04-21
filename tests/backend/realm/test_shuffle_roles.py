@@ -13,7 +13,7 @@ from hypothesis_trio.stateful import (
     multiple,
 )
 from unittest.mock import ANY
-from pendulum import now as pendulum_now
+from parsec.datetime import now as datetime_now
 
 from parsec.api.data import RealmRoleCertificateContent
 from parsec.api.protocol import RealmRole
@@ -107,7 +107,7 @@ def test_shuffle_roles(
 
             certif = RealmRoleCertificateContent(
                 author=author.device_id,
-                timestamp=pendulum_now(),
+                timestamp=datetime_now(),
                 realm_id=self.realm_id,
                 user_id=recipient.user_id,
                 role=role,

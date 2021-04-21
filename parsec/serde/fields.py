@@ -1,9 +1,9 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-from pendulum import DateTime as PendulumDateTime
 from uuid import UUID as _UUID
 from enum import Enum
 from collections import Mapping
+from datetime import datetime
 from marshmallow import ValidationError
 from marshmallow.fields import (
     # Republishing
@@ -19,6 +19,7 @@ from marshmallow.fields import (
 )
 
 from parsec.types import FrozenDict as _FrozenDict
+from parsec.datetime import DateTime as _DateTime
 from parsec.crypto import (
     SecretKey as _SecretKey,
     HashDigest as _HashDigest,
@@ -179,7 +180,7 @@ class DateTime(Field):
     """DateTime already handled by pack/unpack"""
 
     def _deserialize(self, value, attr, data):
-        if not isinstance(value, PendulumDateTime):
+        if not isinstance(value, (_DateTime, datetime)) or not value.tzinfo:
             raise ValidationError("Not a datetime")
 
         return value

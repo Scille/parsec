@@ -3,7 +3,7 @@
 from contextlib import contextmanager
 from typing import Dict, Optional, List, Tuple, cast, Iterator, Callable, Awaitable
 
-from pendulum import DateTime, now as pendulum_now
+from parsec.datetime import DateTime, now as datetime_now
 
 from parsec.utils import timestamps_in_the_ballpark
 from parsec.crypto import HashDigest, CryptoError
@@ -108,7 +108,7 @@ class UserRemoteLoader:
             or self._realm_role_certificates_cache_timestamp is None
             or self._realm_role_certificates_cache_timestamp <= timestamp
         ):
-            cache_timestamp = pendulum_now()
+            cache_timestamp = datetime_now()
             self._realm_role_certificates_cache, _ = await self._load_realm_role_certificates()
             # Set the cache timestamp in two times to avoid invalid value in case of exception
             self._realm_role_certificates_cache_timestamp = cache_timestamp
@@ -281,7 +281,7 @@ class UserRemoteLoader:
             FSBackendOfflineError
         """
         certif = RealmRoleCertificateContent.build_realm_root_certif(
-            author=self.device.device_id, timestamp=pendulum_now(), realm_id=realm_id
+            author=self.device.device_id, timestamp=datetime_now(), realm_id=realm_id
         ).dump_and_sign(self.device.signing_key)
 
         with translate_backend_cmds_errors():
@@ -548,7 +548,7 @@ class RemoteLoader(UserRemoteLoader):
             FSBadEncryptionRevision
         """
         assert manifest.author == self.device.device_id
-        assert timestamps_in_the_ballpark(manifest.timestamp, pendulum_now())
+        assert timestamps_in_the_ballpark(manifest.timestamp, datetime_now())
 
         workspace_entry = self.get_workspace_entry()
 

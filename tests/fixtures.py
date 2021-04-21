@@ -3,12 +3,11 @@
 import attr
 import re
 import pytest
-import pendulum
 from collections import defaultdict
 from typing import Union, Optional, Tuple
 from async_generator import asynccontextmanager
-from pendulum import datetime
 
+from parsec.datetime import DateTime, now as datetime_now
 from parsec.crypto import SigningKey
 from parsec.api.data import (
     UserProfile,
@@ -185,7 +184,7 @@ def otherorg(organization_factory):
 
 @pytest.fixture
 def expiredorg(organization_factory):
-    expired_org = organization_factory("ExpiredOrg", pendulum.datetime(2010, 1, 1))
+    expired_org = organization_factory("ExpiredOrg", DateTime(2010, 1, 1))
     return expired_org
 
 
@@ -288,7 +287,7 @@ class InitialUserManifestState:
             return self._v1[(device.organization_id, device.user_id)]
 
         except KeyError:
-            now = pendulum.now()
+            now = datetime_now()
 
             remote_user_manifest = UserManifest(
                 author=device.device_id,
@@ -357,7 +356,7 @@ def local_device_to_backend_user(
         certifier_id = certifier.device_id
         certifier_signing_key = certifier.signing_key
 
-    now = pendulum.now()
+    now = datetime_now()
 
     user_certificate = UserCertificateContent(
         author=certifier_id,
@@ -553,7 +552,7 @@ def backend_data_binder_factory(request, backend_addr, initial_user_manifest_sta
             org: OrganizationFullData,
             first_device: LocalDevice = None,
             initial_user_manifest_in_v0: bool = False,
-            expiration_date: datetime = None,
+            expiration_date: DateTime = None,
         ):
             bootstrap_token = f"<{org.organization_id}-bootstrap-token>"
             await self.backend.organization.create(
@@ -639,7 +638,7 @@ def backend_data_binder_factory(request, backend_addr, initial_user_manifest_sta
 
         async def bind_revocation(self, user_id: UserID, certifier: LocalDevice):
             revoked_user_certificate = RevokedUserCertificateContent(
-                author=certifier.device_id, timestamp=pendulum.now(), user_id=user_id
+                author=certifier.device_id, timestamp=datetime_now(), user_id=user_id
             ).dump_and_sign(certifier.signing_key)
             await self.backend.user.revoke_user(
                 certifier.organization_id, user_id, revoked_user_certificate, certifier.device_id

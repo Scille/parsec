@@ -5,7 +5,7 @@ import os
 import trio
 import logging
 from pathlib import PurePath
-from pendulum import DateTime
+from parsec.datetime import DateTime
 from structlog import get_logger
 from typing import Sequence, Optional
 from importlib import __import__ as import_function

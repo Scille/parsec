@@ -1,8 +1,8 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
 import pytest
-import pendulum
 
+from parsec.datetime import DateTime, now as datetime_now, timedelta
 from parsec.backend.user import INVITATION_VALIDITY, User, Device
 from parsec.api.data import UserCertificateContent, DeviceCertificateContent, UserProfile
 from parsec.api.protocol import DeviceID
@@ -18,7 +18,7 @@ from tests.backend.common import user_get, user_create
 async def test_user_create_ok(
     backend, backend_sock_factory, alice_backend_sock, alice, mallory, profile, with_labels
 ):
-    now = pendulum.now()
+    now = datetime_now()
     user_certificate = UserCertificateContent(
         author=alice.device_id,
         timestamp=now,
@@ -84,7 +84,7 @@ async def test_user_create_ok(
 
 @pytest.mark.trio
 async def test_user_create_invalid_certificate(alice_backend_sock, alice, bob, mallory):
-    now = pendulum.now()
+    now = datetime_now()
     good_user_certificate = UserCertificateContent(
         author=alice.device_id,
         timestamp=now,
@@ -154,7 +154,7 @@ async def test_user_create_invalid_certificate(alice_backend_sock, alice, bob, m
 
 @pytest.mark.trio
 async def test_user_create_not_matching_user_device(alice_backend_sock, alice, bob, mallory):
-    now = pendulum.now()
+    now = datetime_now()
     user_certificate = UserCertificateContent(
         author=alice.device_id,
         timestamp=now,
@@ -186,7 +186,7 @@ async def test_user_create_not_matching_user_device(alice_backend_sock, alice, b
 
 @pytest.mark.trio
 async def test_user_create_bad_redacted_device_certificate(alice_backend_sock, alice, mallory):
-    now = pendulum.now()
+    now = datetime_now()
     user_certificate = UserCertificateContent(
         author=alice.device_id,
         timestamp=now,
@@ -205,7 +205,7 @@ async def test_user_create_bad_redacted_device_certificate(alice_backend_sock, a
     good_redacted_device_certificate = device_certificate.evolve(device_label=None)
     device_certificate = device_certificate.dump_and_sign(alice.signing_key)
     for bad_redacted_device_certificate in (
-        good_redacted_device_certificate.evolve(timestamp=now.add(seconds=1)),
+        good_redacted_device_certificate.evolve(timestamp=now + timedelta(seconds=1)),
         good_redacted_device_certificate.evolve(device_id=alice.device_id),
         good_redacted_device_certificate.evolve(verify_key=alice.verify_key),
     ):
@@ -252,7 +252,7 @@ async def test_user_create_bad_redacted_device_certificate(alice_backend_sock, a
 
 @pytest.mark.trio
 async def test_user_create_bad_redacted_user_certificate(alice_backend_sock, alice, mallory):
-    now = pendulum.now()
+    now = datetime_now()
     device_certificate = DeviceCertificateContent(
         author=alice.device_id,
         timestamp=now,
@@ -271,7 +271,7 @@ async def test_user_create_bad_redacted_user_certificate(alice_backend_sock, ali
     good_redacted_user_certificate = user_certificate.evolve(human_handle=None)
     user_certificate = user_certificate.dump_and_sign(alice.signing_key)
     for bad_redacted_user_certificate in (
-        good_redacted_user_certificate.evolve(timestamp=now.add(seconds=1)),
+        good_redacted_user_certificate.evolve(timestamp=now + timedelta(seconds=1)),
         good_redacted_user_certificate.evolve(user_id=alice.user_id),
         good_redacted_user_certificate.evolve(public_key=alice.public_key),
         good_redacted_user_certificate.evolve(profile=UserProfile.OUTSIDER),
@@ -317,7 +317,7 @@ async def test_user_create_bad_redacted_user_certificate(alice_backend_sock, ali
 
 @pytest.mark.trio
 async def test_user_create_already_exists(alice_backend_sock, alice, bob):
-    now = pendulum.now()
+    now = datetime_now()
     user_certificate = UserCertificateContent(
         author=alice.device_id,
         timestamp=now,
@@ -346,7 +346,7 @@ async def test_user_create_already_exists(alice_backend_sock, alice, bob):
 
 @pytest.mark.trio
 async def test_user_create_human_handle_already_exists(alice_backend_sock, alice, bob):
-    now = pendulum.now()
+    now = datetime_now()
     bob2_device_id = DeviceID("bob2@dev1")
     user_certificate = UserCertificateContent(
         author=alice.device_id,
@@ -392,7 +392,7 @@ async def test_user_create_human_handle_with_revoked_previous_one(
     await backend_data_binder.bind_revocation(user_id=bob.user_id, certifier=alice)
 
     # Now recreate another user with bob's human handle
-    now = pendulum.now()
+    now = datetime_now()
     bob2_device_id = DeviceID("bob2@dev1")
     user_certificate = UserCertificateContent(
         author=alice.device_id,
@@ -429,8 +429,8 @@ async def test_user_create_human_handle_with_revoked_previous_one(
 
 @pytest.mark.trio
 async def test_user_create_not_matching_certified_on(alice_backend_sock, alice, mallory):
-    date1 = pendulum.datetime(2000, 1, 1)
-    date2 = date1.add(seconds=1)
+    date1 = DateTime(2000, 1, 1)
+    date2 = date1 + timedelta(seconds=1)
     user_certificate = UserCertificateContent(
         author=alice.device_id,
         timestamp=date1,
@@ -462,8 +462,8 @@ async def test_user_create_not_matching_certified_on(alice_backend_sock, alice, 
 
 @pytest.mark.trio
 async def test_user_create_certificate_too_old(alice_backend_sock, alice, mallory):
-    too_old = pendulum.datetime(2000, 1, 1)
-    now = too_old.add(seconds=INVITATION_VALIDITY + 1)
+    too_old = DateTime(2000, 1, 1)
+    now = too_old + timedelta(seconds=INVITATION_VALIDITY + 1)
     user_certificate = UserCertificateContent(
         author=alice.device_id,
         timestamp=too_old,
@@ -512,7 +512,7 @@ async def test_user_create_author_not_admin(backend, bob_backend_sock):
 async def test_redacted_certificates_cannot_contain_sensitive_data(
     alice_backend_sock, alice, mallory
 ):
-    now = pendulum.now()
+    now = datetime_now()
     user_certificate = UserCertificateContent(
         author=alice.device_id,
         timestamp=now,

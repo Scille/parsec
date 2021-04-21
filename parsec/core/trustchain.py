@@ -1,7 +1,7 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
 from typing import Tuple, List, Sequence, Optional
-from pendulum import DateTime, now as pendulum_now
+from parsec.datetime import DateTime, now as datetime_now
 
 from parsec.crypto import VerifyKey
 from parsec.api.protocol import UserID, DeviceID
@@ -43,7 +43,7 @@ class TrustchainContext:
         self._users_cache.pop(user_id, None)
 
     def get_user(self, user_id: UserID, now: DateTime = None) -> Optional[UserCertificateContent]:
-        now = now or pendulum_now()
+        now = now or datetime_now()
         try:
             cached_on, verified_user = self._users_cache[user_id]
             if (now - cached_on).total_seconds() < self.cache_validity:
@@ -55,7 +55,7 @@ class TrustchainContext:
     def get_revoked_user(
         self, user_id: UserID, now: DateTime = None
     ) -> Optional[RevokedUserCertificateContent]:
-        now = now or pendulum_now()
+        now = now or datetime_now()
         try:
             cached_on, verified_revoked_user = self._revoked_users_cache[user_id]
             if (now - cached_on).total_seconds() < self.cache_validity:
@@ -67,7 +67,7 @@ class TrustchainContext:
     def get_device(
         self, device_id: DeviceID, now: DateTime = None
     ) -> Optional[DeviceCertificateContent]:
-        now = now or pendulum_now()
+        now = now or datetime_now()
         try:
             cached_on, verified_device = self._devices_cache[device_id]
             if (now - cached_on).total_seconds() < self.cache_validity:
@@ -88,7 +88,7 @@ class TrustchainContext:
         Optional[RevokedUserCertificateContent],
         List[DeviceCertificateContent],
     ]:
-        now = pendulum_now()
+        now = datetime_now()
         verified_users, verified_revoked_users, verified_devices = self.load_trustchain(
             users=(user_certif, *trustchain["users"]),
             revoked_users=(revoked_user_certif, *trustchain["revoked_users"])
@@ -133,7 +133,7 @@ class TrustchainContext:
         List[RevokedUserCertificateContent],
         List[DeviceCertificateContent],
     ]:
-        now = now or pendulum_now()
+        now = now or datetime_now()
 
         users_states = {}
         devices_states = {}

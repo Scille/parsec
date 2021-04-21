@@ -11,7 +11,6 @@ import ssl
 import trustme
 import socket
 import contextlib
-import pendulum
 from unittest.mock import patch
 import structlog
 import trio
@@ -24,6 +23,7 @@ from pathlib import Path
 import sqlite3
 import tempfile
 
+from parsec.datetime import now as datetime_now
 from parsec.monitoring import TaskMonitoringInstrument
 from parsec.core import CoreConfig
 from parsec.core.types import BackendAddr
@@ -95,11 +95,11 @@ def is_xdist_master(config):
     return config.getoption("dist") != "no" and not os.environ.get("PYTEST_XDIST_WORKER")
 
 
-@pytest.fixture(scope="session", autouse=True)
-def mock_timezone_utc(request):
-    # Mock and non-UTC timezones are a really bad mix, so keep things simple
-    with pendulum.test_local_timezone(pendulum.timezone("utc")):
-        yield
+# @pytest.fixture(scope="session", autouse=True)
+# def mock_timezone_utc(request):
+#     # Mock and non-UTC timezones are a really bad mix, so keep things simple
+#     with pendulum.test_local_timezone(pendulum.timezone("utc")):
+#         yield
 
 
 def pytest_configure(config):
@@ -572,7 +572,7 @@ def backend_factory(
                     binder = backend_data_binder_factory(backend)
                     await binder.bind_organization(coolorg, alice)
                     await binder.bind_organization(
-                        expiredorg, expiredorgalice, expiration_date=pendulum.now()
+                        expiredorg, expiredorgalice, expiration_date=datetime_now()
                     )
                     await binder.bind_organization(otherorg, otheralice)
                     await binder.bind_device(alice2, certifier=alice)

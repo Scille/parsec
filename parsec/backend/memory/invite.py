@@ -5,7 +5,7 @@ import attr
 from uuid import UUID
 from typing import List, Optional, Tuple
 from collections import defaultdict
-from pendulum import DateTime, now as pendulum_now
+from parsec.datetime import DateTime, now as datetime_now
 
 from parsec.api.protocol import OrganizationID, UserID, InvitationStatus, InvitationDeletedReason
 from parsec.backend.invite import (
@@ -225,7 +225,7 @@ class MemoryInviteComponent(BaseInviteComponent):
 
         else:
             # Must create a new invitation
-            created_on = created_on or pendulum_now()
+            created_on = created_on or datetime_now()
             greeter_human_handle = self._user_component._get_user(
                 organization_id, greeter_user_id
             ).human_handle

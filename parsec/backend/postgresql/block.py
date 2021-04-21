@@ -2,8 +2,8 @@
 
 from triopg.exceptions import UniqueViolationError
 from uuid import UUID
-import pendulum
 
+from parsec.datetime import now as datetime_now
 from parsec.api.protocol import DeviceID, OrganizationID
 from parsec.backend.utils import OperationKind
 from parsec.backend.vlob import BaseVlobComponent
@@ -195,7 +195,7 @@ class PGBlockComponent(BaseBlockComponent):
                     realm_id=realm_id,
                     author=author,
                     size=len(block),
-                    created_on=pendulum.now(),
+                    created_on=datetime_now(),
                 )
             )
 

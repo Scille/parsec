@@ -3,7 +3,7 @@
 import trio
 from pathlib import Path
 from trio_typing import TaskStatus
-from pendulum import DateTime, now as pendulum_now
+from parsec.datetime import DateTime, now as datetime_now
 from typing import (
     Tuple,
     Optional,
@@ -191,7 +191,7 @@ class UserFS:
         self._update_user_manifest_lock = trio.Lock()
         self._workspace_storages: Dict[EntryID, WorkspaceFS] = {}
 
-        now = pendulum_now()
+        now = datetime_now()
         wentry = WorkspaceEntry(
             name=EntryName("<user manifest>"),
             id=device.user_manifest_id,
@@ -551,7 +551,7 @@ class UserFS:
         if base_um.is_placeholder:
             certif = RealmRoleCertificateContent.build_realm_root_certif(
                 author=self.device.device_id,
-                timestamp=pendulum_now(),
+                timestamp=datetime_now(),
                 realm_id=self.device.user_manifest_id,
             ).dump_and_sign(self.device.signing_key)
 
@@ -577,7 +577,7 @@ class UserFS:
             await self._workspace_minimal_sync(w)
 
         # Build vlob
-        now = pendulum_now()
+        now = datetime_now()
         to_sync_um = base_um.to_remote(author=self.device.device_id, timestamp=now)
         ciphered = to_sync_um.dump_sign_and_encrypt(
             author_signkey=self.device.signing_key, key=self.device.user_manifest_key
@@ -662,7 +662,7 @@ class UserFS:
         # Note we don't bother to check workspace's access roles given they
         # could be outdated (and backend will do the check anyway)
 
-        now = pendulum_now()
+        now = datetime_now()
 
         # Build the sharing message
         try:
@@ -851,7 +851,7 @@ class UserFS:
             encryption_revision=msg.encryption_revision,
             encrypted_on=msg.encrypted_on,
             role=self_role,
-            role_cached_on=pendulum_now(),
+            role_cached_on=datetime_now(),
         )
 
         async with self._update_user_manifest_lock:
@@ -913,7 +913,7 @@ class UserFS:
             workspace_entry = merge_workspace_entry(
                 None,
                 existing_workspace_entry,
-                existing_workspace_entry.evolve(role=None, role_cached_on=pendulum_now()),
+                existing_workspace_entry.evolve(role=None, role_cached_on=datetime_now()),
             )
             if existing_workspace_entry == workspace_entry:
                 # Cheap idempotent check
@@ -1035,7 +1035,7 @@ class UserFS:
         if not workspace_entry:
             raise FSWorkspaceNotFoundError(f"Unknown workspace `{workspace_id}`")
 
-        now = pendulum_now()
+        now = datetime_now()
         new_workspace_entry = workspace_entry.evolve(
             encryption_revision=workspace_entry.encryption_revision + 1,
             encrypted_on=now,

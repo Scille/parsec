@@ -277,7 +277,6 @@ requirements = [
     # Can use marshmallow or the toasted flavour as you like ;-)
     # "marshmallow==2.14.0",
     "toastedmarshmallow==0.2.6",
-    "pendulum==2.1.2",
     "PyNaCl==1.4.0",
     "trio==0.16.0",
     "trio_typing==0.5.0",

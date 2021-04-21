@@ -1,6 +1,6 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-import pendulum
+from parsec.datetime import DateTime
 from uuid import UUID
 from typing import Dict, Tuple, Optional
 
@@ -96,8 +96,8 @@ async def query_read(
     encryption_revision: int,
     vlob_id: UUID,
     version: Optional[int] = None,
-    timestamp: Optional[pendulum.DateTime] = None,
-) -> Tuple[int, bytes, DeviceID, pendulum.DateTime]:
+    timestamp: Optional[DateTime] = None,
+) -> Tuple[int, bytes, DeviceID, DateTime]:
     realm_id = await _get_realm_id_from_vlob_id(conn, organization_id, vlob_id)
     await _check_realm_and_read_access(conn, organization_id, author, realm_id, encryption_revision)
 
@@ -192,7 +192,7 @@ async def query_poll_changes(
 @query(in_transaction=True)
 async def query_list_versions(
     conn, organization_id: OrganizationID, author: DeviceID, vlob_id: UUID
-) -> Dict[int, Tuple[pendulum.DateTime, DeviceID]]:
+) -> Dict[int, Tuple[DateTime, DeviceID]]:
     realm_id = await _get_realm_id_from_vlob_id(conn, organization_id, vlob_id)
     await _check_realm_and_read_access(conn, organization_id, author, realm_id, None)
 

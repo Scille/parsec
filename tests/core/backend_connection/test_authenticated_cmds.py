@@ -2,8 +2,8 @@
 
 import trio
 import pytest
-import pendulum
 
+from parsec.datetime import now as datetime_now
 from parsec.api.transport import Transport, Ping, Pong
 from parsec.api.data import RevokedUserCertificateContent
 from parsec.api.protocol import ServerHandshake, HandshakeType, AUTHENTICATED_CMDS, APIEvent
@@ -100,7 +100,7 @@ async def test_handshake_rvk_mismatch(running_backend, alice, otherorg):
 @pytest.mark.trio
 async def test_handshake_revoked_device(running_backend, alice, bob):
     revoked_user_certificate = RevokedUserCertificateContent(
-        author=alice.device_id, timestamp=pendulum.now(), user_id=bob.user_id
+        author=alice.device_id, timestamp=datetime_now(), user_id=bob.user_id
     ).dump_and_sign(alice.signing_key)
     await running_backend.backend.user.revoke_user(
         organization_id=alice.organization_id,

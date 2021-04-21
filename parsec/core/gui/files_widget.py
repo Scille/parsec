@@ -4,7 +4,7 @@ import pathlib
 
 from parsec.core.core_events import CoreEvent
 from uuid import UUID
-from pendulum import DateTime
+from parsec.datetime import DateTime
 from enum import IntEnum
 from structlog import get_logger
 

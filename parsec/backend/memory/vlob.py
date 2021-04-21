@@ -1,11 +1,11 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
 import attr
-import pendulum
 from uuid import UUID
 from typing import List, Tuple, Dict, Optional
 from collections import defaultdict
 
+from parsec.datetime import DateTime
 from parsec.backend.backend_events import BackendEvent
 from parsec.api.protocol import DeviceID, OrganizationID
 from parsec.api.protocol import RealmRole
@@ -27,7 +27,7 @@ from parsec.backend.vlob import (
 @attr.s
 class Vlob:
     realm_id: UUID = attr.ib()
-    data: List[Tuple[bytes, DeviceID, pendulum.DateTime]] = attr.ib(factory=list)
+    data: List[Tuple[bytes, DeviceID, DateTime]] = attr.ib(factory=list)
 
     @property
     def current_version(self):
@@ -245,7 +245,7 @@ class MemoryVlobComponent(BaseVlobComponent):
         realm_id: UUID,
         encryption_revision: int,
         vlob_id: UUID,
-        timestamp: pendulum.DateTime,
+        timestamp: DateTime,
         blob: bytes,
     ) -> None:
         self._check_realm_write_access(
@@ -267,8 +267,8 @@ class MemoryVlobComponent(BaseVlobComponent):
         encryption_revision: int,
         vlob_id: UUID,
         version: Optional[int] = None,
-        timestamp: Optional[pendulum.DateTime] = None,
-    ) -> Tuple[int, bytes, DeviceID, pendulum.DateTime]:
+        timestamp: Optional[DateTime] = None,
+    ) -> Tuple[int, bytes, DeviceID, DateTime]:
         vlob = self._get_vlob(organization_id, vlob_id)
 
         self._check_realm_read_access(
@@ -299,7 +299,7 @@ class MemoryVlobComponent(BaseVlobComponent):
         encryption_revision: int,
         vlob_id: UUID,
         version: int,
-        timestamp: pendulum.DateTime,
+        timestamp: DateTime,
         blob: bytes,
     ) -> None:
         vlob = self._get_vlob(organization_id, vlob_id)
@@ -331,7 +331,7 @@ class MemoryVlobComponent(BaseVlobComponent):
 
     async def list_versions(
         self, organization_id: OrganizationID, author: DeviceID, vlob_id: UUID
-    ) -> Dict[int, Tuple[pendulum.DateTime, DeviceID]]:
+    ) -> Dict[int, Tuple[DateTime, DeviceID]]:
         vlobs = self._get_vlob(organization_id, vlob_id)
 
         self._check_realm_read_access(organization_id, vlobs.realm_id, author.user_id, None)

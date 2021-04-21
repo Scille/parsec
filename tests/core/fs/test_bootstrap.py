@@ -2,7 +2,7 @@
 
 from parsec.core.core_events import CoreEvent
 import pytest
-from pendulum import datetime
+from parsec.datetime import DateTime
 from unittest.mock import ANY
 
 from tests.common import freeze_time, customize_fixtures
@@ -29,8 +29,8 @@ async def test_lazy_root_manifest_generation(
         assert stat == {
             "type": "root",
             "id": alice.user_manifest_id,
-            "created": datetime(2000, 1, 2),
-            "updated": datetime(2000, 1, 2),
+            "created": DateTime(2000, 1, 2),
+            "updated": DateTime(2000, 1, 2),
             "base_version": 0,
             "is_folder": True,
             "is_placeholder": True,
@@ -45,8 +45,8 @@ async def test_lazy_root_manifest_generation(
         assert stat == {
             "type": "root",
             "id": ANY,
-            "created": datetime(2000, 1, 2),
-            "updated": datetime(2000, 1, 2),
+            "created": DateTime(2000, 1, 2),
+            "updated": DateTime(2000, 1, 2),
             "base_version": 1,
             "is_folder": True,
             "is_placeholder": False,
@@ -90,7 +90,7 @@ async def test_concurrent_devices_agreed_on_root_manifest(
         with user_fs1.event_bus.listen() as spy:
             with freeze_time("2000-01-05"):
                 await user_fs1.sync()
-        date_sync = datetime(2000, 1, 5)
+        date_sync = DateTime(2000, 1, 5)
         spy.assert_events_exactly_occured(
             [
                 (CoreEvent.FS_ENTRY_MINIMAL_SYNCED, {"id": alice.user_manifest_id}, date_sync),
@@ -103,7 +103,7 @@ async def test_concurrent_devices_agreed_on_root_manifest(
         with user_fs2.event_bus.listen() as spy:
             with freeze_time("2000-01-06"):
                 await user_fs2.sync()
-        date_sync = datetime(2000, 1, 6)
+        date_sync = DateTime(2000, 1, 6)
         spy.assert_events_exactly_occured(
             [
                 (CoreEvent.FS_ENTRY_MINIMAL_SYNCED, {"id": alice.user_manifest_id}, date_sync),
@@ -116,7 +116,7 @@ async def test_concurrent_devices_agreed_on_root_manifest(
         with user_fs1.event_bus.listen() as spy:
             with freeze_time("2000-01-07"):
                 await user_fs1.sync()
-        date_sync = datetime(2000, 1, 7)
+        date_sync = DateTime(2000, 1, 7)
         spy.assert_events_exactly_occured(
             [
                 (
@@ -132,8 +132,8 @@ async def test_concurrent_devices_agreed_on_root_manifest(
     assert path_info1 == {
         "type": "root",
         "id": alice.user_manifest_id,
-        "created": datetime(2000, 1, 3),
-        "updated": datetime(2000, 1, 4),
+        "created": DateTime(2000, 1, 3),
+        "updated": DateTime(2000, 1, 4),
         "base_version": 3,
         "is_folder": True,
         "is_placeholder": False,
@@ -172,8 +172,8 @@ async def test_reloading_v0_user_manifest(
         assert path_info == {
             "type": "root",
             "id": alice.user_manifest_id,
-            "created": datetime(2000, 1, 2),
-            "updated": datetime(2000, 1, 2),
+            "created": DateTime(2000, 1, 2),
+            "updated": DateTime(2000, 1, 2),
             "base_version": 0,
             "is_folder": True,
             "is_placeholder": True,
@@ -192,8 +192,8 @@ async def test_reloading_v0_user_manifest(
         assert path_info == {
             "type": "root",
             "id": ANY,
-            "created": datetime(2000, 1, 2),
-            "updated": datetime(2000, 1, 2),
+            "created": DateTime(2000, 1, 2),
+            "updated": DateTime(2000, 1, 2),
             "base_version": 1,
             "is_folder": True,
             "is_placeholder": False,

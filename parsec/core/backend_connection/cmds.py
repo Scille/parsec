@@ -2,9 +2,8 @@
 
 from typing import Tuple, List, Dict, Optional
 from uuid import UUID
-import pendulum
-from pendulum import DateTime
 
+from parsec.datetime import DateTime
 from parsec.crypto import VerifyKey, PublicKey
 from parsec.api.transport import Transport, TransportError
 from parsec.api.protocol import (
@@ -159,7 +158,7 @@ async def vlob_create(
     realm_id: UUID,
     encryption_revision: int,
     vlob_id: UUID,
-    timestamp: pendulum.DateTime,
+    timestamp: DateTime,
     blob: bytes,
 ) -> dict:
     return await _send_cmd(
@@ -179,7 +178,7 @@ async def vlob_read(
     encryption_revision: int,
     vlob_id: UUID,
     version: int = None,
-    timestamp: pendulum.DateTime = None,
+    timestamp: DateTime = None,
 ) -> dict:
     return await _send_cmd(
         transport,
@@ -197,7 +196,7 @@ async def vlob_update(
     encryption_revision: int,
     vlob_id: UUID,
     version: int,
-    timestamp: pendulum.DateTime,
+    timestamp: DateTime,
     blob: bytes,
 ) -> dict:
     return await _send_cmd(
@@ -297,7 +296,7 @@ async def realm_start_reencryption_maintenance(
     transport: Transport,
     realm_id: UUID,
     encryption_revision: int,
-    timestamp: pendulum.DateTime,
+    timestamp: DateTime,
     per_participant_message: Dict[UserID, bytes],
 ) -> dict:
     return await _send_cmd(

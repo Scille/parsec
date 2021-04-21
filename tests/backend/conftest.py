@@ -2,7 +2,7 @@
 
 import pytest
 from uuid import UUID, uuid4
-from pendulum import datetime, now as pendulum_now
+from parsec.datetime import DateTime, now as datetime_now
 from async_generator import asynccontextmanager
 
 from parsec.api.data import RealmRoleCertificateContent
@@ -207,7 +207,7 @@ def backend_invited_sock_factory(backend_raw_transport_factory):
 def realm_factory():
     async def _realm_factory(backend, author, realm_id=None, now=None):
         realm_id = realm_id or uuid4()
-        now = now or pendulum_now()
+        now = now or datetime_now()
         certif = RealmRoleCertificateContent.build_realm_root_certif(
             author=author.device_id, timestamp=now, realm_id=realm_id
         ).dump_and_sign(author.signing_key)
@@ -232,7 +232,7 @@ def realm_factory():
 @pytest.fixture
 async def realm(backend, alice, realm_factory):
     realm_id = UUID("A0000000000000000000000000000000")
-    return await realm_factory(backend, alice, realm_id, datetime(2000, 1, 2))
+    return await realm_factory(backend, alice, realm_id, DateTime(2000, 1, 2))
 
 
 @pytest.fixture
@@ -244,7 +244,7 @@ async def vlobs(backend, alice, realm):
         realm_id=realm,
         encryption_revision=1,
         vlob_id=vlob_ids[0],
-        timestamp=datetime(2000, 1, 2),
+        timestamp=DateTime(2000, 1, 2),
         blob=b"r:A b:1 v:1",
     )
     await backend.vlob.update(
@@ -253,7 +253,7 @@ async def vlobs(backend, alice, realm):
         encryption_revision=1,
         vlob_id=vlob_ids[0],
         version=2,
-        timestamp=datetime(2000, 1, 3),
+        timestamp=DateTime(2000, 1, 3),
         blob=b"r:A b:1 v:2",
     )
     await backend.vlob.create(
@@ -262,7 +262,7 @@ async def vlobs(backend, alice, realm):
         realm_id=realm,
         encryption_revision=1,
         vlob_id=vlob_ids[1],
-        timestamp=datetime(2000, 1, 4),
+        timestamp=DateTime(2000, 1, 4),
         blob=b"r:A b:2 v:1",
     )
     return vlob_ids
@@ -276,10 +276,10 @@ async def vlob_atoms(vlobs):
 @pytest.fixture
 async def other_realm(backend, alice, realm_factory):
     realm_id = UUID("B0000000000000000000000000000000")
-    return await realm_factory(backend, alice, realm_id, datetime(2000, 1, 2))
+    return await realm_factory(backend, alice, realm_id, DateTime(2000, 1, 2))
 
 
 @pytest.fixture
 async def bob_realm(backend, bob, realm_factory):
     realm_id = UUID("C0000000000000000000000000000000")
-    return await realm_factory(backend, bob, realm_id, datetime(2000, 1, 2))
+    return await realm_factory(backend, bob, realm_id, DateTime(2000, 1, 2))

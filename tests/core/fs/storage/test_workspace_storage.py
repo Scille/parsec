@@ -3,7 +3,7 @@
 from pathlib import Path
 
 import pytest
-from pendulum import now
+from parsec.datetime import now
 
 from parsec.api.data.manifest import LOCAL_AUTHOR_LEGACY_PLACEHOLDER
 from parsec.core.fs.storage import WorkspaceStorage

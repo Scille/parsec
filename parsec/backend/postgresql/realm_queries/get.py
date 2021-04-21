@@ -1,6 +1,6 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-import pendulum
+from parsec.datetime import DateTime
 from uuid import UUID
 from typing import Dict, List, Optional
 
@@ -165,11 +165,7 @@ async def query_get_current_roles(
 
 @query()
 async def query_get_role_certificates(
-    conn,
-    organization_id: OrganizationID,
-    author: DeviceID,
-    realm_id: UUID,
-    since: pendulum.DateTime,
+    conn, organization_id: OrganizationID, author: DeviceID, realm_id: UUID, since: DateTime
 ) -> List[bytes]:
     ret = await conn.fetch(
         *_q_get_role_certificates(organization_id=organization_id, realm_id=realm_id)

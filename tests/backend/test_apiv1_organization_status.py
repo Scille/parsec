@@ -1,7 +1,7 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
 from unittest.mock import ANY
-from pendulum import datetime
+from parsec.datetime import DateTime
 import pytest
 
 from parsec.api.protocol import (
@@ -22,7 +22,7 @@ async def organization_status(sock, organization_id):
     return apiv1_organization_status_serializer.rep_loads(raw_rep)
 
 
-async def organization_update(sock, organization_id, expiration_date: datetime = None):
+async def organization_update(sock, organization_id, expiration_date: DateTime = None):
     raw_rep = await sock.send(
         apiv1_organization_update_serializer.req_dumps(
             {
@@ -63,11 +63,11 @@ async def test_organization_update_expiration_date(
     rep = await organization_status(administration_backend_sock, coolorg.organization_id)
     assert rep == {"status": "ok", "is_bootstrapped": True, "expiration_date": None}
     rep = await organization_update(
-        administration_backend_sock, coolorg.organization_id, expiration_date=datetime(2077, 1, 1)
+        administration_backend_sock, coolorg.organization_id, expiration_date=DateTime(2077, 1, 1)
     )
     assert rep == {"status": "ok"}
     rep = await organization_status(administration_backend_sock, coolorg.organization_id)
-    assert rep == {"status": "ok", "is_bootstrapped": True, "expiration_date": datetime(2077, 1, 1)}
+    assert rep == {"status": "ok", "is_bootstrapped": True, "expiration_date": DateTime(2077, 1, 1)}
     rep = await organization_update(
         administration_backend_sock, coolorg.organization_id, expiration_date=None
     )
@@ -79,7 +79,7 @@ async def test_organization_update_expiration_date(
         rep = await organization_update(
             administration_backend_sock,
             coolorg.organization_id,
-            expiration_date=datetime(1999, 12, 31),
+            expiration_date=DateTime(1999, 12, 31),
         )
         assert rep == {"status": "ok"}
         await spy.wait_with_timeout(BackendEvent.ORGANIZATION_EXPIRED)
@@ -88,7 +88,7 @@ async def test_organization_update_expiration_date(
         assert rep == {
             "status": "ok",
             "is_bootstrapped": True,
-            "expiration_date": datetime(1999, 12, 31),
+            "expiration_date": DateTime(1999, 12, 31),
         }
 
 
@@ -97,7 +97,7 @@ async def test_organization_update_expiration_date_unknown_organization(
     coolorg, organization_factory, administration_backend_sock
 ):
     rep = await organization_update(
-        administration_backend_sock, "dummy", expiration_date=datetime(2077, 1, 1)
+        administration_backend_sock, "dummy", expiration_date=DateTime(2077, 1, 1)
     )
     assert rep == {"status": "not_found"}
 

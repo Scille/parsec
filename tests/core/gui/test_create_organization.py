@@ -1,20 +1,17 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
 import pytest
-
-import pendulum
-
 from PyQt5 import QtCore
 
-from tests.fixtures import local_device_to_backend_user
-from tests.common import customize_fixtures, freeze_time
-
+from parsec.datetime import now as datetime_now
 from parsec.api.protocol import OrganizationID, HumanHandle
 from parsec.core.backend_connection import apiv1_backend_anonymous_cmds_factory
 from parsec.core.types import BackendOrganizationBootstrapAddr
 from parsec.core.invite import bootstrap_organization
-
 from parsec.core.gui.lang import translate
+
+from tests.fixtures import local_device_to_backend_user
+from tests.common import customize_fixtures, freeze_time
 
 
 @pytest.fixture
@@ -555,13 +552,13 @@ async def test_create_organization_wrong_timestamp(
     co_w = await catch_create_org_widget()
     assert co_w
 
-    # Patch the pendulum.now() just for the organization creation in the core so we have
+    # Patch the datetime_now() just for the organization creation in the core so we have
     # a different date than the server
-    def _fake_pendulum_now():
+    def _fake_datetime_now():
         with freeze_time("2000-01-01"):
-            return pendulum.now()
+            return datetime_now()
 
-    monkeypatch.setattr("parsec.core.invite.organization.pendulum_now", _fake_pendulum_now)
+    monkeypatch.setattr("parsec.core.invite.organization.datetime_now", _fake_datetime_now)
 
     await _do_creation_process(aqtbot, co_w)
 

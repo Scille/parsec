@@ -2,7 +2,7 @@
 
 import trio
 from functools import partial
-from pendulum import now as pendulum_now
+from parsec.datetime import now as datetime_now
 from async_generator import asynccontextmanager
 
 from parsec.api.protocol import (
@@ -195,7 +195,7 @@ vlob_create = CmdSock(
         "realm_id": realm_id,
         "vlob_id": vlob_id,
         "blob": blob,
-        "timestamp": timestamp or pendulum_now(),
+        "timestamp": timestamp or datetime_now(),
         "encryption_revision": encryption_revision,
     },
     check_rep_by_default=True,
@@ -218,7 +218,7 @@ vlob_update = CmdSock(
         "version": version,
         "blob": blob,
         "encryption_revision": encryption_revision,
-        "timestamp": timestamp or pendulum_now(),
+        "timestamp": timestamp or datetime_now(),
     },
     check_rep_by_default=True,
 )

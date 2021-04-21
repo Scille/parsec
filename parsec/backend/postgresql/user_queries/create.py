@@ -5,7 +5,7 @@ import itertools
 from typing import Optional
 from triopg import UniqueViolationError
 from uuid import UUID
-from pendulum import now as pendulum_now
+from parsec.datetime import now as datetime_now
 
 from parsec.api.protocol import OrganizationID
 from parsec.backend.user import User, Device, UserError, UserNotFoundError, UserAlreadyExistsError
@@ -167,7 +167,7 @@ async def _do_create_user_with_human_handle(
         raise UserError(f"Insertion error: {result}")
 
     # Finally make sure there is only one non-revoked user with this human handle
-    now = pendulum_now()
+    now = datetime_now()
     not_revoked_users = await conn.fetch(
         *_q_get_not_revoked_users_for_human(
             organization_id=organization_id, email=user.human_handle.email, now=now

@@ -2,12 +2,12 @@
 
 import trio
 import attr
-import pendulum
 from contextlib import contextmanager
 from unittest.mock import ANY
 from enum import Enum
 
 from parsec.event_bus import EventBus
+from parsec.datetime import now as datetime_now
 
 
 class PartialDict(dict):
@@ -55,7 +55,7 @@ class PartialObj:
 class SpiedEvent:
     event = attr.ib()
     kwargs = attr.ib(factory=dict)
-    dt = attr.ib(factory=pendulum.now)
+    dt = attr.ib(factory=datetime_now)
 
 
 @attr.s(repr=False, eq=False)

@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import QWidget, QDialog, QApplication
 
 from structlog import get_logger
 
-import pendulum
+from parsec.datetime import now as datetime_now, timedelta
 
 from parsec.core.gui.lang import get_qlocale, translate as _, format_datetime
 from parsec.core.gui.custom_dialogs import show_error, GreyedDialog
@@ -19,7 +19,7 @@ logger = get_logger()
 
 async def _do_workspace_get_creation_timestamp(workspace_fs):
     # Add 1 second as we want a timestamp safe to ask for a manifest to the backend from the GUI
-    return (await workspace_fs.get_earliest_timestamp()).add(seconds=1)
+    return (await workspace_fs.get_earliest_timestamp()) + timedelta(seconds=1)
 
 
 class TimestampedWorkspaceWidget(QWidget, Ui_TimestampedWorkspaceWidget):
@@ -98,7 +98,7 @@ class TimestampedWorkspaceWidget(QWidget, Ui_TimestampedWorkspaceWidget):
                 created=format_datetime(creation, full=True)
             )
         )
-        now = pendulum.now().in_timezone("local")
+        now = datetime_now().in_timezone("local")
         self.now_date = (now.year, now.month, now.day)
         self.now_time = (now.hour, now.minute, now.second)
         self.calendar_widget.setMinimumDate(QDate(*self.creation_date))

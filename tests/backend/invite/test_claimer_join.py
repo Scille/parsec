@@ -2,7 +2,7 @@
 
 import pytest
 import trio
-from pendulum import datetime
+from parsec.datetime import DateTime
 
 from parsec.api.protocol import InvitationType, InvitationStatus, APIEvent
 
@@ -21,7 +21,7 @@ async def test_claimer_join_and_leave(
     invitation = await backend.invite.new_for_device(
         organization_id=alice.organization_id,
         greeter_user_id=alice.user_id,
-        created_on=datetime(2000, 1, 2),
+        created_on=DateTime(2000, 1, 2),
     )
 
     await events_subscribe(alice_backend_sock)
@@ -56,7 +56,7 @@ async def test_claimer_join_and_leave(
                 {
                     "type": InvitationType.DEVICE,
                     "token": invitation.token,
-                    "created_on": datetime(2000, 1, 2),
+                    "created_on": DateTime(2000, 1, 2),
                     "status": InvitationStatus.READY,
                 }
             ],
@@ -79,7 +79,7 @@ async def test_claimer_join_and_leave(
             {
                 "type": InvitationType.DEVICE,
                 "token": invitation.token,
-                "created_on": datetime(2000, 1, 2),
+                "created_on": DateTime(2000, 1, 2),
                 "status": InvitationStatus.IDLE,
             }
         ],

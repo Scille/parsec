@@ -2,8 +2,8 @@
 
 from typing import List, Tuple, Dict, Optional
 from uuid import UUID
-import pendulum
 
+from parsec.datetime import DateTime, now as datetime_now
 from parsec.utils import timestamps_in_the_ballpark
 from parsec.api.protocol import (
     DeviceID,
@@ -65,7 +65,7 @@ class BaseVlobComponent:
     async def api_vlob_create(self, client_ctx, msg):
         msg = vlob_create_serializer.req_load(msg)
 
-        now = pendulum.now()
+        now = datetime_now()
         if not timestamps_in_the_ballpark(msg["timestamp"], now):
             return {"status": "bad_timestamp", "reason": f"Timestamp is out of date."}
 
@@ -129,7 +129,7 @@ class BaseVlobComponent:
     async def api_vlob_update(self, client_ctx, msg):
         msg = vlob_update_serializer.req_load(msg)
 
-        now = pendulum.now()
+        now = datetime_now()
         if not timestamps_in_the_ballpark(msg["timestamp"], now):
             return {"status": "bad_timestamp", "reason": f"Timestamp is out of date."}
 
@@ -299,7 +299,7 @@ class BaseVlobComponent:
         realm_id: UUID,
         encryption_revision: int,
         vlob_id: UUID,
-        timestamp: pendulum.DateTime,
+        timestamp: DateTime,
         blob: bytes,
     ) -> None:
         """
@@ -317,8 +317,8 @@ class BaseVlobComponent:
         encryption_revision: int,
         vlob_id: UUID,
         version: Optional[int] = None,
-        timestamp: Optional[pendulum.DateTime] = None,
-    ) -> Tuple[int, bytes, DeviceID, pendulum.DateTime]:
+        timestamp: Optional[DateTime] = None,
+    ) -> Tuple[int, bytes, DeviceID, DateTime]:
         """
         Raises:
             VlobAccessError
@@ -336,7 +336,7 @@ class BaseVlobComponent:
         encryption_revision: int,
         vlob_id: UUID,
         version: int,
-        timestamp: pendulum.DateTime,
+        timestamp: DateTime,
         blob: bytes,
     ) -> None:
         """
@@ -363,7 +363,7 @@ class BaseVlobComponent:
 
     async def list_versions(
         self, organization_id: OrganizationID, author: DeviceID, vlob_id: UUID
-    ) -> Dict[int, Tuple[pendulum.DateTime, DeviceID]]:
+    ) -> Dict[int, Tuple[DateTime, DeviceID]]:
         """
         Raises:
             VlobInMaintenanceError

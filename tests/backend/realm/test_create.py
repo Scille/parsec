@@ -1,7 +1,7 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
 import pytest
-import pendulum
+from parsec.datetime import now as datetime_now, timedelta
 from uuid import UUID
 
 from parsec.utils import TIMESTAMP_MAX_DT
@@ -20,7 +20,7 @@ async def test_create_ok(backend, alice, alice_backend_sock):
 
     realm_id = UUID("C0000000000000000000000000000000")
     certif = RealmRoleCertificateContent.build_realm_root_certif(
-        author=alice.device_id, timestamp=pendulum.now(), realm_id=realm_id
+        author=alice.device_id, timestamp=datetime_now(), realm_id=realm_id
     ).dump_and_sign(alice.signing_key)
     with backend.event_bus.listen() as spy:
         rep = await realm_create(alice_backend_sock, certif)
@@ -32,7 +32,7 @@ async def test_create_ok(backend, alice, alice_backend_sock):
 async def test_create_invalid_certif(backend, alice, bob, alice_backend_sock):
     realm_id = UUID("C0000000000000000000000000000000")
     certif = RealmRoleCertificateContent.build_realm_root_certif(
-        author=bob.device_id, timestamp=pendulum.now(), realm_id=realm_id
+        author=bob.device_id, timestamp=datetime_now(), realm_id=realm_id
     ).dump_and_sign(bob.signing_key)
     rep = await realm_create(alice_backend_sock, certif)
     assert rep == {
@@ -46,7 +46,7 @@ async def test_create_certif_not_self_signed(backend, alice, bob, alice_backend_
     realm_id = UUID("C0000000000000000000000000000000")
     certif = RealmRoleCertificateContent(
         author=alice.device_id,
-        timestamp=pendulum.now(),
+        timestamp=datetime_now(),
         realm_id=realm_id,
         user_id=bob.user_id,
         role=RealmRole.OWNER,
@@ -63,7 +63,7 @@ async def test_create_certif_role_not_owner(backend, alice, bob, alice_backend_s
     realm_id = UUID("C0000000000000000000000000000000")
     certif = RealmRoleCertificateContent(
         author=alice.device_id,
-        timestamp=pendulum.now(),
+        timestamp=datetime_now(),
         realm_id=realm_id,
         user_id=alice.user_id,
         role=RealmRole.MANAGER,
@@ -78,11 +78,11 @@ async def test_create_certif_role_not_owner(backend, alice, bob, alice_backend_s
 @pytest.mark.trio
 async def test_create_certif_too_old(backend, alice, alice_backend_sock):
     realm_id = UUID("C0000000000000000000000000000000")
-    now = pendulum.now()
+    now = datetime_now()
     certif = RealmRoleCertificateContent.build_realm_root_certif(
         author=alice.device_id, timestamp=now, realm_id=realm_id
     ).dump_and_sign(alice.signing_key)
-    with freeze_time(now.add(seconds=TIMESTAMP_MAX_DT)):
+    with freeze_time(now + timedelta(seconds=TIMESTAMP_MAX_DT)):
         rep = await realm_create(alice_backend_sock, certif)
     assert rep == {
         "status": "invalid_certification",
@@ -93,7 +93,7 @@ async def test_create_certif_too_old(backend, alice, alice_backend_sock):
 @pytest.mark.trio
 async def test_create_realm_already_exists(backend, alice, alice_backend_sock, realm):
     certif = RealmRoleCertificateContent.build_realm_root_certif(
-        author=alice.device_id, timestamp=pendulum.now(), realm_id=realm
+        author=alice.device_id, timestamp=datetime_now(), realm_id=realm
     ).dump_and_sign(alice.signing_key)
     rep = await realm_create(alice_backend_sock, certif)
     assert rep == {"status": "already_exists"}
@@ -104,7 +104,7 @@ async def test_create_realm_already_exists(backend, alice, alice_backend_sock, r
 async def test_realm_create_not_allowed_for_outsider(backend, alice, alice_backend_sock):
     realm_id = UUID("C0000000000000000000000000000000")
     certif = RealmRoleCertificateContent.build_realm_root_certif(
-        author=alice.device_id, timestamp=pendulum.now(), realm_id=realm_id
+        author=alice.device_id, timestamp=datetime_now(), realm_id=realm_id
     ).dump_and_sign(alice.signing_key)
     rep = await realm_create(alice_backend_sock, certif, check_rep=False)
     assert rep == {"status": "not_allowed", "reason": "Outsider user cannot create realm"}

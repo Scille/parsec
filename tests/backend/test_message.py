@@ -1,7 +1,7 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
 import pytest
-from pendulum import datetime
+from parsec.datetime import DateTime
 
 from parsec.api.protocol import message_get_serializer, APIEvent
 from parsec.backend.backend_events import BackendEvent
@@ -19,7 +19,7 @@ async def message_get(sock, offset=0):
 @pytest.mark.trio
 async def test_message_from_bob_to_alice(backend, alice, bob, alice_backend_sock):
     await events_subscribe(alice_backend_sock)
-    d1 = datetime(2000, 1, 1)
+    d1 = DateTime(2000, 1, 1)
     async with events_listen(alice_backend_sock) as listen:
         await backend.message.send(
             bob.organization_id, bob.device_id, alice.user_id, d1, b"Hello from Bob !"
@@ -38,8 +38,8 @@ async def test_message_from_bob_to_alice(backend, alice, bob, alice_backend_sock
 
 @pytest.mark.trio
 async def test_message_get_with_offset(backend, alice, bob, alice_backend_sock):
-    d1 = datetime(2000, 1, 1)
-    d2 = datetime(2000, 1, 2)
+    d1 = DateTime(2000, 1, 1)
+    d2 = DateTime(2000, 1, 2)
     await backend.message.send(bob.organization_id, bob.device_id, alice.user_id, d1, b"1")
     await backend.message.send(bob.organization_id, bob.device_id, alice.user_id, d1, b"2")
     await backend.message.send(bob.organization_id, bob.device_id, alice.user_id, d2, b"3")
@@ -59,7 +59,7 @@ async def test_message_get_with_offset(backend, alice, bob, alice_backend_sock):
 async def test_message_from_bob_to_alice_multi_backends(
     postgresql_url, alice, bob, backend_factory, backend_sock_factory
 ):
-    d1 = datetime(2000, 1, 1)
+    d1 = DateTime(2000, 1, 1)
     async with backend_factory(
         config={"blockstore_config": PostgreSQLBlockStoreConfig(), "db_url": postgresql_url}
     ) as backend_1, backend_factory(
@@ -93,7 +93,7 @@ async def test_message_from_bob_to_alice_multi_backends(
 
 @pytest.mark.trio
 async def test_message_received_event(backend, alice_backend_sock, alice, bob):
-    d1 = datetime(2000, 1, 1)
+    d1 = DateTime(2000, 1, 1)
     await events_subscribe(alice_backend_sock)
 
     # Good message

@@ -1,6 +1,6 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
-import pendulum
+from parsec.datetime import DateTime
 from typing import Callable
 
 from parsec.core.types import WorkspaceRole, WorkspaceEntry
@@ -9,7 +9,7 @@ from parsec.core.fs.workspacefs.workspacefs import WorkspaceFS
 
 
 class WorkspaceFSTimestamped(WorkspaceFS):
-    def __init__(self, workspacefs: WorkspaceFS, timestamp: pendulum.DateTime):
+    def __init__(self, workspacefs: WorkspaceFS, timestamp: DateTime):
         self.workspace_id = workspacefs.workspace_id
         if isinstance(workspacefs, WorkspaceFSTimestamped):
             self.get_workspace_entry = workspacefs.get_workspace_entry

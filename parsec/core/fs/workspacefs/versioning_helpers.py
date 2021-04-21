@@ -21,7 +21,7 @@ import math
 import typing
 from functools import partial
 from typing import List, Tuple, NamedTuple, Optional, Union, cast, Dict, Awaitable
-from pendulum import DateTime
+from parsec.datetime import DateTime, timedelta, now as datetime_now
 from collections import defaultdict
 
 from parsec.api.protocol import DeviceID
@@ -120,7 +120,10 @@ class ManifestDataAndMutablePaths:
         # TODO : Use future manifest source field to follow files and directories
         async with open_service_nursery() as child_nursery:
             child_nursery.start_soon(
-                self.populate_source_path, manifest_cache, entry_id, early.add(microseconds=-1)
+                self.populate_source_path,
+                manifest_cache,
+                entry_id,
+                early + timedelta(microseconds=-1),
             )
             child_nursery.start_soon(self.populate_destination_path, manifest_cache, entry_id, late)
             child_nursery.start_soon(self.populate_current_path, manifest_cache, entry_id, early)
@@ -497,7 +500,7 @@ class VersionListerOneShot:
                     0,
                     root_manifest.id,
                     starting_timestamp or root_manifest.created,
-                    ending_timestamp or DateTime.now(),
+                    ending_timestamp or datetime_now(),
                 ),
             )
             while not self.task_list.is_empty():
@@ -560,7 +563,7 @@ class VersionListerOneShot:
                     and previous.size == 0  # Empty file (would be None for dir)
                     and previous.is_folder == item.is_folder
                     and previous.late == item.early
-                    and previous.late < previous.early.add(seconds=SYNC_GUESSED_TIME_FRAME)
+                    and previous.late < previous.early + timedelta(seconds=SYNC_GUESSED_TIME_FRAME)
                     and not previous.source
                 ):
                     previous = item

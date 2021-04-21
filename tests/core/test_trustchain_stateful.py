@@ -1,7 +1,7 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
 import pytest
-from pendulum import now as pendulum_now
+from parsec.datetime import now as datetime_now
 from hypothesis import strategies as st, note
 from hypothesis.stateful import (
     run_state_machine_as_test,
@@ -51,7 +51,7 @@ def test_workspace_reencryption_need(hypothesis_settings, caplog, local_device_f
 
             user = UserCertificateContent(
                 author=certifier_id,
-                timestamp=pendulum_now(),
+                timestamp=datetime_now(),
                 user_id=local_device.user_id,
                 human_handle=local_device.human_handle,
                 public_key=local_device.public_key,
@@ -62,7 +62,7 @@ def test_workspace_reencryption_need(hypothesis_settings, caplog, local_device_f
 
             device = DeviceCertificateContent(
                 author=certifier_id,
-                timestamp=pendulum_now(),
+                timestamp=datetime_now(),
                 device_id=local_device.device_id,
                 device_label=local_device.device_label,
                 verify_key=local_device.verify_key,
@@ -137,7 +137,7 @@ def test_workspace_reencryption_need(hypothesis_settings, caplog, local_device_f
             author = possible_authors[author_rand % len(possible_authors)]
             note(f"revoke user: {user} (author: {author.device_id})")
             revoked_user = RevokedUserCertificateContent(
-                author=author.device_id, timestamp=pendulum_now(), user_id=user
+                author=author.device_id, timestamp=datetime_now(), user_id=user
             )
             self.revoked_users_content[user] = revoked_user
             self.revoked_users_certifs[user] = revoked_user.dump_and_sign(author.signing_key)
@@ -155,7 +155,7 @@ def test_workspace_reencryption_need(hypothesis_settings, caplog, local_device_f
             local_device = local_device_factory(device_id, org=coolorg)
             device = DeviceCertificateContent(
                 author=author.device_id,
-                timestamp=pendulum_now(),
+                timestamp=datetime_now(),
                 device_id=local_device.device_id,
                 device_label=local_device.device_label,
                 verify_key=local_device.verify_key,

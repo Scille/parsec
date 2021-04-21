@@ -1,7 +1,7 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
 import pytest
-from pendulum import datetime
+from parsec.datetime import DateTime, timedelta
 
 from parsec.api.protocol import apiv1_device_get_invitation_creator_serializer
 from parsec.backend.user import DeviceInvitation, INVITATION_VALIDITY
@@ -12,7 +12,7 @@ from tests.common import freeze_time
 @pytest.fixture
 async def alice_nd_invitation(backend, alice):
     invitation = DeviceInvitation(
-        alice.user_id.to_device_id("new_device"), alice.device_id, datetime(2000, 1, 2)
+        alice.user_id.to_device_id("new_device"), alice.device_id, DateTime(2000, 1, 2)
     )
     await backend.user.create_device_invitation(alice.organization_id, invitation)
     return invitation
@@ -32,7 +32,7 @@ async def device_get_invitation_creator(sock, **kwargs):
 async def test_device_get_invitation_creator_too_late(
     apiv1_anonymous_backend_sock, alice_nd_invitation
 ):
-    with freeze_time(alice_nd_invitation.created_on.add(seconds=INVITATION_VALIDITY + 1)):
+    with freeze_time(alice_nd_invitation.created_on + timedelta(seconds=INVITATION_VALIDITY + 1)):
         rep = await device_get_invitation_creator(
             apiv1_anonymous_backend_sock, invited_device_id=alice_nd_invitation.device_id
         )

@@ -1,7 +1,7 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2019 Scille SAS
 
 import pytest
-from pendulum import datetime
+from parsec.datetime import DateTime
 from unittest.mock import ANY
 
 from parsec.core.types import EntryID
@@ -184,8 +184,8 @@ async def test_no_access_during_reencryption(running_backend, alice2_user_fs, wo
         "id": workspace,
         "type": "folder",
         "base_version": 2,
-        "created": datetime(2000, 1, 2),
-        "updated": datetime(2000, 1, 2),
+        "created": DateTime(2000, 1, 2),
+        "updated": DateTime(2000, 1, 2),
         "is_placeholder": False,
         "need_sync": False,
         "children": ["foo.txt"],
@@ -215,8 +215,8 @@ async def test_no_access_during_reencryption(running_backend, alice2_user_fs, wo
         "id": workspace,
         "type": "folder",
         "base_version": 2,
-        "created": datetime(2000, 1, 2),
-        "updated": datetime(2000, 1, 3),
+        "created": DateTime(2000, 1, 2),
+        "updated": DateTime(2000, 1, 3),
         "is_placeholder": False,
         "need_sync": True,
         "children": ["bar.txt", "foo.txt"],
@@ -238,8 +238,8 @@ async def test_no_access_during_reencryption(running_backend, alice2_user_fs, wo
         "id": ANY,
         "type": "file",
         "base_version": 2,
-        "created": datetime(2000, 1, 2),
-        "updated": datetime(2000, 1, 2),
+        "created": DateTime(2000, 1, 2),
+        "updated": DateTime(2000, 1, 2),
         "is_placeholder": False,
         "need_sync": False,
         "size": 2,
