@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2020-12-08 11:12+0100\n"
+"POT-Creation-Date: 2021-02-24 08:04+0100\n"
 "PO-Revision-Date: 2020-10-15 10:31+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: fr\n"
@@ -20,6 +20,9 @@ msgstr ""
 
 msgid "TEXT_PARSEC_VERSION_version"
 msgstr "PARSEC version {version}"
+
+msgid "ACTION_DEVICE_MENU_CHANGE_PASSWORD"
+msgstr "Changer le mot de passe"
 
 msgid "ACTION_LOG_OUT"
 msgstr "Se déconnecter"
@@ -303,9 +306,6 @@ msgstr "Erreur"
 msgid "TEXT_DEVICE_IS_CURRENT"
 msgstr "actuel"
 
-msgid "ACTION_DEVICE_MENU_CHANGE_PASSWORD"
-msgstr "Changer le mot de passe"
-
 msgid "TEXT_INVITE_DEVICE_INVITE_OFFLINE"
 msgstr "Le serveur est hors-ligne ou vous n'avez pas de connexion internet."
 
@@ -347,11 +347,11 @@ msgstr "Ko"
 msgid "TEXT_FILE_SIZE_B"
 msgstr "o"
 
-msgid "ACTION_FILE_OPEN_CURRENT_DIRECTORY"
-msgstr "Ouvrir le répertoire dans l'explorateur de fichiers"
-
 msgid "ACTION_FILE_OPEN_CURRENT_DIRECTORY_MAC"
 msgstr "Ouvrir le répertoire dans le Finder"
+
+msgid "ACTION_FILE_OPEN_CURRENT_DIRECTORY"
+msgstr "Ouvrir le répertoire dans l'explorateur de fichiers"
 
 msgid "ACTION_FILE_MENU_OPEN"
 msgstr "Ouvrir"
@@ -717,10 +717,9 @@ msgstr ""
 msgid "TEXT_LOGIN_ERROR_FUSE_NOT_AVAILABLE"
 msgstr ""
 "FUSE n'a pas pu être chargé.<br>Merci de vérifier votre "
-"installation.<br><br>Sur Mac, il est nécessaire d'installer macFUSE"
-" et de l'accepter dans les réglages de sécurité.<br>À partir "
-"de Mac OS 11.x, un rédémarrage est nécessaire après l'installation de "
-"macFUSE.<br><br><a "
+"installation.<br><br>Sur Mac, il est nécessaire d'installer macFUSE et de"
+" l'accepter dans les réglages de sécurité.<br>À partir de Mac OS 11.x, un"
+" rédémarrage est nécessaire après l'installation de macFUSE.<br><br><a "
 "href=\"https://osxfuse.github.io/2021/01/02/macFUSE-4.0.4.html\">Télécharger"
 " macFUSE ici</a>"
 
@@ -1880,11 +1879,11 @@ msgstr "Cet utilisateur fait déjà parti de cette organisation."
 msgid "TEXT_INVITE_USER_INVITE_ERROR"
 msgstr "Impossible d'inviter l'utilisateur."
 
-msgid "ACTION_WORKSPACE_OPEN_IN_FILE_EXPLORER"
-msgstr "Ouvrir dans l'explorateur de fichiers"
-
 msgid "ACTION_WORKSPACE_OPEN_IN_FINDER"
 msgstr "Ouvrir dans le Finder"
+
+msgid "ACTION_WORKSPACE_OPEN_IN_FILE_EXPLORER"
+msgstr "Ouvrir dans l'explorateur de fichiers"
 
 msgid "ACTION_WORKSPACE_RENAME"
 msgstr "Renommer"
@@ -1937,8 +1936,8 @@ msgstr "Non partagé"
 msgid "TEXT_WORKSPACE_SHARING_USER_HAS_BEEN_REVOKED"
 msgstr "Cet utilisateur a été révoqué."
 
-msgid "TEXT_WORKSPACE_SHesARING_OFFLINE"
-msgstr "Le serveur est hors-ligne ou vous n'avez pas de connexion internet."
+msgid "TEXT_WORKSPACE_SHARING_OFFLINE"
+msgstr ""
 
 msgid "TEXT_WORKSPACE_SHARING_UNSHARE_ERROR_workspace-user"
 msgstr ""
@@ -2444,6 +2443,9 @@ msgstr ""
 "/>Nous vous conseillons également de créer plusieurs appareils et de "
 "partager vos espaces de travail."
 
+msgid "TEXT_CAPS_LOCK_IS_ON"
+msgstr "Attention : la touche VERR. MAJ. est activée."
+
 msgid "TEXT_SETTINGS_BEHAVIOR_TITLE"
 msgstr "Comportement"
 
@@ -2554,4 +2556,7 @@ msgstr "Créer un nouvel espace de travail"
 
 msgid "ACTION_WORKSPACE_GOTO_FILE_LINK"
 msgstr "Trouver un fichier via son lien"
+
+#~ msgid "TEXT_WORKSPACE_SHesARING_OFFLINE"
+#~ msgstr "Le serveur est hors-ligne ou vous n'avez pas de connexion internet."
 

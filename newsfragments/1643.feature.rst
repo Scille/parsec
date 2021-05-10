@@ -1,0 +1,1 @@
+Added caps lock indicator when entering a password

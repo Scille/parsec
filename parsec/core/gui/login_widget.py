@@ -9,6 +9,7 @@ from parsec.core.local_device import list_available_devices, AvailableDevice
 
 from parsec.core.gui.lang import translate as _
 from parsec.core.gui.parsec_application import ParsecApp
+from parsec.core.gui import desktop
 from parsec.core.gui.ui.login_widget import Ui_LoginWidget
 from parsec.core.gui.ui.account_button import Ui_AccountButton
 from parsec.core.gui.ui.login_accounts_widget import Ui_LoginAccountsWidget
@@ -67,11 +68,16 @@ class LoginPasswordInputWidget(QWidget, Ui_LoginPasswordInputWidget):
                 email="",
             )
         )
+        self.line_edit_password.textChanged.connect(self._on_password_text_changed)
+        self.label_caps_lock.setVisible(desktop.is_caps_lock_on())
 
     def _on_log_in_clicked(self):
         self.button_login.setDisabled(True)
         self.button_login.setText(_("ACTION_LOGGING_IN"))
         self.log_in_clicked.emit(self.device.key_file_path, self.line_edit_password.text())
+
+    def _on_password_text_changed(self, _):
+        self.label_caps_lock.setVisible(desktop.is_caps_lock_on())
 
     def keyPressEvent(self, event):
         if event.key() in (Qt.Key_Return, Qt.Key_Enter) and self.button_login.isEnabled():

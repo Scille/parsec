@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2020-12-08 11:12+0100\n"
+"POT-Creation-Date: 2021-02-24 08:04+0100\n"
 "PO-Revision-Date: 2020-10-15 10:30+0200\n"
 "Last-Translator: \n"
 "Language: en\n"
@@ -20,6 +20,9 @@ msgstr ""
 
 msgid "TEXT_PARSEC_VERSION_version"
 msgstr "PARSEC version {version}"
+
+msgid "ACTION_DEVICE_MENU_CHANGE_PASSWORD"
+msgstr "Change password"
 
 msgid "ACTION_LOG_OUT"
 msgstr "Log Out"
@@ -286,9 +289,6 @@ msgstr "Error"
 msgid "TEXT_DEVICE_IS_CURRENT"
 msgstr "current"
 
-msgid "ACTION_DEVICE_MENU_CHANGE_PASSWORD"
-msgstr "Change password"
-
 msgid "TEXT_INVITE_DEVICE_INVITE_OFFLINE"
 msgstr "The server is offline or you have no access to the internet."
 
@@ -328,11 +328,11 @@ msgstr "KB"
 msgid "TEXT_FILE_SIZE_B"
 msgstr "B"
 
-msgid "ACTION_FILE_OPEN_CURRENT_DIRECTORY"
-msgstr "Open current directory in the file explorer"
-
 msgid "ACTION_FILE_OPEN_CURRENT_DIRECTORY_MAC"
 msgstr "Open current directory in Finder"
+
+msgid "ACTION_FILE_OPEN_CURRENT_DIRECTORY"
+msgstr "Open current directory in the file explorer"
 
 msgid "ACTION_FILE_MENU_OPEN"
 msgstr "Open"
@@ -675,9 +675,8 @@ msgstr ""
 msgid "TEXT_LOGIN_ERROR_FUSE_NOT_AVAILABLE"
 msgstr ""
 "Fuse could not be loaded.<br>Please check your installation.<br><br>On "
-"Mac, you have to install macFUSE and allow in security "
-"settings.<br>From Mac OS 11.x, a restart is required after macFUSE "
-"installation.<br><br><a "
+"Mac, you have to install macFUSE and allow in security settings.<br>From "
+"Mac OS 11.x, a restart is required after macFUSE installation.<br><br><a "
 "href=\"https://osxfuse.github.io/2021/01/02/macFUSE-4.0.4.html\">Get "
 "macFUSE here</a>"
 
@@ -1831,11 +1830,11 @@ msgstr "This user is already a member of this organization."
 msgid "TEXT_INVITE_USER_INVITE_ERROR"
 msgstr "Could not invite the user."
 
-msgid "ACTION_WORKSPACE_OPEN_IN_FILE_EXPLORER"
-msgstr "Open in the file explorer"
-
 msgid "ACTION_WORKSPACE_OPEN_IN_FINDER"
 msgstr "Open in Finder"
+
+msgid "ACTION_WORKSPACE_OPEN_IN_FILE_EXPLORER"
+msgstr "Open in the file explorer"
 
 msgid "ACTION_WORKSPACE_RENAME"
 msgstr "Rename"
@@ -2378,6 +2377,9 @@ msgstr ""
 "that you will remember. Your data will be encrypted with it and it is not"
 " possible to recover them if your forget it.<br />We also advise that you"
 " create multiple devices if possible and share your workspaces."
+
+msgid "TEXT_CAPS_LOCK_IS_ON"
+msgstr "Warning: CAPS LOCK key is toggled."
 
 msgid "TEXT_SETTINGS_BEHAVIOR_TITLE"
 msgstr "Application behavior"
