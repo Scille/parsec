@@ -271,11 +271,18 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         )
 
     def _on_join_org_clicked(self):
+        default_url = ""
+        try:
+            # Get the clipboard text, try and convert it to parsec addr and use it as default value
+            default_url = BackendActionAddr.from_url(desktop.get_clipboard()).to_url()
+        except ValueError:
+            pass
         url = get_text_input(
             parent=self,
             title=_("TEXT_JOIN_ORG_URL_TITLE"),
             message=_("TEXT_JOIN_ORG_URL_INSTRUCTIONS"),
             placeholder=_("TEXT_JOIN_ORG_URL_PLACEHOLDER"),
+            default_text=default_url,
         )
         if url is None:
             return

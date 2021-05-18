@@ -1,0 +1,1 @@
+Use clipboard content as default URL when joining an org in the GUI
