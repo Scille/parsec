@@ -35,6 +35,7 @@ from parsec.core.fs.storage import LocalDatabase, UserStorage
 
 from parsec.backend import backend_app_factory
 from parsec.backend.config import (
+    OrganizationConfig,
     BackendConfig,
     MockedEmailConfig,
     MockedBlockStoreConfig,
@@ -541,8 +542,9 @@ def backend_factory(
                 "backend_addr": None,
                 "forward_proto_enforce_https": None,
                 "ssl_context": ssl_context if ssl_context else False,
-                "spontaneous_organization_bootstrap": False,
-                "organization_bootstrap_webhook_url": None,
+                "organization_config": OrganizationConfig(
+                    bootstrap_webhook_url=None, spontaneous_bootstrap=False
+                ),
                 **config,
             }
         )
@@ -576,15 +578,16 @@ async def backend(backend_factory, request, fixtures_customization, backend_addr
     tmpdir = tempfile.mkdtemp(prefix="tmp-email-folder-")
     config["email_config"] = MockedEmailConfig(sender="Parsec <no-reply@parsec.com>", tmpdir=tmpdir)
     config["backend_addr"] = backend_addr
+    organization_config = {}
     if fixtures_customization.get("backend_spontaneous_organization_boostrap", False):
-        config["spontaneous_organization_bootstrap"] = True
+        organization_config["spontaneous_bootstrap"] = True
     if fixtures_customization.get("backend_has_webhook", False):
         # Invalid port, hence we should crash if by mistake we try to reach this url
-        config["organization_bootstrap_webhook_url"] = "http://example.com:888888/webhook"
+        organization_config["bootstrap_webhook_url"] = "http://example.com:888888/webhook"
     forward_proto_enforce_https = fixtures_customization.get("backend_forward_proto_enforce_https")
     if forward_proto_enforce_https:
         config["forward_proto_enforce_https"] = forward_proto_enforce_https
-
+    config["organization_config"] = OrganizationConfig(**organization_config)
     async with backend_factory(populated=populated, config=config) as backend:
         yield backend
 

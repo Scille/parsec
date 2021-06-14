@@ -39,7 +39,7 @@ class WebhooksComponent:
         human_email: Optional[str],
         human_label: Optional[str],
     ):
-        if not self._config.organization_bootstrap_webhook_url:
+        if not self._config.organization_config.bootstrap_webhook_url:
             return
         data = organization_bootstrap_webhook_serializer.dumps(
             {
@@ -51,5 +51,5 @@ class WebhooksComponent:
             }
         )
         await trio.to_thread.run_sync(
-            _do_urllib_request, self._config.organization_bootstrap_webhook_url, data
+            _do_urllib_request, self._config.organization_config.bootstrap_webhook_url, data
         )

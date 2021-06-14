@@ -90,6 +90,13 @@ EmailConfig = Union[SmtpEmailConfig, MockedEmailConfig]
 
 
 @attr.s(slots=True, frozen=True, auto_attribs=True)
+class OrganizationConfig:
+    bootstrap_webhook_url: Optional[str] = None
+    spontaneous_bootstrap: bool = False
+    default_users_limit: Optional[int] = None
+
+
+@attr.s(slots=True, frozen=True, auto_attribs=True)
 class BackendConfig:
     administration_token: str
 
@@ -104,8 +111,7 @@ class BackendConfig:
     forward_proto_enforce_https: Optional[Tuple[bytes, bytes]]
     backend_addr: Optional[BackendAddr]
 
-    spontaneous_organization_bootstrap: bool
-    organization_bootstrap_webhook_url: Optional[str]
+    organization_config: OrganizationConfig
 
     debug: bool
 

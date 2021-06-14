@@ -15,6 +15,7 @@ from parsec.logging import configure_logging, configure_sentry_logging
 from parsec.backend import backend_app_factory
 from parsec.backend.config import (
     BackendConfig,
+    OrganizationConfig,
     SmtpEmailConfig,
     MockedEmailConfig,
     MockedBlockStoreConfig,
@@ -333,6 +334,12 @@ organization_id, device_id, device_label (can be null), human_email (can be null
 """,
 )
 @click.option(
+    "--organization-default-users-limit",
+    envvar="PARSEC_ORGANIZATION_DEFAULT_USERS_LIMIT",
+    help="",
+    type=int,
+)
+@click.option(
     "--backend-addr",
     envvar="PARSEC_BACKEND_ADDR",
     required=True,
@@ -455,6 +462,7 @@ def run_cmd(
     administration_token,
     spontaneous_organization_bootstrap,
     organization_bootstrap_webhook,
+    organization_default_users_limit,
     backend_addr,
     email_host,
     email_port,
@@ -509,13 +517,18 @@ def run_cmd(
                 sender=email_sender,
             )
 
+        organization_config = OrganizationConfig(
+            bootstrap_webhook_url=organization_bootstrap_webhook,
+            spontaneous_bootstrap=spontaneous_organization_bootstrap,
+            default_users_limit=organization_default_users_limit,
+        )
+
         app_config = BackendConfig(
             administration_token=administration_token,
             db_url=db,
             db_min_connections=db_min_connections,
             db_max_connections=db_max_connections,
-            spontaneous_organization_bootstrap=spontaneous_organization_bootstrap,
-            organization_bootstrap_webhook_url=organization_bootstrap_webhook,
+            organization_config=organization_config,
             blockstore_config=blockstore,
             email_config=email_config,
             ssl_context=True if ssl_context else False,
