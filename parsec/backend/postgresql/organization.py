@@ -30,8 +30,8 @@ from parsec.backend.postgresql.handler import send_signal
 
 _q_insert_organization = Q(
     """
-INSERT INTO organization (organization_id, bootstrap_token, expiration_date, user_profile_outsider_allowed)
-VALUES ($organization_id, $bootstrap_token, $expiration_date, FALSE)
+INSERT INTO organization (organization_id, bootstrap_token, expiration_date, user_profile_outsider_allowed, users_limit)
+VALUES ($organization_id, $bootstrap_token, $expiration_date, FALSE, $users_limit)
 ON CONFLICT (organization_id) DO
     UPDATE SET
         bootstrap_token = EXCLUDED.bootstrap_token,
@@ -124,7 +124,11 @@ class PGOrganizationComponent(BaseOrganizationComponent):
         self.dbh = dbh
 
     async def create(
-        self, id: OrganizationID, bootstrap_token: str, expiration_date: Optional[DateTime] = None
+        self,
+        id: OrganizationID,
+        bootstrap_token: str,
+        expiration_date: Optional[DateTime] = None,
+        users_limit: Optional[int] = None,
     ) -> None:
         async with self.dbh.pool.acquire() as conn:
             try:
@@ -133,6 +137,7 @@ class PGOrganizationComponent(BaseOrganizationComponent):
                         organization_id=id,
                         bootstrap_token=bootstrap_token,
                         expiration_date=expiration_date,
+                        users_limit=users_limit,
                     )
                 )
             except UniqueViolationError:

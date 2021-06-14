@@ -25,6 +25,7 @@ from parsec.api.data import UserCertificateContent, DeviceCertificateContent, Da
 from parsec.backend.user import User, Device
 from parsec.backend.webhooks import WebhooksComponent
 from parsec.backend.utils import catch_protocol_errors, api, Unset, UnsetType
+from parsec.backend.config import BackendConfig
 
 
 class OrganizationError(Exception):
@@ -62,6 +63,7 @@ class Organization:
     expiration_date: Optional[DateTime] = None
     root_verify_key: Optional[VerifyKey] = None
     user_profile_outsider_allowed: bool = False
+    users_limit: Optional[int] = None
 
     def is_bootstrapped(self):
         return self.root_verify_key is not None
@@ -83,9 +85,12 @@ class OrganizationStats:
 
 
 class BaseOrganizationComponent:
-    def __init__(self, webhooks: WebhooksComponent, bootstrap_token_size: int = 32):
+    def __init__(
+        self, webhooks: WebhooksComponent, config: BackendConfig, bootstrap_token_size: int = 32
+    ):
         self.webhooks = webhooks
         self.bootstrap_token_size = bootstrap_token_size
+        self._config = config
 
     @api("organization_create", handshake_types=[APIV1_HandshakeType.ADMINISTRATION])
     @catch_protocol_errors
@@ -99,6 +104,7 @@ class BaseOrganizationComponent:
                 msg["organization_id"],
                 bootstrap_token=bootstrap_token,
                 expiration_date=expiration_date,
+                users_limit=self._config.organization_config.default_users_limit,
             )
 
         except OrganizationAlreadyExistsError:

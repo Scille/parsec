@@ -48,7 +48,11 @@ class MemoryOrganizationComponent(BaseOrganizationComponent):
         self._realm_component = realm
 
     async def create(
-        self, id: OrganizationID, bootstrap_token: str, expiration_date: Optional[DateTime] = None
+        self,
+        id: OrganizationID,
+        bootstrap_token: str,
+        expiration_date: Optional[DateTime] = None,
+        users_limit: Optional[int] = None,
     ) -> None:
         org = self._organizations.get(id)
 
@@ -57,7 +61,10 @@ class MemoryOrganizationComponent(BaseOrganizationComponent):
             raise OrganizationAlreadyExistsError()
 
         self._organizations[id] = Organization(
-            organization_id=id, bootstrap_token=bootstrap_token, expiration_date=expiration_date
+            organization_id=id,
+            bootstrap_token=bootstrap_token,
+            expiration_date=expiration_date,
+            users_limit=users_limit,
         )
 
     async def get(self, id: OrganizationID) -> Organization:
