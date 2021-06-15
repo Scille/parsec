@@ -101,12 +101,16 @@ WHERE organization_id = $organization_id
 
 
 @lru_cache()
-def _q_update_factory(with_expiration_date: bool, with_user_profile_outsider_allowed: bool):
+def _q_update_factory(
+    with_expiration_date: bool, with_user_profile_outsider_allowed: bool, with_users_limit: bool
+):
     fields = []
     if with_expiration_date:
         fields.append("expiration_date = $expiration_date")
     if with_user_profile_outsider_allowed:
         fields.append("user_profile_outsider_allowed = $user_profile_outsider_allowed")
+    if with_users_limit:
+        fields.append("users_limit = $users_limit")
 
     return Q(
         f"""
@@ -214,6 +218,7 @@ class PGOrganizationComponent(BaseOrganizationComponent):
         id: OrganizationID,
         expiration_date: Union[UnsetType, Optional[DateTime]] = Unset,
         user_profile_outsider_allowed: Union[UnsetType, bool] = Unset,
+        users_limit: Union[UnsetType, int] = Unset,
     ) -> None:
         """
         Raises:
@@ -224,16 +229,21 @@ class PGOrganizationComponent(BaseOrganizationComponent):
 
         with_expiration_date = expiration_date is not Unset
         with_user_profile_outsider_allowed = user_profile_outsider_allowed is not Unset
+        with_users_limit = users_limit is not Unset
 
         if with_expiration_date:
             fields["expiration_date"] = expiration_date
         if with_user_profile_outsider_allowed:
             fields["user_profile_outsider_allowed"] = user_profile_outsider_allowed
+        if with_users_limit:
+            fields["users_limit"] = users_limit
 
         q = _q_update_factory(
             with_expiration_date=with_expiration_date,
             with_user_profile_outsider_allowed=with_user_profile_outsider_allowed,
+            with_users_limit=with_users_limit,
         )
+
         async with self.dbh.pool.acquire() as conn, conn.transaction():
             result = await conn.execute(*q(organization_id=id, **fields))
 

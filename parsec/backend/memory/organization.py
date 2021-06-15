@@ -129,6 +129,7 @@ class MemoryOrganizationComponent(BaseOrganizationComponent):
         id: OrganizationID,
         expiration_date: Union[UnsetType, Optional[DateTime]] = Unset,
         user_profile_outsider_allowed: Union[UnsetType, bool] = Unset,
+        users_limit: Union[UnsetType, int] = Unset,
     ) -> None:
         """
         Raises:
@@ -145,6 +146,8 @@ class MemoryOrganizationComponent(BaseOrganizationComponent):
             organization = organization.evolve(
                 user_profile_outsider_allowed=user_profile_outsider_allowed
             )
+        if users_limit is not Unset:
+            organization = organization.evolve(users_limit=users_limit)
 
         self._organizations[id] = organization
 

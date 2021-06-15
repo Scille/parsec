@@ -121,6 +121,7 @@ class APIV1_OrganizationUpdateReqSchema(BaseReqSchema):
     organization_id = OrganizationIDField(required=True)
     expiration_date = fields.DateTime(allow_none=True, required=False)
     user_profile_outsider_allowed = fields.Boolean(required=False)
+    users_limit = fields.Integer(allow_none=True, required=False)
 
 
 class APIV1_OrganizationUpdateRepSchema(BaseRepSchema):
