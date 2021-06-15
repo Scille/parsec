@@ -43,7 +43,7 @@ ON CONFLICT (organization_id) DO
 
 _q_get_organization = Q(
     """
-SELECT bootstrap_token, root_verify_key, expiration_date, user_profile_outsider_allowed
+SELECT bootstrap_token, root_verify_key, expiration_date, user_profile_outsider_allowed, users_limit
 FROM organization
 WHERE organization_id = $organization_id
 """
@@ -167,6 +167,7 @@ class PGOrganizationComponent(BaseOrganizationComponent):
             root_verify_key=rvk,
             expiration_date=data[2],
             user_profile_outsider_allowed=data[3],
+            users_limit=data[4],
         )
 
     async def bootstrap(
