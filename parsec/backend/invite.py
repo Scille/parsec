@@ -78,6 +78,10 @@ class InvitationAlreadyMemberError(InvitationError):
     pass
 
 
+class InvitationInvalidOrganizationConfig(InvitationError):
+    pass
+
+
 class ConduitState(Enum):
     STATE_1_WAIT_PEERS = "1_WAIT_PEERS"
     STATE_2_1_CLAIMER_HASHED_NONCE = "2_1_CLAIMER_HASHED_NONCE"
@@ -290,6 +294,8 @@ class BaseInviteComponent:
                 )
             except InvitationAlreadyMemberError:
                 return invite_new_serializer.rep_dump({"status": "already_member"})
+            except InvitationInvalidOrganizationConfig:
+                return invite_new_serializer.rep_dump({"status": "not_allowed"})
 
             if msg["send_email"]:
                 if client_ctx.human_handle:

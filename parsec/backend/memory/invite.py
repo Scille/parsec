@@ -20,6 +20,7 @@ from parsec.backend.invite import (
     InvitationAlreadyDeletedError,
     InvitationInvalidStateError,
     InvitationAlreadyMemberError,
+    InvitationInvalidOrganizationConfig,
 )
 
 
@@ -46,6 +47,7 @@ class MemoryInviteComponent(BaseInviteComponent):
 
     def register_components(self, **other_components):
         self._user_component = other_components["user"]
+        self._organization_component = other_components["organization"]
 
     def _get_invitation_and_conduit(
         self,
@@ -176,8 +178,14 @@ class MemoryInviteComponent(BaseInviteComponent):
     ) -> UserInvitation:
         """
         Raise: InvitationAlreadyMemberError
+        Raise: InvitationInvalidOrganizationConfig
         """
         org = self._user_component._organizations[organization_id]
+        users_limit = self._organization_component._organizations[organization_id].users_limit
+
+        if users_limit and users_limit <= len(org.users):
+            raise InvitationInvalidOrganizationConfig()
+
         for _, user in org.users.items():
             if (
                 user.human_handle

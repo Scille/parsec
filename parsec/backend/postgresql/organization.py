@@ -99,6 +99,20 @@ WHERE organization_id = $organization_id
 """
 )
 
+_q_check_users_limit = Q(
+    f"""
+    SELECT
+        organization._id
+    FROM organization
+    LEFT JOIN
+        user_ on user_.organization = organization._id
+    WHERE
+        organization = { q_organization_internal_id("$organization_id") }
+    GROUP BY organization._id
+    HAVING users_limit is NULL OR count(user_) < users_limit;
+"""
+)
+
 
 @lru_cache()
 def _q_update_factory(
