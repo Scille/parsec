@@ -487,7 +487,8 @@ class PGInviteComponent(BaseInviteComponent):
             )
             if user_id:
                 raise InvitationAlreadyMemberError()
-            data = conn.fetchrow(*_q_check_users_limit(organization_id=organization_id))
+            data = await conn.fetchrow(*_q_check_users_limit(organization_id=organization_id))
+
             if not data:
                 raise InvitationInvalidOrganizationConfig()
 
