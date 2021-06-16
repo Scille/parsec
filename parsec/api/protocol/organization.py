@@ -112,6 +112,7 @@ class OrganizationConfigReqSchema(BaseReqSchema):
 class OrganizationConfigRepSchema(BaseRepSchema):
     expiration_date = fields.DateTime(allow_none=True, required=False)
     user_profile_outsider_allowed = fields.Boolean(required=True)
+    users_limit = fields.Integer(required=True, allow_none=True)
 
 
 organization_config_serializer = CmdSerializer(

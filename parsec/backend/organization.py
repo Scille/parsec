@@ -147,7 +147,6 @@ class BaseOrganizationComponent:
     async def api_authenticated_organization_config(self, client_ctx, msg):
         msg = organization_config_serializer.req_load(msg)
         organization_id = client_ctx.organization_id
-
         try:
             organization = await self.get(organization_id)
 
@@ -158,6 +157,7 @@ class BaseOrganizationComponent:
             {
                 "expiration_date": organization.expiration_date,
                 "user_profile_outsider_allowed": organization.user_profile_outsider_allowed,
+                "users_limit": organization.users_limit,
                 "status": "ok",
             }
         )
