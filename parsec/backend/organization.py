@@ -137,6 +137,7 @@ class BaseOrganizationComponent:
                 "is_bootstrapped": organization.is_bootstrapped(),
                 "expiration_date": organization.expiration_date,
                 "user_profile_outsider_allowed": organization.user_profile_outsider_allowed,
+                "users_limit": organization.users_limit,
                 "status": "ok",
             }
         )
