@@ -12,6 +12,7 @@ class APIV1_OrganizationCreateReqSchema(BaseReqSchema):
 class APIV1_OrganizationCreateRepSchema(BaseRepSchema):
     bootstrap_token = fields.String(required=True)
     expiration_date = fields.DateTime(allow_none=True, required=False)
+    users_limit = fields.Integer(allow_none=True, required=True)
 
 
 apiv1_organization_create_serializer = CmdSerializer(

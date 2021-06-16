@@ -99,18 +99,23 @@ class BaseOrganizationComponent:
 
         bootstrap_token = token_hex(self.bootstrap_token_size)
         expiration_date = msg.get("expiration_date", None)
+        default_users_limit = self._config.organization_config.default_users_limit
         try:
             await self.create(
                 msg["organization_id"],
                 bootstrap_token=bootstrap_token,
                 expiration_date=expiration_date,
-                users_limit=self._config.organization_config.default_users_limit,
+                users_limit=default_users_limit,
             )
 
         except OrganizationAlreadyExistsError:
             return {"status": "already_exists"}
 
-        rep = {"bootstrap_token": bootstrap_token, "status": "ok"}
+        rep = {
+            "users_limit": default_users_limit,
+            "bootstrap_token": bootstrap_token,
+            "status": "ok",
+        }
         if expiration_date:
             rep["expiration_date"] = expiration_date
 

@@ -84,12 +84,20 @@ async def test_organization_recreate_and_bootstrap(
 ):
     neworg = organization_factory("NewOrg")
     rep = await organization_create(administration_backend_sock, neworg.organization_id)
-    assert rep == {"status": "ok", "bootstrap_token": ANY}
+    assert rep == {
+        "status": "ok",
+        "bootstrap_token": ANY,
+        "users_limit": backend.config.organization_config.default_users_limit,
+    }
     bootstrap_token1 = rep["bootstrap_token"]
 
     # Can recreate the organization as long as it hasn't been bootstrapped yet
     rep = await organization_create(administration_backend_sock, neworg.organization_id)
-    assert rep == {"status": "ok", "bootstrap_token": ANY}
+    assert rep == {
+        "status": "ok",
+        "bootstrap_token": ANY,
+        "users_limit": backend.config.organization_config.default_users_limit,
+    }
     bootstrap_token2 = rep["bootstrap_token"]
 
     assert bootstrap_token1 != bootstrap_token2
@@ -139,7 +147,11 @@ async def test_organization_create_and_bootstrap(
     # will contain an invalid token
 
     rep = await organization_create(administration_backend_sock, neworg.organization_id)
-    assert rep == {"status": "ok", "bootstrap_token": ANY}
+    assert rep == {
+        "status": "ok",
+        "bootstrap_token": ANY,
+        "users_limit": backend.config.organization_config.default_users_limit,
+    }
     bootstrap_token = rep["bootstrap_token"]
 
     # 2) Bootstrap organization
@@ -212,7 +224,12 @@ async def test_organization_with_expiration_date_create_and_bootstrap(
         rep = await organization_create(
             administration_backend_sock, neworg.organization_id, expiration_date=expiration_date
         )
-        assert rep == {"status": "ok", "bootstrap_token": ANY, "expiration_date": expiration_date}
+        assert rep == {
+            "status": "ok",
+            "bootstrap_token": ANY,
+            "users_limit": backend.config.organization_config.default_users_limit,
+            "expiration_date": expiration_date,
+        }
         bootstrap_token = rep["bootstrap_token"]
 
         # 2) Bootstrap organization
@@ -273,7 +290,12 @@ async def test_organization_expired_create_and_bootstrap(
     rep = await organization_create(
         administration_backend_sock, neworg.organization_id, expiration_date=expiration_date
     )
-    assert rep == {"status": "ok", "bootstrap_token": ANY, "expiration_date": expiration_date}
+    assert rep == {
+        "status": "ok",
+        "bootstrap_token": ANY,
+        "users_limit": backend.config.organization_config.default_users_limit,
+        "expiration_date": expiration_date,
+    }
 
     # 2) Connection to backend for bootstrap purpose is not possible
 
@@ -284,7 +306,11 @@ async def test_organization_expired_create_and_bootstrap(
     # 3) Now re-create the organization to overwrite the expiration date
 
     rep = await organization_create(administration_backend_sock, neworg.organization_id)
-    assert rep == {"status": "ok", "bootstrap_token": ANY}
+    assert rep == {
+        "status": "ok",
+        "bootstrap_token": ANY,
+        "users_limit": backend.config.organization_config.default_users_limit,
+    }
 
     # 4) This time, bootstrap is possible
 

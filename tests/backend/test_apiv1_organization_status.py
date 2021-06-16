@@ -46,12 +46,16 @@ async def test_organization_status_bootstrapped(coolorg, administration_backend_
 
 @pytest.mark.trio
 async def test_organization_status_not_bootstrapped(
-    organization_factory, administration_backend_sock
+    organization_factory, administration_backend_sock, backend
 ):
     # 1) Create organization
     neworg = organization_factory("NewOrg")
     rep = await organization_create(administration_backend_sock, neworg.organization_id)
-    assert rep == {"status": "ok", "bootstrap_token": ANY}
+    assert rep == {
+        "status": "ok",
+        "bootstrap_token": ANY,
+        "users_limit": backend.config.organization_config.default_users_limit,
+    }
 
     # 2) Check its status
     rep = await organization_status(administration_backend_sock, neworg.organization_id)
