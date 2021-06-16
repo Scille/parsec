@@ -203,7 +203,7 @@ async def test_invite_with_users_limit(backend, alice, alice_backend_sock):
         claimer_email="toto@example.com",
         send_email=False,
     )
-    assert rep == {"status": "not_allowed"}
+    assert rep == {"status": "not_allowed", "reason": "User's limit reached"}
 
 
 @pytest.mark.trio

@@ -295,7 +295,9 @@ class BaseInviteComponent:
             except InvitationAlreadyMemberError:
                 return invite_new_serializer.rep_dump({"status": "already_member"})
             except InvitationInvalidOrganizationConfig:
-                return invite_new_serializer.rep_dump({"status": "not_allowed"})
+                return invite_new_serializer.rep_dump(
+                    {"status": "not_allowed", "reason": "User's limit reached"}
+                )
 
             if msg["send_email"]:
                 if client_ctx.human_handle:
