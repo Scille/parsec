@@ -113,6 +113,7 @@ async def test_user_create_and_info(
 async def test_device_create_and_info(
     backend, alice, alice_backend_sock, alice2_backend_sock, backend_invited_sock_factory
 ):
+
     # Provide other unrelated invitations that should stay unchanged
     with backend.event_bus.listen() as spy:
         other_user_invitation = await backend.invite.new_for_user(
@@ -172,6 +173,37 @@ async def test_device_create_and_info(
             "greeter_user_id": alice.user_id,
             "greeter_human_handle": alice.human_handle,
         }
+
+
+@pytest.mark.trio
+async def test_invite_with_users_limit(backend, alice, alice_backend_sock):
+    org = await backend.organization.get(alice.organization_id)
+    nb_users = (await backend.user.find(alice.organization_id))[1]
+
+    assert nb_users == 3
+    assert org.users_limit is None
+
+    # User invitation
+    rep = await invite_new(
+        alice_backend_sock,
+        type=InvitationType.USER,
+        claimer_email="zack@example.com",
+        send_email=False,
+    )
+    assert rep == {"status": "ok", "token": ANY}
+
+    await backend.organization.update(alice.organization_id, users_limit=3)
+    org = await backend.organization.get(alice.organization_id)
+    assert org.users_limit == 3
+
+    # User invitation
+    rep = await invite_new(
+        alice_backend_sock,
+        type=InvitationType.USER,
+        claimer_email="toto@example.com",
+        send_email=False,
+    )
+    assert rep == {"status": "not_allowed"}
 
 
 @pytest.mark.trio
