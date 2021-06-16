@@ -13,8 +13,10 @@ from parsec.backend.user import (
     UserInvitation,
     DeviceInvitation,
     HumanFindResultItem,
+    UserLimitReached,
 )
 from parsec.backend.postgresql.handler import PGHandler
+from parsec.backend.postgresql.organization import _q_check_users_limit
 from parsec.backend.postgresql.user_queries import (
     query_create_user,
     query_create_device,
@@ -46,6 +48,9 @@ class PGUserComponent(BaseUserComponent):
         self, organization_id: OrganizationID, user: User, first_device: Device
     ) -> None:
         async with self.dbh.pool.acquire() as conn:
+            data = conn.fetchrow(*_q_check_users_limit(organization_id=organization_id))
+            if not data:
+                raise UserLimitReached()
             await query_create_user(conn, organization_id, user, first_device)
 
     async def create_device(
