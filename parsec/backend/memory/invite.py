@@ -20,7 +20,6 @@ from parsec.backend.invite import (
     InvitationAlreadyDeletedError,
     InvitationInvalidStateError,
     InvitationAlreadyMemberError,
-    InvitationInvalidOrganizationConfig,
 )
 
 
@@ -178,13 +177,8 @@ class MemoryInviteComponent(BaseInviteComponent):
     ) -> UserInvitation:
         """
         Raise: InvitationAlreadyMemberError
-        Raise: InvitationInvalidOrganizationConfig
         """
         org = self._user_component._organizations[organization_id]
-        users_limit = self._organization_component._organizations[organization_id].users_limit
-
-        if users_limit and users_limit <= len(org.users):
-            raise InvitationInvalidOrganizationConfig()
 
         for _, user in org.users.items():
             if (

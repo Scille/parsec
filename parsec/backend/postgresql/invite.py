@@ -26,7 +26,6 @@ from parsec.backend.invite import (
     InvitationAlreadyDeletedError,
     InvitationInvalidStateError,
     InvitationAlreadyMemberError,
-    InvitationInvalidOrganizationConfig,
 )
 from parsec.backend.postgresql.utils import (
     Q,
@@ -36,7 +35,6 @@ from parsec.backend.postgresql.utils import (
     STR_TO_INVITATION_CONDUIT_STATE,
 )
 from parsec.backend.postgresql.user_queries.find import query_retrieve_active_human_by_email
-from parsec.backend.postgresql.organization import _q_check_users_limit
 
 _q_retrieve_compatible_user_invitation = Q(
     f"""
@@ -478,7 +476,6 @@ class PGInviteComponent(BaseInviteComponent):
     ) -> UserInvitation:
         """
         Raise: InvitationAlreadyMemberError
-        Raise: InvitationInvalidOrganizationConfig
         """
         created_on = created_on or pendulum_now()
         async with self.dbh.pool.acquire() as conn, conn.transaction():
@@ -487,10 +484,6 @@ class PGInviteComponent(BaseInviteComponent):
             )
             if user_id:
                 raise InvitationAlreadyMemberError()
-            data = await conn.fetchrow(*_q_check_users_limit(organization_id=organization_id))
-
-            if not data:
-                raise InvitationInvalidOrganizationConfig()
 
             token = await _do_new_user_invitation(
                 conn,

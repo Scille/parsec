@@ -176,37 +176,6 @@ async def test_device_create_and_info(
 
 
 @pytest.mark.trio
-async def test_invite_with_users_limit(backend, alice, alice_backend_sock):
-    org = await backend.organization.get(alice.organization_id)
-    nb_users = (await backend.user.find(alice.organization_id))[1]
-
-    assert nb_users == 3
-    assert org.users_limit is None
-
-    # User invitation
-    rep = await invite_new(
-        alice_backend_sock,
-        type=InvitationType.USER,
-        claimer_email="zack@example.com",
-        send_email=False,
-    )
-    assert rep == {"status": "ok", "token": ANY}
-
-    await backend.organization.update(alice.organization_id, users_limit=3)
-    org = await backend.organization.get(alice.organization_id)
-    assert org.users_limit == 3
-
-    # User invitation
-    rep = await invite_new(
-        alice_backend_sock,
-        type=InvitationType.USER,
-        claimer_email="toto@example.com",
-        send_email=False,
-    )
-    assert rep == {"status": "not_allowed", "reason": "User's limit reached"}
-
-
-@pytest.mark.trio
 async def test_invite_with_send_mail(alice, alice_backend_sock, email_letterbox):
     # User invitation
     rep = await invite_new(

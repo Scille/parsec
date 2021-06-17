@@ -231,7 +231,6 @@ class UsersWidget(QWidget, Ui_UsersWidget):
         self.layout_content.addLayout(self.layout_users)
         self.button_add_user.apply_style()
         if core.device.is_admin:
-            self.button_add_user.setDisabled(True)
             self.button_add_user.clicked.connect(self.invite_user)
         else:
             self.button_add_user.hide()
@@ -458,9 +457,6 @@ class UsersWidget(QWidget, Ui_UsersWidget):
 
         users_limit = self.core.get_organization_config().users_limit
         add_users_disabled = users_limit is not None and len(users) >= users_limit
-        self.button_add_user.setDisabled(add_users_disabled)
-        if add_users_disabled:
-            self.button_add_user.setToolTip(_("USERS_LIMIT_REACHED"))
 
         for invitation in reversed(invitations):
             addr = BackendInvitationAddr.build(
