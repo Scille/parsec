@@ -2506,3 +2506,6 @@ msgstr "Create a new workspace"
 
 msgid "ACTION_WORKSPACE_GOTO_FILE_LINK"
 msgstr "Go to a file using a link"
+
+msgid "USERS_LIMIT_REACHED"
+msgstr "User's limit reached"

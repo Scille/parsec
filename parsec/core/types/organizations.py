@@ -1,5 +1,6 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2016-2021 Scille SAS
 import attr
+from typing import Optional
 from pendulum import DateTime
 
 
@@ -14,3 +15,4 @@ class OrganizationStats:
 class OrganizationConfig:
     expiration_date: DateTime
     user_profile_outsider_allowed: bool
+    users_limit: Optional[int]

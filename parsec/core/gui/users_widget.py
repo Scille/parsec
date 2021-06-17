@@ -231,6 +231,7 @@ class UsersWidget(QWidget, Ui_UsersWidget):
         self.layout_content.addLayout(self.layout_users)
         self.button_add_user.apply_style()
         if core.device.is_admin:
+            self.button_add_user.setDisabled(True)
             self.button_add_user.clicked.connect(self.invite_user)
         else:
             self.button_add_user.hide()
@@ -313,10 +314,13 @@ class UsersWidget(QWidget, Ui_UsersWidget):
         button.revoke_clicked.connect(self.revoke_user)
         button.show()
 
-    def add_user_invitation(self, email, invite_addr):
+    def add_user_invitation(self, email, invite_addr, greet_disabled):
         button = UserInvitationButton(email, invite_addr)
         self.layout_users.addWidget(button)
         button.greet_clicked.connect(self.greet_user)
+        button.setDisabled(greet_disabled)
+        if greet_disabled:
+            button.setToolTip(_("USERS_LIMIT_REACHED"))
         button.cancel_clicked.connect(self.cancel_invitation)
         button.show()
 
@@ -451,6 +455,13 @@ class UsersWidget(QWidget, Ui_UsersWidget):
         self._flush_users_list()
 
         current_user = self.core.device.user_id
+
+        users_limit = self.core.get_organization_config().users_limit
+        add_users_disabled = users_limit is not None and len(users) >= users_limit
+        self.button_add_user.setDisabled(add_users_disabled)
+        if add_users_disabled:
+            self.button_add_user.setToolTip(_("USERS_LIMIT_REACHED"))
+
         for invitation in reversed(invitations):
             addr = BackendInvitationAddr.build(
                 backend_addr=self.core.device.organization_addr,
@@ -458,10 +469,11 @@ class UsersWidget(QWidget, Ui_UsersWidget):
                 invitation_type=InvitationType.USER,
                 token=invitation["token"],
             )
-            self.add_user_invitation(invitation["claimer_email"], addr)
+            self.add_user_invitation(invitation["claimer_email"], addr, add_users_disabled)
         for user_info in users:
             self.add_user(user_info=user_info, is_current_user=current_user == user_info.user_id)
         self.spinner.hide()
+
         self.pagination(total=total, users_on_page=len(users))
         self.button_users_filter.setEnabled(True)
         self.line_edit_search.setEnabled(True)
