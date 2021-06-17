@@ -231,6 +231,7 @@ class UsersWidget(QWidget, Ui_UsersWidget):
         self.layout_content.addLayout(self.layout_users)
         self.button_add_user.apply_style()
         if core.device.is_admin:
+            self.button_add_user.setDisabled(True)
             self.button_add_user.clicked.connect(self.invite_user)
         else:
             self.button_add_user.hide()
