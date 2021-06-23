@@ -37,7 +37,7 @@ from parsec.core.gui.lang import translate as _
 from parsec.core.gui.custom_widgets import Pixmap
 from parsec.core.gui.custom_dialogs import show_error
 from parsec.core.gui.ui.central_widget import Ui_CentralWidget
-from parsec.core.gui.trio_thread import JobResultError, ThreadSafeQtSignal, QtToTrioJob
+from parsec.core.gui.trio_thread import JobResultError, QtToTrioJob
 
 
 async def _do_get_organization_stats(core: LoggedCore) -> OrganizationStats:
@@ -260,8 +260,8 @@ class CentralWidget(QWidget, Ui_CentralWidget):  # type: ignore[misc]
         self.jobs_ctx.submit_throttled_job(
             "central_widget.load_organization_stats",
             delay,
-            ThreadSafeQtSignal(self, "organization_stats_success", QtToTrioJob),
-            ThreadSafeQtSignal(self, "organization_stats_error", QtToTrioJob),
+            self.organization_stats_success,
+            self.organization_stats_error,
             _do_get_organization_stats,
             core=self.core,
         )

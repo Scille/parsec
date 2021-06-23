@@ -36,12 +36,7 @@ from parsec.core.mountpoint.exceptions import (
     MountpointNoDriveAvailable,
 )
 
-from parsec.core.gui.trio_thread import (
-    JobResultError,
-    ThreadSafeQtSignal,
-    QtToTrioJob,
-    JobSchedulerNotAvailable,
-)
+from parsec.core.gui.trio_thread import JobResultError, QtToTrioJob, JobSchedulerNotAvailable
 from parsec.core.gui import desktop
 from parsec.core.gui.custom_dialogs import show_error, get_text_input, ask_question
 from parsec.core.gui.flow_layout import FlowLayout
@@ -398,8 +393,8 @@ class WorkspacesWidget(QWidget, Ui_WorkspacesWidget):
             if button.is_owner:
                 try:
                     self.jobs_ctx.submit_job(
-                        ThreadSafeQtSignal(self, "reencryption_needs_success", QtToTrioJob),
-                        ThreadSafeQtSignal(self, "reencryption_needs_error", QtToTrioJob),
+                        self.reencryption_needs_success,
+                        self.reencryption_needs_error,
                         _get_reencryption_needs,
                         workspace_fs=workspace_fs,
                     )
@@ -502,8 +497,8 @@ class WorkspacesWidget(QWidget, Ui_WorkspacesWidget):
         if token in workspace_name:
             workspace_name, *_ = workspace_name.split(token)
             self.jobs_ctx.submit_job(
-                ThreadSafeQtSignal(self, "ignore_success", QtToTrioJob),
-                ThreadSafeQtSignal(self, "ignore_error", QtToTrioJob),
+                self.ignore_success,
+                self.ignore_error,
                 _do_workspace_rename,
                 core=self.core,
                 workspace_id=workspace_fs.workspace_id,
@@ -559,8 +554,8 @@ class WorkspacesWidget(QWidget, Ui_WorkspacesWidget):
 
     def mount_workspace(self, workspace_id, timestamp=None):
         self.jobs_ctx.submit_job(
-            ThreadSafeQtSignal(self, "mount_success", QtToTrioJob),
-            ThreadSafeQtSignal(self, "mount_error", QtToTrioJob),
+            self.mount_success,
+            self.mount_error,
             _do_workspace_mount,
             core=self.core,
             workspace_id=workspace_id,
@@ -569,8 +564,8 @@ class WorkspacesWidget(QWidget, Ui_WorkspacesWidget):
 
     def unmount_workspace(self, workspace_id, timestamp=None):
         self.jobs_ctx.submit_job(
-            ThreadSafeQtSignal(self, "unmount_success", QtToTrioJob),
-            ThreadSafeQtSignal(self, "unmount_error", QtToTrioJob),
+            self.unmount_success,
+            self.unmount_error,
             _do_workspace_unmount,
             core=self.core,
             workspace_id=workspace_id,
@@ -620,8 +615,8 @@ class WorkspacesWidget(QWidget, Ui_WorkspacesWidget):
         if not new_name:
             return
         self.jobs_ctx.submit_job(
-            ThreadSafeQtSignal(self, "rename_success", QtToTrioJob),
-            ThreadSafeQtSignal(self, "rename_error", QtToTrioJob),
+            self.rename_success,
+            self.rename_error,
             _do_workspace_rename,
             core=self.core,
             workspace_id=workspace_button.workspace_fs.workspace_id,
@@ -701,12 +696,10 @@ class WorkspacesWidget(QWidget, Ui_WorkspacesWidget):
         workspace_button.reencrypting = 1, 0
 
         self.jobs_ctx.submit_job(
-            ThreadSafeQtSignal(self, "workspace_reencryption_success", QtToTrioJob),
-            ThreadSafeQtSignal(self, "workspace_reencryption_error", QtToTrioJob),
+            self.workspace_reencryption_success,
+            self.workspace_reencryption_error,
             _reencrypt,
-            on_progress=ThreadSafeQtSignal(
-                self, "workspace_reencryption_progress", EntryID, int, int
-            ),
+            on_progress=self.workspace_reencryption_progress,
             workspace_id=workspace_id,
         )
 
@@ -759,8 +752,8 @@ class WorkspacesWidget(QWidget, Ui_WorkspacesWidget):
         if not workspace_name:
             return
         self.jobs_ctx.submit_job(
-            ThreadSafeQtSignal(self, "create_success", QtToTrioJob),
-            ThreadSafeQtSignal(self, "create_error", QtToTrioJob),
+            self.create_success,
+            self.create_error,
             _do_workspace_create,
             core=self.core,
             workspace_name=workspace_name,
@@ -776,8 +769,8 @@ class WorkspacesWidget(QWidget, Ui_WorkspacesWidget):
         self.jobs_ctx.submit_throttled_job(
             "workspace_widget.list_workspaces",
             self.REFRESH_WORKSPACES_LIST_DELAY,
-            ThreadSafeQtSignal(self, "list_success", QtToTrioJob),
-            ThreadSafeQtSignal(self, "list_error", QtToTrioJob),
+            self.list_success,
+            self.list_error,
             _do_workspace_list,
             core=self.core,
         )

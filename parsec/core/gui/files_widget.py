@@ -18,7 +18,7 @@ from parsec.core.fs.exceptions import (
     FSFileNotFoundError,
 )
 
-from parsec.core.gui.trio_thread import JobResultError, ThreadSafeQtSignal, QtToTrioJob
+from parsec.core.gui.trio_thread import JobResultError, QtToTrioJob
 from parsec.core.gui import desktop
 from parsec.core.gui.file_items import FileType, TYPE_DATA_INDEX, UUID_DATA_INDEX
 from parsec.core.gui.custom_dialogs import (
@@ -446,8 +446,8 @@ class FilesWidget(QWidget, Ui_FilesWidget):
 
         if self.clipboard.status == Clipboard.Status.Cut:
             self.jobs_ctx.submit_job(
-                ThreadSafeQtSignal(self, "move_success", QtToTrioJob),
-                ThreadSafeQtSignal(self, "move_error", QtToTrioJob),
+                self.move_success,
+                self.move_error,
                 _do_move_files,
                 workspace_fs=self.workspace_fs,
                 target_dir=self.current_directory,
@@ -461,8 +461,8 @@ class FilesWidget(QWidget, Ui_FilesWidget):
 
         elif self.clipboard.status == Clipboard.Status.Copied:
             self.jobs_ctx.submit_job(
-                ThreadSafeQtSignal(self, "copy_success", QtToTrioJob),
-                ThreadSafeQtSignal(self, "copy_error", QtToTrioJob),
+                self.copy_success,
+                self.copy_error,
                 _do_copy_files,
                 workspace_fs=self.workspace_fs,
                 target_dir=self.current_directory,
@@ -522,8 +522,8 @@ class FilesWidget(QWidget, Ui_FilesWidget):
             if not new_name:
                 return
             self.jobs_ctx.submit_job(
-                ThreadSafeQtSignal(self, "rename_success", QtToTrioJob),
-                ThreadSafeQtSignal(self, "rename_error", QtToTrioJob),
+                self.rename_success,
+                self.rename_error,
                 _do_rename,
                 workspace_fs=self.workspace_fs,
                 paths=[
@@ -546,8 +546,8 @@ class FilesWidget(QWidget, Ui_FilesWidget):
                 return
 
             self.jobs_ctx.submit_job(
-                ThreadSafeQtSignal(self, "rename_success", QtToTrioJob),
-                ThreadSafeQtSignal(self, "rename_error", QtToTrioJob),
+                self.rename_success,
+                self.rename_error,
                 _do_rename,
                 workspace_fs=self.workspace_fs,
                 paths=[
@@ -580,8 +580,8 @@ class FilesWidget(QWidget, Ui_FilesWidget):
         if result != _("ACTION_FILE_DELETE_MULTIPLE") and result != _("ACTION_FILE_DELETE"):
             return
         self.jobs_ctx.submit_job(
-            ThreadSafeQtSignal(self, "delete_success", QtToTrioJob),
-            ThreadSafeQtSignal(self, "delete_error", QtToTrioJob),
+            self.delete_success,
+            self.delete_error,
             _do_delete,
             workspace_fs=self.workspace_fs,
             files=[(self.current_directory / f.name, f.type) for f in files],
@@ -640,8 +640,8 @@ class FilesWidget(QWidget, Ui_FilesWidget):
         self.jobs_ctx.submit_throttled_job(
             "files_widget.reload",
             delay,
-            ThreadSafeQtSignal(self, "folder_stat_success", QtToTrioJob),
-            ThreadSafeQtSignal(self, "folder_stat_error", QtToTrioJob),
+            self.folder_stat_success,
+            self.folder_stat_error,
             _do_folder_stat,
             workspace_fs=self.workspace_fs,
             path=self.current_directory,
@@ -652,8 +652,8 @@ class FilesWidget(QWidget, Ui_FilesWidget):
     def load(self, directory, default_selection=None):
         self.spinner.show()
         self.jobs_ctx.submit_job(
-            ThreadSafeQtSignal(self, "folder_stat_success", QtToTrioJob),
-            ThreadSafeQtSignal(self, "folder_stat_error", QtToTrioJob),
+            self.folder_stat_success,
+            self.folder_stat_error,
             _do_folder_stat,
             workspace_fs=self.workspace_fs,
             path=directory,
@@ -670,13 +670,13 @@ class FilesWidget(QWidget, Ui_FilesWidget):
         self.loading_dialog.show()
 
         self.import_job = self.jobs_ctx.submit_job(
-            ThreadSafeQtSignal(self, "import_success", QtToTrioJob),
-            ThreadSafeQtSignal(self, "import_error", QtToTrioJob),
+            self.import_success,
+            self.import_error,
             _do_import,
             workspace_fs=self.workspace_fs,
             files=files,
             total_size=total_size,
-            progress_signal=ThreadSafeQtSignal(self, "import_progress", str, int),
+            progress_signal=self.import_progress,
         )
 
     def cancel_import(self):
@@ -774,8 +774,8 @@ class FilesWidget(QWidget, Ui_FilesWidget):
         else:
             target_dir = self.current_directory / target_name
         self.jobs_ctx.submit_job(
-            ThreadSafeQtSignal(self, "move_success", QtToTrioJob),
-            ThreadSafeQtSignal(self, "move_error", QtToTrioJob),
+            self.move_success,
+            self.move_error,
             _do_move_files,
             workspace_fs=self.workspace_fs,
             target_dir=target_dir,
@@ -806,8 +806,8 @@ class FilesWidget(QWidget, Ui_FilesWidget):
             return
 
         self.jobs_ctx.submit_job(
-            ThreadSafeQtSignal(self, "folder_create_success", QtToTrioJob),
-            ThreadSafeQtSignal(self, "folder_create_error", QtToTrioJob),
+            self.folder_create_success,
+            self.folder_create_error,
             _do_folder_create,
             workspace_fs=self.workspace_fs,
             path=self.current_directory / folder_name,
@@ -963,8 +963,8 @@ class FilesWidget(QWidget, Ui_FilesWidget):
 
         if hasattr(self.import_job.exc, "status") and self.import_job.exc.status == "cancelled":
             self.jobs_ctx.submit_job(
-                ThreadSafeQtSignal(self, "delete_success", QtToTrioJob),
-                ThreadSafeQtSignal(self, "delete_error", QtToTrioJob),
+                self.delete_success,
+                self.delete_error,
                 _do_delete,
                 workspace_fs=self.workspace_fs,
                 files=[(self.import_job.exc.params["last_file"], FileType.File)],
@@ -1050,8 +1050,8 @@ class FilesWidget(QWidget, Ui_FilesWidget):
         self, timestamp, path, file_type, open_after_load, close_after_remount, reload_after_remount
     ):
         self.jobs_ctx.submit_job(
-            ThreadSafeQtSignal(self, "reload_timestamped_success", QtToTrioJob),
-            ThreadSafeQtSignal(self, "reload_timestamped_error", QtToTrioJob),
+            self.reload_timestamped_success,
+            self.reload_timestamped_error,
             _do_remount_timestamped,
             mountpoint_manager=self.core.mountpoint_manager,
             workspace_fs=self.workspace_fs,

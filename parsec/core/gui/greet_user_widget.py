@@ -10,7 +10,7 @@ from parsec.api.data import UserProfile
 from parsec.api.protocol import HumanHandle
 from parsec.core.backend_connection import BackendNotAvailable
 from parsec.core.invite import InviteError, InvitePeerResetError, InviteAlreadyUsedError
-from parsec.core.gui.trio_thread import JobResultError, ThreadSafeQtSignal, QtToTrioJob
+from parsec.core.gui.trio_thread import JobResultError, QtToTrioJob
 from parsec.core.gui.custom_dialogs import show_error, GreyedDialog, show_info
 from parsec.core.gui import validators
 from parsec.core.gui.lang import translate as _
@@ -179,9 +179,7 @@ class GreetUserInstructionsWidget(QWidget, Ui_GreetUserInstructionsWidget):
         self.button_start.setDisabled(True)
         self.button_start.setText(_("TEXT_GREET_USER_WAITING"))
         self.wait_peer_job = self.jobs_ctx.submit_job(
-            ThreadSafeQtSignal(self, "wait_peer_success", QtToTrioJob),
-            ThreadSafeQtSignal(self, "wait_peer_error", QtToTrioJob),
-            self.greeter.wait_peer,
+            self.wait_peer_success, self.wait_peer_error, self.greeter.wait_peer
         )
 
     def _on_wait_peer_success(self, job):
@@ -258,9 +256,7 @@ class GreetUserCheckInfoWidget(QWidget, Ui_GreetUserCheckInfoWidget):
         self.button_create_user.clicked.connect(self._on_create_user_clicked)
 
         self.get_requests_job = self.jobs_ctx.submit_job(
-            ThreadSafeQtSignal(self, "get_requests_success", QtToTrioJob),
-            ThreadSafeQtSignal(self, "get_requests_error", QtToTrioJob),
-            self.greeter.get_claim_requests,
+            self.get_requests_success, self.get_requests_error, self.greeter.get_claim_requests
         )
 
     def check_infos(self, _=None):
@@ -286,8 +282,8 @@ class GreetUserCheckInfoWidget(QWidget, Ui_GreetUserCheckInfoWidget):
         self.button_create_user.setDisabled(True)
         self.button_create_user.setText(_("TEXT_GREET_USER_WAITING"))
         self.create_user_job = self.jobs_ctx.submit_job(
-            ThreadSafeQtSignal(self, "create_user_success", QtToTrioJob),
-            ThreadSafeQtSignal(self, "create_user_error", QtToTrioJob),
+            self.create_user_success,
+            self.create_user_error,
             self.greeter.create_new_user,
             human_handle=handle,
             device_label=device_label,
@@ -401,17 +397,13 @@ class GreetUserCodeExchangeWidget(QWidget, Ui_GreetUserCodeExchangeWidget):
         self.get_claimer_sas_error.connect(self._on_get_claimer_sas_error)
 
         self.get_greeter_sas_job = self.jobs_ctx.submit_job(
-            ThreadSafeQtSignal(self, "get_greeter_sas_success", QtToTrioJob),
-            ThreadSafeQtSignal(self, "get_greeter_sas_error", QtToTrioJob),
-            self.greeter.get_greeter_sas,
+            self.get_greeter_sas_success, self.get_greeter_sas_error, self.greeter.get_greeter_sas
         )
 
     def _on_good_claimer_code_clicked(self):
         self.widget_claimer_code.setDisabled(True)
         self.signify_trust_job = self.jobs_ctx.submit_job(
-            ThreadSafeQtSignal(self, "signify_trust_success", QtToTrioJob),
-            ThreadSafeQtSignal(self, "signify_trust_error", QtToTrioJob),
-            self.greeter.signify_trust,
+            self.signify_trust_success, self.signify_trust_error, self.greeter.signify_trust
         )
 
     def _on_wrong_claimer_code_clicked(self):
@@ -432,9 +424,7 @@ class GreetUserCodeExchangeWidget(QWidget, Ui_GreetUserCodeExchangeWidget):
         greeter_sas = job.ret
         self.line_edit_greeter_code.setText(str(greeter_sas))
         self.wait_peer_trust_job = self.jobs_ctx.submit_job(
-            ThreadSafeQtSignal(self, "wait_peer_trust_success", QtToTrioJob),
-            ThreadSafeQtSignal(self, "wait_peer_trust_error", QtToTrioJob),
-            self.greeter.wait_peer_trust,
+            self.wait_peer_trust_success, self.wait_peer_trust_error, self.greeter.wait_peer_trust
         )
 
     def _on_get_greeter_sas_error(self, job):
@@ -517,9 +507,7 @@ class GreetUserCodeExchangeWidget(QWidget, Ui_GreetUserCodeExchangeWidget):
         assert job.is_finished()
         assert job.status == "ok"
         self.get_claimer_sas_job = self.jobs_ctx.submit_job(
-            ThreadSafeQtSignal(self, "get_claimer_sas_success", QtToTrioJob),
-            ThreadSafeQtSignal(self, "get_claimer_sas_error", QtToTrioJob),
-            self.greeter.get_claimer_sas,
+            self.get_claimer_sas_success, self.get_claimer_sas_error, self.greeter.get_claimer_sas
         )
 
     def _on_wait_peer_trust_error(self, job):
@@ -559,8 +547,8 @@ class GreetUserWidget(QWidget, Ui_GreetUserWidget):
 
     def _run_greeter(self):
         self.greeter_job = self.jobs_ctx.submit_job(
-            ThreadSafeQtSignal(self, "greeter_success", QtToTrioJob),
-            ThreadSafeQtSignal(self, "greeter_error", QtToTrioJob),
+            self.greeter_success,
+            self.greeter_error,
             self.greeter.run,
             core=self.core,
             token=self.token,

@@ -20,11 +20,7 @@ from parsec.core.mountpoint import (
     MountpointWinfspNotAvailable,
 )
 
-from parsec.core.gui.trio_thread import (
-    QtToTrioJobScheduler,
-    ThreadSafeQtSignal,
-    run_trio_job_scheduler,
-)
+from parsec.core.gui.trio_thread import QtToTrioJobScheduler, run_trio_job_scheduler
 from parsec.core.gui.parsec_application import ParsecApp
 from parsec.core.gui.custom_dialogs import show_error, show_info_link
 from parsec.core.gui.lang import translate as _
@@ -118,12 +114,12 @@ class InstanceWidget(QWidget):
         self.config = ParsecApp.get_main_window().config
 
         self.running_core_job = self.jobs_ctx.submit_job(
-            ThreadSafeQtSignal(self, "run_core_success"),
-            ThreadSafeQtSignal(self, "run_core_error"),
+            self.run_core_success,
+            self.run_core_error,
             _do_run_core,
             self.config,
             device,
-            ThreadSafeQtSignal(self, "run_core_ready", object, object),
+            self.run_core_ready,
         )
 
     def on_run_core_ready(self, core, core_jobs_ctx):

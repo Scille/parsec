@@ -29,7 +29,7 @@ try:
     from parsec.core.gui.new_version import CheckNewVersion
     from parsec.core.gui.systray import systray_available, Systray
     from parsec.core.gui.main_window import MainWindow
-    from parsec.core.gui.trio_thread import ThreadSafeQtSignal, run_trio_job_scheduler
+    from parsec.core.gui.trio_thread import run_trio_job_scheduler
 except ImportError as exc:
     raise ModuleNotFoundError(
         """PyQt forms haven't been generated.
@@ -53,8 +53,8 @@ IPCServerStartupOutcome = Enum("IPCServerStartupOutcome", "STARTED ALREADY_RUNNI
 
 async def _run_ipc_server(config, main_window, start_arg, task_status=trio.TASK_STATUS_IGNORED):
     try:
-        new_instance_needed_qt = ThreadSafeQtSignal(main_window, "new_instance_needed", object)
-        foreground_needed_qt = ThreadSafeQtSignal(main_window, "foreground_needed")
+        new_instance_needed_qt = main_window.new_instance_needed
+        foreground_needed_qt = main_window.foreground_needed
 
         async def _cmd_handler(cmd):
             if cmd["cmd"] == IPCCommand.FOREGROUND:

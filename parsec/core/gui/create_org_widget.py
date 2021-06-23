@@ -22,7 +22,7 @@ from parsec.core.invite import (
 from parsec.core.local_device import save_device_with_password
 
 from parsec.core.gui.custom_dialogs import GreyedDialog, show_error, show_info
-from parsec.core.gui.trio_thread import JobResultError, ThreadSafeQtSignal
+from parsec.core.gui.trio_thread import JobResultError
 from parsec.core.gui.desktop import get_default_device
 from parsec.core.gui.lang import translate as _
 from parsec.core.gui import validators
@@ -285,8 +285,8 @@ class CreateOrgWidget(QWidget, Ui_CreateOrgWidget):
             return
 
         self.create_job = self.jobs_ctx.submit_job(
-            ThreadSafeQtSignal(self, "req_success"),
-            ThreadSafeQtSignal(self, "req_error"),
+            self.req_success,
+            self.req_error,
             _do_create_org,
             config=self.config,
             human_handle=human_handle,

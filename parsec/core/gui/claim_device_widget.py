@@ -17,7 +17,7 @@ from parsec.core.backend_connection import (
     BackendNotAvailable,
 )
 from parsec.core.gui import validators
-from parsec.core.gui.trio_thread import JobResultError, ThreadSafeQtSignal, QtToTrioJob
+from parsec.core.gui.trio_thread import JobResultError, QtToTrioJob
 from parsec.core.gui.desktop import get_default_device
 from parsec.core.gui.custom_dialogs import show_error, GreyedDialog, show_info
 from parsec.core.gui.lang import translate as _
@@ -214,17 +214,13 @@ class ClaimDeviceCodeExchangeWidget(QWidget, Ui_ClaimDeviceCodeExchangeWidget):
         self.wait_peer_trust_error.connect(self._on_wait_peer_trust_error)
 
         self.get_greeter_sas_job = self.jobs_ctx.submit_job(
-            ThreadSafeQtSignal(self, "get_greeter_sas_success", QtToTrioJob),
-            ThreadSafeQtSignal(self, "get_greeter_sas_error", QtToTrioJob),
-            self.claimer.get_greeter_sas,
+            self.get_greeter_sas_success, self.get_greeter_sas_error, self.claimer.get_greeter_sas
         )
 
     def _on_good_greeter_code_clicked(self):
         self.widget_greeter_code.setDisabled(True)
         self.signify_trust_job = self.jobs_ctx.submit_job(
-            ThreadSafeQtSignal(self, "signify_trust_success", QtToTrioJob),
-            ThreadSafeQtSignal(self, "signify_trust_error", QtToTrioJob),
-            self.claimer.signify_trust,
+            self.signify_trust_success, self.signify_trust_error, self.claimer.signify_trust
         )
 
     def _on_wrong_greeter_code_clicked(self):
@@ -276,9 +272,7 @@ class ClaimDeviceCodeExchangeWidget(QWidget, Ui_ClaimDeviceCodeExchangeWidget):
         self.widget_claimer_code.setVisible(True)
         self.line_edit_claimer_code.setText(str(claimer_sas))
         self.wait_peer_trust_job = self.jobs_ctx.submit_job(
-            ThreadSafeQtSignal(self, "wait_peer_trust_success", QtToTrioJob),
-            ThreadSafeQtSignal(self, "wait_peer_trust_error", QtToTrioJob),
-            self.claimer.wait_peer_trust,
+            self.wait_peer_trust_success, self.wait_peer_trust_error, self.claimer.wait_peer_trust
         )
 
     def _on_get_claimer_sas_error(self, job):
@@ -298,9 +292,7 @@ class ClaimDeviceCodeExchangeWidget(QWidget, Ui_ClaimDeviceCodeExchangeWidget):
         assert job.is_finished()
         assert job.status == "ok"
         self.get_claimer_sas_job = self.jobs_ctx.submit_job(
-            ThreadSafeQtSignal(self, "get_claimer_sas_success", QtToTrioJob),
-            ThreadSafeQtSignal(self, "get_claimer_sas_error", QtToTrioJob),
-            self.claimer.get_claimer_sas,
+            self.get_claimer_sas_success, self.get_claimer_sas_error, self.claimer.get_claimer_sas
         )
 
     def _on_signify_trust_error(self, job):
@@ -396,8 +388,8 @@ class ClaimDeviceProvideInfoWidget(QWidget, Ui_ClaimDeviceProvideInfoWidget):
         self.widget_info.setDisabled(True)
         self.label_wait.show()
         self.claim_job = self.jobs_ctx.submit_job(
-            ThreadSafeQtSignal(self, "claim_success", QtToTrioJob),
-            ThreadSafeQtSignal(self, "claim_error", QtToTrioJob),
+            self.claim_success,
+            self.claim_error,
             self.claimer.claim_device,
             device_label=device_label,
         )
@@ -460,9 +452,7 @@ class ClaimDeviceInstructionsWidget(QWidget, Ui_ClaimDeviceInstructionsWidget):
         self.button_start.setDisabled(True)
         self.button_start.setText(_("TEXT_CLAIM_DEVICE_WAITING"))
         self.wait_peer_job = self.jobs_ctx.submit_job(
-            ThreadSafeQtSignal(self, "wait_peer_success", QtToTrioJob),
-            ThreadSafeQtSignal(self, "wait_peer_error", QtToTrioJob),
-            self.claimer.wait_peer,
+            self.wait_peer_success, self.wait_peer_error, self.claimer.wait_peer
         )
 
     def _on_wait_peer_success(self, job):
@@ -525,16 +515,14 @@ class ClaimDeviceWidget(QWidget, Ui_ClaimDeviceWidget):
 
     def _run_claimer(self):
         self.claimer_job = self.jobs_ctx.submit_job(
-            ThreadSafeQtSignal(self, "claimer_success", QtToTrioJob),
-            ThreadSafeQtSignal(self, "claimer_error", QtToTrioJob),
+            self.claimer_success,
+            self.claimer_error,
             self.claimer.run,
             addr=self.addr,
             config=self.config,
         )
         self.retrieve_info_job = self.jobs_ctx.submit_job(
-            ThreadSafeQtSignal(self, "retrieve_info_success", QtToTrioJob),
-            ThreadSafeQtSignal(self, "retrieve_info_error", QtToTrioJob),
-            self.claimer.retrieve_info,
+            self.retrieve_info_success, self.retrieve_info_error, self.claimer.retrieve_info
         )
 
     def _on_retrieve_info_success(self, job):

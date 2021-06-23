@@ -9,7 +9,6 @@ from structlog import get_logger
 from parsec.core.fs import FSError
 from parsec.core.mountpoint import MountpointError
 from parsec.utils import split_multi_error
-from PyQt5.QtCore import pyqtBoundSignal, Q_ARG, QMetaObject, Qt
 
 
 logger = get_logger()
@@ -26,32 +25,8 @@ class JobSchedulerNotAvailable(Exception):
     pass
 
 
-class ThreadSafeQtSignal:
-    def __init__(self, qobj, signal_name, *args_types):
-        signal = getattr(qobj, signal_name)
-        assert isinstance(signal, pyqtBoundSignal)
-        self.qobj = qobj
-        self.signal_name = signal_name
-        self.args_types = args_types
-
-    def emit(self, *args):
-        assert len(self.args_types) == len(args)
-        cooked_args = [Q_ARG(t, v) for t, v in zip(self.args_types, args)]
-        QMetaObject.invokeMethod(self.qobj, self.signal_name, Qt.QueuedConnection, *cooked_args)
-
-    def __repr__(self):
-        return f"<ThreadSafeQtSignal {self.signal_name}>"
-
-
 class QtToTrioJob:
     def __init__(self, fn, args, kwargs, qt_on_success, qt_on_error):
-        # Fool-proof sanity check, signals must be wrapped in `ThreadSafeQtSignal`
-        assert not [x for x in args if isinstance(x, pyqtBoundSignal)]
-        assert not [v for v in kwargs.values() if isinstance(v, pyqtBoundSignal)]
-        assert isinstance(qt_on_success, ThreadSafeQtSignal)
-        assert qt_on_success.args_types in ((), (QtToTrioJob,))
-        assert isinstance(qt_on_error, ThreadSafeQtSignal)
-        assert qt_on_error.args_types in ((), (QtToTrioJob,))
         self._qt_on_success = qt_on_success
         self._qt_on_error = qt_on_error
         self._fn = fn
