@@ -20,7 +20,11 @@ from parsec.core.mountpoint import (
     MountpointWinfspNotAvailable,
 )
 
-from parsec.core.gui.trio_thread import QtToTrioJobScheduler, ThreadSafeQtSignal
+from parsec.core.gui.trio_thread import (
+    QtToTrioJobScheduler,
+    ThreadSafeQtSignal,
+    run_trio_job_scheduler,
+)
 from parsec.core.gui.parsec_application import ParsecApp
 from parsec.core.gui.custom_dialogs import show_error, show_info_link
 from parsec.core.gui.lang import translate as _
@@ -38,10 +42,9 @@ async def _do_run_core(config, device, qt_on_ready):
         async with logged_core_factory(config=config, device=device, event_bus=None) as core:
             # Create our own job scheduler allows us to cancel all pending
             # jobs depending on us when we logout
-            core_jobs_ctx = QtToTrioJobScheduler()
-            async with trio.open_service_nursery() as nursery:
-                await nursery.start(core_jobs_ctx._start)
+            async with run_trio_job_scheduler() as core_jobs_ctx:
                 qt_on_ready.emit(core, core_jobs_ctx)
+                await trio.sleep_forever()
 
 
 class InstanceWidget(QWidget):
