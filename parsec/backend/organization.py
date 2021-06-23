@@ -340,6 +340,8 @@ class BaseOrganizationComponent:
         except (OrganizationNotFoundError, OrganizationInvalidBootstrapTokenError):
             return {"status": "not_found"}
 
+        organization = await self.get(client_ctx.organization_id)
+
         # Note: we let OrganizationFirstUserCreationError bubbles up given
         # it should not occurs under normal circumstances
 
@@ -350,6 +352,7 @@ class BaseOrganizationComponent:
             device_label=first_device.device_label,
             human_email=user.human_handle.email if user.human_handle else None,
             human_label=user.human_handle.label if user.human_handle else None,
+            users_limit=organization.users_limit,
         )
 
         return apiv1_organization_bootstrap_serializer.rep_dump({"status": "ok"})

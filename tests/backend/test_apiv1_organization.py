@@ -146,13 +146,13 @@ async def test_organization_create_and_bootstrap(
     # 1) Create organization, note this means `neworg.bootstrap_token`
     # will contain an invalid token
 
-    rep = await organization_create(administration_backend_sock, neworg.organization_id)
-    assert rep == {
+    create_org_rep = await organization_create(administration_backend_sock, neworg.organization_id)
+    assert create_org_rep == {
         "status": "ok",
         "bootstrap_token": ANY,
         "users_limit": backend.config.organization_config.default_users_limit,
     }
-    bootstrap_token = rep["bootstrap_token"]
+    bootstrap_token = create_org_rep["bootstrap_token"]
 
     # 2) Bootstrap organization
 
@@ -182,6 +182,7 @@ async def test_organization_create_and_bootstrap(
                 "human_email": "alice@example.com",
                 "human_label": "Alicey McAliceFace",
                 "organization_id": "NewOrg",
+                "users_limit": create_org_rep["users_limit"],
             },
         )
     ]

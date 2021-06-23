@@ -53,6 +53,7 @@ class OrganizationBootstrapWebhookSchema(BaseSchema):
     device_label = fields.String(allow_none=True, required=True)
     human_email = fields.String(allow_none=True, required=True)
     human_label = fields.String(allow_none=True, required=True)
+    users_limit = fields.Integer(allow_none=True, required=True)
 
 
 organization_bootstrap_webhook_serializer = JSONSerializer(OrganizationBootstrapWebhookSchema)
