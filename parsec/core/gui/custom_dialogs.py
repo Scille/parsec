@@ -319,6 +319,8 @@ class ErrorWidget(QWidget, Ui_ErrorWidget):
 
 
 def show_error(parent, message, exception=None):
+    if parent and not parent.isVisible():
+        return QDialog.Rejected
     w = ErrorWidget(message, exception)
     d = GreyedDialog(w, title=_("TEXT_ERR_DIALOG_TITLE"), parent=parent)
     return d.open()
@@ -345,6 +347,8 @@ class InfoWidget(QWidget, Ui_InfoWidget):
 
 
 def show_info(parent, message, button_text=None):
+    if parent and not parent.isVisible():
+        return QDialog.Rejected
     w = InfoWidget(message, button_text)
     d = GreyedDialog(w, title=None, parent=parent, hide_close=True)
     w.dialog = d
