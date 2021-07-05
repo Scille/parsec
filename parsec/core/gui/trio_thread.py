@@ -120,7 +120,10 @@ class QtToTrioJob:
     def _set_done(self):
         self._done.set()
         signal = self._qt_on_success if self.is_ok() else self._qt_on_error
-        signal.emit(self) if signal.args_types else signal.emit()
+        if signal.signal.endswith("(PyQt_PyObject)"):
+            signal.emit(self)
+        else:
+            signal.emit()
 
     def cancel(self):
         self.cancel_scope.cancel()
@@ -179,12 +182,15 @@ class QtToTrioJobScheduler:
         self.nursery.start_soon(_throttled_execute)
 
     def submit_job(self, qt_on_success, qt_on_error, fn, *args, **kwargs):
-        assert not self.nursery._closed
+        if self.nursery._closed:
+            raise JobSchedulerNotAvailable
         job = QtToTrioJob(fn, args, kwargs, qt_on_success, qt_on_error)
         self.nursery.start_soon(job)
+        return job
 
     def run_sync(self, fn, *args):
-        assert not self.nursery._closed
+        if self.nursery_closed:
+            raise JobSchedulerNotAvailable
         return fn(*args)
 
 

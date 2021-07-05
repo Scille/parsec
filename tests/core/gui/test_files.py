@@ -505,9 +505,7 @@ async def test_cut_dir_in_itself(aqtbot, autoclose_dialog, files_widget_testbed)
 
 @pytest.mark.gui
 @pytest.mark.trio
-async def test_drag_and_drop(
-    qt_thread_gateway, tmpdir, aqtbot, autoclose_dialog, files_widget_testbed
-):
+async def test_drag_and_drop(tmpdir, aqtbot, autoclose_dialog, files_widget_testbed):
     tb = files_widget_testbed
     f_w = files_widget_testbed.files_widget
 
@@ -529,7 +527,7 @@ async def test_drag_and_drop(
 
     # Good drap&drop
 
-    await qt_thread_gateway.send_action(_import_file)
+    _import_file()
     await tb.check_files_view(path="/", expected_entries=["file1.txt"])
 
     # Drap&drop in readonly workspace is not allowed
@@ -537,7 +535,7 @@ async def test_drag_and_drop(
     # Quick hack to have a read-only workspace ;-)
     f_w.table_files.current_user_role = WorkspaceRole.READER
 
-    await qt_thread_gateway.send_action(_import_file)
+    _import_file()
 
     def _import_failed():
         assert autoclose_dialog.dialogs == [("Error", _("TEXT_FILE_DROP_WORKSPACE_IS_READ_ONLY"))]
