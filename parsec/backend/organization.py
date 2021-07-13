@@ -99,7 +99,7 @@ class BaseOrganizationComponent:
 
         bootstrap_token = token_hex(self.bootstrap_token_size)
         expiration_date = msg.get("expiration_date", None)
-        default_users_limit = self._config.organization_config.default_users_limit
+        default_users_limit = self._config.default_users_limit
         try:
             await self.create(
                 msg["organization_id"],

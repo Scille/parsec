@@ -224,7 +224,7 @@ async def _apiv1_process_anonymous_answer(
         organization = await backend.organization.get(organization_id)
 
     except OrganizationNotFoundError:
-        if backend.config.organization_config.spontaneous_bootstrap:
+        if backend.config.spontaneous_bootstrap:
             # Lazy creation of the organization with always the same empty token
             try:
                 await backend.organization.create(

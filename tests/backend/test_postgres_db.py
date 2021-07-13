@@ -6,7 +6,7 @@ import sys
 import triopg
 
 from parsec.backend.cli.run import _run_backend, RetryPolicy
-from parsec.backend.config import BackendConfig, PostgreSQLBlockStoreConfig, OrganizationConfig
+from parsec.backend.config import BackendConfig, PostgreSQLBlockStoreConfig
 
 
 def records_filter_debug(records):
@@ -78,9 +78,8 @@ async def test_retry_policy_no_retry(postgresql_url, unused_tcp_port, asyncio_lo
         backend_addr=None,
         forward_proto_enforce_https=None,
         ssl_context=False,
-        organization_config=OrganizationConfig(
-            spontaneous_bootstrap=False, bootstrap_webhook_url=None
-        ),
+        spontaneous_bootstrap=False,
+        bootstrap_webhook_url=None,
         db_url=postgresql_url,
     )
 
@@ -123,9 +122,8 @@ async def test_retry_policy_allow_retry(postgresql_url, unused_tcp_port, asyncio
         backend_addr=None,
         forward_proto_enforce_https=None,
         ssl_context=False,
-        organization_config=OrganizationConfig(
-            spontaneous_bootstrap=False, bootstrap_webhook_url=None
-        ),
+        spontaneous_bootstrap=False,
+        bootstrap_webhook_url=None,
         db_url=postgresql_url,
     )
     # Allow to retry once

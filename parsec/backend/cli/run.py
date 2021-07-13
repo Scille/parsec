@@ -15,7 +15,6 @@ from parsec.logging import configure_logging, configure_sentry_logging
 from parsec.backend import backend_app_factory
 from parsec.backend.config import (
     BackendConfig,
-    OrganizationConfig,
     SmtpEmailConfig,
     MockedEmailConfig,
     MockedBlockStoreConfig,
@@ -517,24 +516,20 @@ def run_cmd(
                 sender=email_sender,
             )
 
-        organization_config = OrganizationConfig(
-            bootstrap_webhook_url=organization_bootstrap_webhook,
-            spontaneous_bootstrap=spontaneous_organization_bootstrap,
-            default_users_limit=organization_default_users_limit,
-        )
-
         app_config = BackendConfig(
             administration_token=administration_token,
             db_url=db,
             db_min_connections=db_min_connections,
             db_max_connections=db_max_connections,
-            organization_config=organization_config,
             blockstore_config=blockstore,
             email_config=email_config,
             ssl_context=True if ssl_context else False,
             forward_proto_enforce_https=forward_proto_enforce_https,
             backend_addr=backend_addr,
             debug=debug,
+            bootstrap_webhook_url=organization_bootstrap_webhook,
+            spontaneous_bootstrap=spontaneous_organization_bootstrap,
+            default_users_limit=organization_default_users_limit,
         )
 
         click.echo(
