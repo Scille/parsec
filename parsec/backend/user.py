@@ -535,7 +535,7 @@ class BaseUserComponent:
         except UserAlreadyExistsError as exc:
             return {"status": "already_exists", "reason": str(exc)}
         except UserLimitReached:
-            return {"status": "not_allowed", "reason": "User's limit reached"}
+            return {"status": "not_allowed", "reason": "Users limit reached"}
 
         return {"status": "ok"}
 

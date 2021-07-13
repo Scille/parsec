@@ -107,7 +107,7 @@ _q_check_users_limit = Q(
     LEFT JOIN
         user_ on user_.organization = organization._id
     WHERE
-        organization = { q_organization_internal_id("$organization_id") }
+        organization_id = $organization_id
     GROUP BY organization._id
     HAVING active_users_limit is NULL OR count(user_) < active_users_limit;
 """

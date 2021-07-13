@@ -46,7 +46,6 @@ class MemoryInviteComponent(BaseInviteComponent):
 
     def register_components(self, **other_components):
         self._user_component = other_components["user"]
-        self._organization_component = other_components["organization"]
 
     def _get_invitation_and_conduit(
         self,

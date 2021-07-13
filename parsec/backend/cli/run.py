@@ -336,7 +336,7 @@ organization_id, device_id, device_label (can be null), human_email (can be null
 @click.option(
     "--organization-default-users-limit",
     envvar="PARSEC_ORGANIZATION_DEFAULT_USERS_LIMIT",
-    help="",
+    help="Default value uses by the system to limit the users by organization",
     type=int,
 )
 @click.option(

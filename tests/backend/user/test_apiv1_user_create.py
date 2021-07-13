@@ -52,7 +52,7 @@ async def test_user_create_nok_limit_reached(
         rep = await user_create(
             sock, user_certificate=user_certificate, device_certificate=device_certificate
         )
-    assert rep == {"status": "not_allowed", "reason": "User's limit reached"}
+    assert rep == {"status": "not_allowed", "reason": "Users limit reached"}
 
 
 @pytest.mark.trio
