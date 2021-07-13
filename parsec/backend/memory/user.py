@@ -44,9 +44,11 @@ class MemoryUserComponent(BaseUserComponent):
         self, organization_id: OrganizationID, user: User, first_device: Device
     ) -> None:
         org = self._organizations[organization_id]
-        users_limit = self._organization_component._organizations[organization_id].users_limit
+        active_users_limit = self._organization_component._organizations[
+            organization_id
+        ].active_users_limit
 
-        if users_limit and users_limit <= len(org.users):
+        if active_users_limit and active_users_limit <= len(org.users):
             raise UserLimitReached()
 
         if user.user_id in org.users:

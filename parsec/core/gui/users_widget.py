@@ -455,8 +455,8 @@ class UsersWidget(QWidget, Ui_UsersWidget):
 
         current_user = self.core.device.user_id
 
-        users_limit = self.core.get_organization_config().users_limit
-        add_users_disabled = users_limit is not None and len(users) >= users_limit
+        active_users_limit = self.core.get_organization_config().active_users_limit
+        add_users_disabled = active_users_limit is not None and len(users) >= active_users_limit
 
         for invitation in reversed(invitations):
             addr = BackendInvitationAddr.build(

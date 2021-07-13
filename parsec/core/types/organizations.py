@@ -15,4 +15,4 @@ class OrganizationStats:
 class OrganizationConfig:
     expiration_date: DateTime
     user_profile_outsider_allowed: bool
-    users_limit: Optional[int]
+    active_users_limit: Optional[int]

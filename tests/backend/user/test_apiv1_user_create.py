@@ -41,12 +41,12 @@ async def test_user_create_nok_limit_reached(
         verify_key=mallory.verify_key,
     ).dump_and_sign(alice.signing_key)
 
-    await backend.organization.update(alice.organization_id, users_limit=3)
+    await backend.organization.update(alice.organization_id, active_users_limit=3)
     org = await backend.organization.get(alice.organization_id)
     nb_users = (await backend.user.find(alice.organization_id))[1]
 
     assert nb_users == 3
-    assert org.users_limit == 3
+    assert org.active_users_limit == 3
 
     async with apiv1_backend_sock_factory(backend, alice) as sock:
         rep = await user_create(

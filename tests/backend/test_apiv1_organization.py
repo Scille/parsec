@@ -87,7 +87,7 @@ async def test_organization_recreate_and_bootstrap(
     assert rep == {
         "status": "ok",
         "bootstrap_token": ANY,
-        "users_limit": backend.config.organization_config.default_users_limit,
+        "active_users_limit": backend.config.organization_config.default_users_limit,
     }
     bootstrap_token1 = rep["bootstrap_token"]
 
@@ -96,7 +96,7 @@ async def test_organization_recreate_and_bootstrap(
     assert rep == {
         "status": "ok",
         "bootstrap_token": ANY,
-        "users_limit": backend.config.organization_config.default_users_limit,
+        "active_users_limit": backend.config.organization_config.default_users_limit,
     }
     bootstrap_token2 = rep["bootstrap_token"]
 
@@ -150,7 +150,7 @@ async def test_organization_create_and_bootstrap(
     assert create_org_rep == {
         "status": "ok",
         "bootstrap_token": ANY,
-        "users_limit": backend.config.organization_config.default_users_limit,
+        "active_users_limit": backend.config.organization_config.default_users_limit,
     }
     bootstrap_token = create_org_rep["bootstrap_token"]
 
@@ -182,7 +182,7 @@ async def test_organization_create_and_bootstrap(
                 "human_email": "alice@example.com",
                 "human_label": "Alicey McAliceFace",
                 "organization_id": "NewOrg",
-                "users_limit": create_org_rep["users_limit"],
+                "active_users_limit": create_org_rep["active_users_limit"],
             },
         )
     ]
@@ -228,7 +228,7 @@ async def test_organization_with_expiration_date_create_and_bootstrap(
         assert rep == {
             "status": "ok",
             "bootstrap_token": ANY,
-            "users_limit": backend.config.organization_config.default_users_limit,
+            "active_users_limit": backend.config.organization_config.default_users_limit,
             "expiration_date": expiration_date,
         }
         bootstrap_token = rep["bootstrap_token"]
@@ -294,7 +294,7 @@ async def test_organization_expired_create_and_bootstrap(
     assert rep == {
         "status": "ok",
         "bootstrap_token": ANY,
-        "users_limit": backend.config.organization_config.default_users_limit,
+        "active_users_limit": backend.config.organization_config.default_users_limit,
         "expiration_date": expiration_date,
     }
 
@@ -310,7 +310,7 @@ async def test_organization_expired_create_and_bootstrap(
     assert rep == {
         "status": "ok",
         "bootstrap_token": ANY,
-        "users_limit": backend.config.organization_config.default_users_limit,
+        "active_users_limit": backend.config.organization_config.default_users_limit,
     }
 
     # 4) This time, bootstrap is possible

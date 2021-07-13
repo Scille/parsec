@@ -52,7 +52,7 @@ class MemoryOrganizationComponent(BaseOrganizationComponent):
         id: OrganizationID,
         bootstrap_token: str,
         expiration_date: Optional[DateTime] = None,
-        users_limit: Optional[int] = None,
+        active_users_limit: Optional[int] = None,
     ) -> None:
         org = self._organizations.get(id)
 
@@ -64,7 +64,7 @@ class MemoryOrganizationComponent(BaseOrganizationComponent):
             organization_id=id,
             bootstrap_token=bootstrap_token,
             expiration_date=expiration_date,
-            users_limit=users_limit,
+            active_users_limit=active_users_limit,
         )
 
     async def get(self, id: OrganizationID) -> Organization:
@@ -129,7 +129,7 @@ class MemoryOrganizationComponent(BaseOrganizationComponent):
         id: OrganizationID,
         expiration_date: Union[UnsetType, Optional[DateTime]] = Unset,
         user_profile_outsider_allowed: Union[UnsetType, bool] = Unset,
-        users_limit: Union[UnsetType, int] = Unset,
+        active_users_limit: Union[UnsetType, int] = Unset,
     ) -> None:
         """
         Raises:
@@ -146,8 +146,8 @@ class MemoryOrganizationComponent(BaseOrganizationComponent):
             organization = organization.evolve(
                 user_profile_outsider_allowed=user_profile_outsider_allowed
             )
-        if users_limit is not Unset:
-            organization = organization.evolve(users_limit=users_limit)
+        if active_users_limit is not Unset:
+            organization = organization.evolve(active_users_limit=active_users_limit)
 
         self._organizations[id] = organization
 

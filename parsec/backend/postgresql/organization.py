@@ -30,8 +30,8 @@ from parsec.backend.postgresql.handler import send_signal
 
 _q_insert_organization = Q(
     """
-INSERT INTO organization (organization_id, bootstrap_token, expiration_date, user_profile_outsider_allowed, users_limit)
-VALUES ($organization_id, $bootstrap_token, $expiration_date, FALSE, $users_limit)
+INSERT INTO organization (organization_id, bootstrap_token, expiration_date, user_profile_outsider_allowed, active_users_limit)
+VALUES ($organization_id, $bootstrap_token, $expiration_date, FALSE, $active_users_limit)
 ON CONFLICT (organization_id) DO
     UPDATE SET
         bootstrap_token = EXCLUDED.bootstrap_token,
@@ -43,7 +43,7 @@ ON CONFLICT (organization_id) DO
 
 _q_get_organization = Q(
     """
-SELECT bootstrap_token, root_verify_key, expiration_date, user_profile_outsider_allowed, users_limit
+SELECT bootstrap_token, root_verify_key, expiration_date, user_profile_outsider_allowed, active_users_limit
 FROM organization
 WHERE organization_id = $organization_id
 """
@@ -109,22 +109,24 @@ _q_check_users_limit = Q(
     WHERE
         organization = { q_organization_internal_id("$organization_id") }
     GROUP BY organization._id
-    HAVING users_limit is NULL OR count(user_) < users_limit;
+    HAVING active_users_limit is NULL OR count(user_) < active_users_limit;
 """
 )
 
 
 @lru_cache()
 def _q_update_factory(
-    with_expiration_date: bool, with_user_profile_outsider_allowed: bool, with_users_limit: bool
+    with_expiration_date: bool,
+    with_user_profile_outsider_allowed: bool,
+    with_active_users_limit: bool,
 ):
     fields = []
     if with_expiration_date:
         fields.append("expiration_date = $expiration_date")
     if with_user_profile_outsider_allowed:
         fields.append("user_profile_outsider_allowed = $user_profile_outsider_allowed")
-    if with_users_limit:
-        fields.append("users_limit = $users_limit")
+    if with_active_users_limit:
+        fields.append("active_users_limit = $active_users_limit")
 
     return Q(
         f"""
@@ -146,7 +148,7 @@ class PGOrganizationComponent(BaseOrganizationComponent):
         id: OrganizationID,
         bootstrap_token: str,
         expiration_date: Optional[DateTime] = None,
-        users_limit: Optional[int] = None,
+        active_users_limit: Optional[int] = None,
     ) -> None:
         async with self.dbh.pool.acquire() as conn:
             try:
@@ -155,7 +157,7 @@ class PGOrganizationComponent(BaseOrganizationComponent):
                         organization_id=id,
                         bootstrap_token=bootstrap_token,
                         expiration_date=expiration_date,
-                        users_limit=users_limit,
+                        active_users_limit=active_users_limit,
                     )
                 )
             except UniqueViolationError:
@@ -181,7 +183,7 @@ class PGOrganizationComponent(BaseOrganizationComponent):
             root_verify_key=rvk,
             expiration_date=data[2],
             user_profile_outsider_allowed=data[3],
-            users_limit=data[4],
+            active_users_limit=data[4],
         )
 
     async def bootstrap(
@@ -233,7 +235,7 @@ class PGOrganizationComponent(BaseOrganizationComponent):
         id: OrganizationID,
         expiration_date: Union[UnsetType, Optional[DateTime]] = Unset,
         user_profile_outsider_allowed: Union[UnsetType, bool] = Unset,
-        users_limit: Union[UnsetType, int] = Unset,
+        active_users_limit: Union[UnsetType, int] = Unset,
     ) -> None:
         """
         Raises:
@@ -244,19 +246,19 @@ class PGOrganizationComponent(BaseOrganizationComponent):
 
         with_expiration_date = expiration_date is not Unset
         with_user_profile_outsider_allowed = user_profile_outsider_allowed is not Unset
-        with_users_limit = users_limit is not Unset
+        with_active_users_limit = active_users_limit is not Unset
 
         if with_expiration_date:
             fields["expiration_date"] = expiration_date
         if with_user_profile_outsider_allowed:
             fields["user_profile_outsider_allowed"] = user_profile_outsider_allowed
-        if with_users_limit:
-            fields["users_limit"] = users_limit
+        if with_active_users_limit:
+            fields["active_users_limit"] = active_users_limit
 
         q = _q_update_factory(
             with_expiration_date=with_expiration_date,
             with_user_profile_outsider_allowed=with_user_profile_outsider_allowed,
-            with_users_limit=with_users_limit,
+            with_active_users_limit=with_active_users_limit,
         )
 
         async with self.dbh.pool.acquire() as conn, conn.transaction():

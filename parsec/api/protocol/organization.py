@@ -12,7 +12,7 @@ class APIV1_OrganizationCreateReqSchema(BaseReqSchema):
 class APIV1_OrganizationCreateRepSchema(BaseRepSchema):
     bootstrap_token = fields.String(required=True)
     expiration_date = fields.DateTime(allow_none=True, required=False)
-    users_limit = fields.Integer(allow_none=True, required=True)
+    active_users_limit = fields.Integer(allow_none=True, required=True)
 
 
 apiv1_organization_create_serializer = CmdSerializer(
@@ -53,7 +53,7 @@ class OrganizationBootstrapWebhookSchema(BaseSchema):
     device_label = fields.String(allow_none=True, required=True)
     human_email = fields.String(allow_none=True, required=True)
     human_label = fields.String(allow_none=True, required=True)
-    users_limit = fields.Integer(allow_none=True, required=True)
+    active_users_limit = fields.Integer(allow_none=True, required=True)
 
 
 organization_bootstrap_webhook_serializer = JSONSerializer(OrganizationBootstrapWebhookSchema)
@@ -98,7 +98,7 @@ class APIV1_OrganizationStatusRepSchema(BaseRepSchema):
     is_bootstrapped = fields.Boolean(required=True)
     expiration_date = fields.DateTime(allow_none=True, required=False)
     user_profile_outsider_allowed = fields.Boolean(required=True)
-    users_limit = fields.Integer(required=True, allow_none=True)
+    active_users_limit = fields.Integer(required=True, allow_none=True)
 
 
 apiv1_organization_status_serializer = CmdSerializer(
@@ -113,7 +113,7 @@ class OrganizationConfigReqSchema(BaseReqSchema):
 class OrganizationConfigRepSchema(BaseRepSchema):
     expiration_date = fields.DateTime(allow_none=True, required=False)
     user_profile_outsider_allowed = fields.Boolean(required=True)
-    users_limit = fields.Integer(required=True, allow_none=True)
+    active_users_limit = fields.Integer(required=True, allow_none=True)
 
 
 organization_config_serializer = CmdSerializer(
@@ -125,7 +125,7 @@ class APIV1_OrganizationUpdateReqSchema(BaseReqSchema):
     organization_id = OrganizationIDField(required=True)
     expiration_date = fields.DateTime(allow_none=True, required=False)
     user_profile_outsider_allowed = fields.Boolean(required=False)
-    users_limit = fields.Integer(allow_none=True, required=False)
+    active_users_limit = fields.Integer(allow_none=True, required=False)
 
 
 class APIV1_OrganizationUpdateRepSchema(BaseRepSchema):

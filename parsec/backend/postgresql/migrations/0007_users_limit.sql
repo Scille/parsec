@@ -5,4 +5,4 @@
 --  Migration
 -------------------------------------------------------
 
-ALTER TABLE organization ADD users_limit INTEGER;
+ALTER TABLE organization ADD active_users_limit INTEGER;

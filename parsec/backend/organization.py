@@ -63,7 +63,7 @@ class Organization:
     expiration_date: Optional[DateTime] = None
     root_verify_key: Optional[VerifyKey] = None
     user_profile_outsider_allowed: bool = False
-    users_limit: Optional[int] = None
+    active_users_limit: Optional[int] = None
 
     def is_bootstrapped(self):
         return self.root_verify_key is not None
@@ -105,14 +105,14 @@ class BaseOrganizationComponent:
                 msg["organization_id"],
                 bootstrap_token=bootstrap_token,
                 expiration_date=expiration_date,
-                users_limit=default_users_limit,
+                active_users_limit=default_users_limit,
             )
 
         except OrganizationAlreadyExistsError:
             return {"status": "already_exists"}
 
         rep = {
-            "users_limit": default_users_limit,
+            "active_users_limit": default_users_limit,
             "bootstrap_token": bootstrap_token,
             "status": "ok",
         }
@@ -131,13 +131,12 @@ class BaseOrganizationComponent:
 
         except OrganizationNotFoundError:
             return {"status": "not_found"}
-
         return apiv1_organization_status_serializer.rep_dump(
             {
                 "is_bootstrapped": organization.is_bootstrapped(),
                 "expiration_date": organization.expiration_date,
                 "user_profile_outsider_allowed": organization.user_profile_outsider_allowed,
-                "users_limit": organization.users_limit,
+                "active_users_limit": organization.active_users_limit,
                 "status": "ok",
             }
         )
@@ -157,7 +156,7 @@ class BaseOrganizationComponent:
             {
                 "expiration_date": organization.expiration_date,
                 "user_profile_outsider_allowed": organization.user_profile_outsider_allowed,
-                "users_limit": organization.users_limit,
+                "active_users_limit": organization.active_users_limit,
                 "status": "ok",
             }
         )
@@ -214,6 +213,7 @@ class BaseOrganizationComponent:
     @catch_protocol_errors
     async def api_organization_update(self, client_ctx, msg):
         msg = apiv1_organization_update_serializer.req_load(msg)
+        print(msg)
         try:
             await self.update(msg.pop("organization_id"), **msg)
         except OrganizationNotFoundError:
@@ -352,13 +352,17 @@ class BaseOrganizationComponent:
             device_label=first_device.device_label,
             human_email=user.human_handle.email if user.human_handle else None,
             human_label=user.human_handle.label if user.human_handle else None,
-            users_limit=organization.users_limit,
+            active_users_limit=organization.active_users_limit,
         )
 
         return apiv1_organization_bootstrap_serializer.rep_dump({"status": "ok"})
 
     async def create(
-        self, id: OrganizationID, bootstrap_token: str, expiration_date: Optional[DateTime] = None
+        self,
+        id: OrganizationID,
+        bootstrap_token: str,
+        expiration_date: Optional[DateTime] = None,
+        active_users_limit: Optional[int] = None,
     ) -> None:
         """
         Raises:
@@ -402,6 +406,7 @@ class BaseOrganizationComponent:
         id: OrganizationID,
         expiration_date: Union[UnsetType, Optional[DateTime]] = Unset,
         user_profile_outsider_allowed: Union[UnsetType, bool] = Unset,
+        active_users_limit: Union[UnsetType, int] = Unset,
     ):
         """
         Raises:
