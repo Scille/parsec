@@ -182,14 +182,15 @@ class QtToTrioJobScheduler:
         self.nursery.start_soon(_throttled_execute)
 
     def submit_job(self, qt_on_success, qt_on_error, fn, *args, **kwargs):
-        if self.nursery._closed:
-            raise JobSchedulerNotAvailable
         job = QtToTrioJob(fn, args, kwargs, qt_on_success, qt_on_error)
-        self.nursery.start_soon(job)
+        if self.nursery._closed:
+            job.set_cancelled(JobSchedulerNotAvailable())
+        else:
+            self.nursery.start_soon(job)
         return job
 
     def run_sync(self, fn, *args):
-        if self.nursery_closed:
+        if self.nursery._closed:
             raise JobSchedulerNotAvailable
         return fn(*args)
 
