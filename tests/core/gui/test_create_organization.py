@@ -229,7 +229,6 @@ async def test_create_organization_previous_clicked(
 async def test_create_organization_bootstrap_only(
     aqtbot,
     running_backend,
-    qt_thread_gateway,
     catch_create_org_widget,
     autoclose_dialog,
     gui_factory,
@@ -301,7 +300,6 @@ async def test_create_organization_bootstrap_only(
 async def test_create_organization_bootstrap_only_custom_server(
     aqtbot,
     running_backend,
-    qt_thread_gateway,
     catch_create_org_widget,
     autoclose_dialog,
     gui_factory,
@@ -441,13 +439,7 @@ async def test_create_organization_already_bootstrapped(
 @customize_fixtures(backend_spontaneous_organization_boostrap=True)
 @customize_fixtures(fake_preferred_org_creation_backend_addr=True)
 async def test_create_organization_custom_backend(
-    gui,
-    aqtbot,
-    running_backend,
-    catch_create_org_widget,
-    autoclose_dialog,
-    unused_tcp_port,
-    qt_thread_gateway,
+    gui, aqtbot, running_backend, catch_create_org_widget, autoclose_dialog, unused_tcp_port
 ):
     # The org creation window is usually opened using a sub-menu.
     # Sub-menus can be a bit challenging to open in tests so we cheat
@@ -517,11 +509,8 @@ async def test_create_organization_custom_backend(
 
     await aqtbot.wait_until(_user_widget_ready_again)
 
-    def _select_radio_custom():
-        co_w.user_widget.radio_use_custom.setChecked(True)
-
     # Clicking the radio doesn't do anything, so we cheat
-    await qt_thread_gateway.send_action(_select_radio_custom)
+    co_w.user_widget.radio_use_custom.setChecked(True)
 
     await aqtbot.key_clicks(co_w.user_widget.line_edit_backend_addr, running_backend.addr.to_url())
     await aqtbot.wait_until(_user_widget_button_validate_ready)
