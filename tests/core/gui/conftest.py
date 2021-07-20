@@ -211,12 +211,11 @@ def throttled_job_fast_wait(monkeypatch):
 @pytest.fixture
 def gui_factory(
     aqtbot,
-    qtbot,
-    testing_main_window_cls,
     job_scheduler,
+    testing_main_window_cls,
     core_config,
-    monkeypatch,
     event_bus_factory,
+    running_backend_ready,
 ):
     windows = []
 
@@ -227,6 +226,9 @@ def gui_factory(
         skip_dialogs=True,
         throttle_job_no_wait=True,
     ):
+        # Wait for the backend to run if necessary
+        await running_backend_ready.wait()
+
         # First start popup blocks the test
         # Check version and mountpoint are useless for most tests
         core_config = core_config.evolve(
@@ -251,7 +253,7 @@ def gui_factory(
         main_w = testing_main_window_cls(
             job_scheduler, event_bus, core_config, minimize_on_close=True
         )
-        qtbot.add_widget(main_w)
+        aqtbot.qtbot.add_widget(main_w)
         main_w.show_window(skip_dialogs=skip_dialogs)
         main_w.show_top()
         windows.append(main_w)
@@ -263,7 +265,8 @@ def gui_factory(
         # For some reasons, the main window from the previous test might
         # still be around. Simply wait for things to settle down until
         # our freshly created window is detected as the app main window.
-        qtbot.wait_until(right_main_window)
+        # TODO: investigate why `await aqtbot.wait_until(right_main_window)` fails
+        aqtbot.qtbot.wait_until(right_main_window)
 
         return main_w
 
