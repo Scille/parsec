@@ -438,6 +438,9 @@ def testing_main_window_cls(aqtbot):
 
             f_w = self.test_get_files_widget()
             async with aqtbot.wait_exposed(f_w), aqtbot.wait_signal(f_w.folder_changed):
+                # We need to make sure the workspace button is ready for left click first
+                await aqtbot.wait_until(wk_button.switch_button.isChecked)
+                # Send the click
                 await aqtbot.mouse_click(wk_button, QtCore.Qt.LeftButton)
 
             return f_w
