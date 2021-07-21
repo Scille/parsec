@@ -15,21 +15,13 @@ def catch_password_change_widget(widget_catcher_factory):
 @pytest.mark.gui
 @pytest.mark.trio
 async def test_change_password_invalid_old_password(
-    aqtbot,
-    running_backend,
-    logged_gui,
-    catch_password_change_widget,
-    autoclose_dialog,
-    qt_thread_gateway,
+    aqtbot, running_backend, logged_gui, catch_password_change_widget, autoclose_dialog
 ):
     c_w = logged_gui.test_get_central_widget()
-
     assert c_w is not None
 
-    def _trigger_password_change():
-        c_w.button_user.menu().actions()[0].trigger()
-
-    await qt_thread_gateway.send_action(_trigger_password_change)
+    # Trigger password change
+    c_w.button_user.menu().actions()[0].trigger()
 
     pc_w = await catch_password_change_widget()
 
@@ -46,21 +38,14 @@ async def test_change_password_invalid_old_password(
 @pytest.mark.gui
 @pytest.mark.trio
 async def test_change_password_invalid_password_check(
-    aqtbot,
-    running_backend,
-    logged_gui,
-    catch_password_change_widget,
-    autoclose_dialog,
-    qt_thread_gateway,
+    aqtbot, running_backend, logged_gui, catch_password_change_widget, autoclose_dialog
 ):
     c_w = logged_gui.test_get_central_widget()
 
     assert c_w is not None
 
-    def _trigger_password_change():
-        c_w.button_user.menu().actions()[0].trigger()
-
-    await qt_thread_gateway.send_action(_trigger_password_change)
+    # Trigger password change
+    c_w.button_user.menu().actions()[0].trigger()
 
     pc_w = await catch_password_change_widget()
 
@@ -73,21 +58,14 @@ async def test_change_password_invalid_password_check(
 @pytest.mark.gui
 @pytest.mark.trio
 async def test_change_password_success(
-    aqtbot,
-    running_backend,
-    logged_gui,
-    catch_password_change_widget,
-    autoclose_dialog,
-    qt_thread_gateway,
+    aqtbot, running_backend, logged_gui, catch_password_change_widget, autoclose_dialog
 ):
     c_w = logged_gui.test_get_central_widget()
 
     assert c_w is not None
 
-    def _trigger_password_change():
-        c_w.button_user.menu().actions()[0].trigger()
-
-    await qt_thread_gateway.send_action(_trigger_password_change)
+    # Trigger password change
+    c_w.button_user.menu().actions()[0].trigger()
 
     pc_w = await catch_password_change_widget()
 

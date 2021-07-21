@@ -78,20 +78,20 @@ async def test_workspace_sharing_list_users(
 async def test_share_workspace(
     aqtbot,
     running_backend,
+    logged_gui,
     gui_workspace_sharing,
     autoclose_dialog,
     core_config,
     alice,
     adam,
     catch_share_workspace_widget,
-    qt_thread_gateway,
     monkeypatch,
 ):
     password = "P@ssw0rd"
     save_device_with_password(core_config.config_dir, alice, password)
     save_device_with_password(core_config.config_dir, adam, password)
 
-    logged_gui, w_w, share_w_w = gui_workspace_sharing
+    _, w_w, share_w_w = gui_workspace_sharing
 
     # Fix the return value of ensure_string_size, because it can depend of the size of the window
     monkeypatch.setattr(
@@ -109,11 +109,8 @@ async def test_share_workspace(
     user_name = user_w.user_info.short_user_display
     user_w.status_timer.setInterval(200)
 
-    def _set_manager():
-        user_w.combo_role.setCurrentIndex(3)
-
     async with aqtbot.wait_signal(share_w_w.share_success):
-        await qt_thread_gateway.send_action(_set_manager)
+        user_w.combo_role.setCurrentIndex(3)
 
     async with aqtbot.wait_signal(user_w.status_timer.timeout):
 
@@ -134,11 +131,7 @@ async def test_share_workspace(
     # sporadic segfault, causing the test to become inconsistent
     parent = share_w_w.parent().parent()
     async with aqtbot.wait_signals([parent.closing, w_w.list_success]):
-
-        def _close_dialog():
-            parent.reject()
-
-        await qt_thread_gateway.send_action(_close_dialog)
+        parent.reject()
 
     def _workspace_listed():
         assert w_w.layout_workspaces.count() == 1
@@ -215,9 +208,9 @@ async def test_share_workspace(
 @pytest.mark.gui
 @pytest.mark.trio
 async def test_share_workspace_offline(
-    aqtbot, running_backend, gui_workspace_sharing, autoclose_dialog, qt_thread_gateway
+    aqtbot, running_backend, logged_gui, gui_workspace_sharing, autoclose_dialog
 ):
-    logged_gui, w_w, share_w_w = gui_workspace_sharing
+    _, w_w, share_w_w = gui_workspace_sharing
 
     def _users_listed():
         assert share_w_w.scroll_content.layout().count() == 4
@@ -227,17 +220,17 @@ async def test_share_workspace_offline(
     user_w = share_w_w.scroll_content.layout().itemAt(1).widget()
     assert user_w.combo_role.currentIndex() == 0
 
-    def _set_manager():
+    with running_backend.offline():
         user_w.combo_role.setCurrentIndex(3)
 
-    with running_backend.offline():
-        await qt_thread_gateway.send_action(_set_manager)
+        def _error_shown():
+            assert len(autoclose_dialog.dialogs) == 1
+            assert autoclose_dialog.dialogs[0] == (
+                "Error",
+                translate("TEXT_WORKSPACE_SHARING_OFFLINE"),
+            )
 
-    def _error_shown():
-        assert len(autoclose_dialog.dialogs) == 1
-        assert autoclose_dialog.dialogs[0] == ("Error", translate("TEXT_WORKSPACE_SHARING_OFFLINE"))
-
-    await aqtbot.wait_until(_error_shown)
+        await aqtbot.wait_until(_error_shown)
 
 
 @pytest.mark.gui
@@ -247,9 +240,9 @@ async def test_share_workspace_offline(
 @customize_fixtures(logged_gui_as_admin=True)
 @customize_fixtures(bob_profile=UserProfile.OUTSIDER)
 async def test_share_with_outsider_limit_roles(
-    aqtbot, running_backend, gui_workspace_sharing, autoclose_dialog, qt_thread_gateway
+    aqtbot, running_backend, logged_gui, gui_workspace_sharing, autoclose_dialog
 ):
-    logged_gui, w_w, share_w_w = gui_workspace_sharing
+    _, w_w, share_w_w = gui_workspace_sharing
 
     def _users_listed():
         assert share_w_w.scroll_content.layout().count() == 4
@@ -258,14 +251,11 @@ async def test_share_with_outsider_limit_roles(
 
     for role_index, role_name in [(3, "Manager"), (4, "Owner")]:
 
-        def _set_manager():
-            select_bob_w = share_w_w.scroll_content.layout().itemAt(2).widget()
-            assert select_bob_w.label_email.text() == "bob@example.com"
-            # Switch bob to an invalid role
-            assert select_bob_w.combo_role.itemText(role_index) == role_name
-            select_bob_w.combo_role.setCurrentIndex(3)
-
-        await qt_thread_gateway.send_action(_set_manager)
+        select_bob_w = share_w_w.scroll_content.layout().itemAt(2).widget()
+        assert select_bob_w.label_email.text() == "bob@example.com"
+        # Switch bob to an invalid role
+        assert select_bob_w.combo_role.itemText(role_index) == role_name
+        select_bob_w.combo_role.setCurrentIndex(3)
 
         def _error_shown():
             assert len(autoclose_dialog.dialogs) == 1
@@ -282,7 +272,7 @@ async def test_share_with_outsider_limit_roles(
 @pytest.mark.gui
 @pytest.mark.trio
 async def test_workspace_sharing_filter_users(
-    aqtbot, running_backend, gui_workspace_sharing, autoclose_dialog, qt_thread_gateway
+    aqtbot, running_backend, gui_workspace_sharing, autoclose_dialog
 ):
     logged_gui, w_w, share_w_w = gui_workspace_sharing
 
@@ -306,24 +296,25 @@ async def test_workspace_sharing_filter_users(
 
     await aqtbot.key_clicks(share_w_w.line_edit_filter, "face")
     assert _users_visible() == 3
-    await qt_thread_gateway.send_action(_reset_input)
+    _reset_input()
 
     await aqtbot.key_clicks(share_w_w.line_edit_filter, "mca")
     assert _users_visible() == 2
-    await qt_thread_gateway.send_action(_reset_input)
+    _reset_input()
 
     await aqtbot.key_clicks(share_w_w.line_edit_filter, "bob")
     assert _users_visible() == 1
-    await qt_thread_gateway.send_action(_reset_input)
+    _reset_input()
 
     await aqtbot.key_clicks(share_w_w.line_edit_filter, "zoidberg")
     assert _users_visible() == 0
+    _reset_input()
 
 
 @pytest.mark.gui
 @pytest.mark.trio
 async def test_share_workspace_while_connected(
-    aqtbot, running_backend, logged_gui, autoclose_dialog, qt_thread_gateway, alice_user_fs, bob
+    aqtbot, running_backend, logged_gui, autoclose_dialog, alice_user_fs, bob
 ):
     w_w = await logged_gui.test_switch_to_workspaces_widget()
     wid = await alice_user_fs.workspace_create("Workspace")
@@ -349,7 +340,7 @@ async def test_share_workspace_while_connected(
 @pytest.mark.gui
 @pytest.mark.trio
 async def test_unshare_workspace_while_connected(
-    aqtbot, running_backend, logged_gui, autoclose_dialog, qt_thread_gateway, alice_user_fs, bob
+    aqtbot, running_backend, logged_gui, autoclose_dialog, alice_user_fs, bob
 ):
     w_w = await logged_gui.test_switch_to_workspaces_widget()
     wid = await alice_user_fs.workspace_create("Workspace")
