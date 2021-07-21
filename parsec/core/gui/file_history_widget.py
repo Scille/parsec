@@ -31,7 +31,11 @@ class FileHistoryButton(QWidget, Ui_FileHistoryButton):
     def __init__(self, version, creator, name, size, src, dst, timestamp):
         super().__init__()
         self.setupUi(self)
-        self.label_version.setText(str(version))
+        if version <= 1:
+            version_str = _("TEXT_FILE_HISTORY_CREATION")
+        else:
+            version_str = str(version - 1)
+        self.label_version.setText(version_str)
         self.label_user.setText(creator)
         self.label_size.setText(get_filesize(size) if size is not None else "")
         self.label_date.setText(format_datetime(timestamp))
