@@ -2521,6 +2521,9 @@ msgstr "Annuler l'invitation"
 msgid "ACTION_GREET_USER"
 msgstr "Accueillir l'utilisateur"
 
+msgid "ACTION_GREET_USER_CANCEL"
+msgstr "Annuler l'invitation"
+
 msgid "TEXT_USERS_FILTER_USERS_PLACEHOLDER"
 msgstr "Filtrer les utilisateurs"
 

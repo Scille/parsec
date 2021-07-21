@@ -41,21 +41,6 @@
 }</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
-   <property name="spacing">
-    <number>0</number>
-   </property>
-   <property name="leftMargin">
-    <number>0</number>
-   </property>
-   <property name="topMargin">
-    <number>0</number>
-   </property>
-   <property name="rightMargin">
-    <number>0</number>
-   </property>
-   <property name="bottomMargin">
-    <number>0</number>
-   </property>
    <item>
     <widget class="QWidget" name="widget" native="true">
      <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -283,11 +268,49 @@
          </spacer>
         </item>
         <item>
-         <widget class="QPushButton" name="button_greet">
-          <property name="text">
-           <string>ACTION_GREET_USER</string>
+         <layout class="QVBoxLayout" name="verticalLayout_3">
+          <property name="leftMargin">
+           <number>0</number>
           </property>
-         </widget>
+          <item>
+           <widget class="QPushButton" name="button_greet">
+            <property name="text">
+             <string>ACTION_GREET_USER</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="button_greet_cancel">
+            <property name="styleSheet">
+             <string notr="true">
+QPushButton {
+    background-color: #F44336;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 4px;
+    height: 38px;
+    font-size: 15px;
+    font-weight: bold;
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+QPushButton:disabled {
+    background-color: #DDDDDD;
+    color: #999999;
+}
+
+QPushButton:hover {
+    background-color: #FF6366;
+}
+</string>
+            </property>
+            <property name="text">
+             <string>ACTION_GREET_USER_CANCEL</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </item>
         <item>
          <spacer name="horizontalSpacer_5">
@@ -311,13 +334,13 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>IconLabel</class>
-   <extends>QLabel</extends>
+   <class>Button</class>
+   <extends>QPushButton</extends>
    <header>parsec.core.gui.custom_widgets</header>
   </customwidget>
   <customwidget>
-   <class>Button</class>
-   <extends>QPushButton</extends>
+   <class>IconLabel</class>
+   <extends>QLabel</extends>
    <header>parsec.core.gui.custom_widgets</header>
   </customwidget>
  </customwidgets>

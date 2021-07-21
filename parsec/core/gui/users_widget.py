@@ -49,6 +49,7 @@ class UserInvitationButton(QWidget, Ui_UserInvitationButton):
 
         self.button_greet.clicked.connect(self._on_greet_clicked)
         self.button_cancel.clicked.connect(self._on_cancel_clicked)
+        self.button_greet_cancel.clicked.connect(self._on_cancel_clicked)
         self.button_cancel.apply_style()
         self.label_icon.apply_style()
         self.setContextMenuPolicy(Qt.CustomContextMenu)
