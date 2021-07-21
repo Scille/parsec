@@ -23,7 +23,7 @@ class DeviceButton(QWidget, Ui_DeviceButton):
         self.device_info = device_info
         self.label_icon.apply_style()
         self.label_device_name.setText(
-            ensure_string_size(self.device_info.device_display, 260, self.label_device_name.font())
+            ensure_string_size(self.device_info.device_display, 190, self.label_device_name.font())
         )
         self.label_device_name.setToolTip(self.device_info.device_display)
         if self.is_current_device:
@@ -69,7 +69,7 @@ class DevicesWidget(QWidget, Ui_DevicesWidget):
         self.jobs_ctx = jobs_ctx
         self.core = core
         self.event_bus = event_bus
-        self.layout_devices = FlowLayout(spacing=40)
+        self.layout_devices = FlowLayout(spacing=30)
         self.layout_content.addLayout(self.layout_devices)
         self.button_add_device.clicked.connect(self.invite_device)
         self.button_add_device.apply_style()

@@ -42,14 +42,13 @@ class UserInvitationButton(QWidget, Ui_UserInvitationButton):
         self.setupUi(self)
         self.addr = addr
         self.email = email
-        self.label_addr.setText(ensure_string_size(str(self.addr), 260, self.label_addr.font()))
+        self.label_addr.setText(ensure_string_size(str(self.addr), 160, self.label_addr.font()))
         self.label_addr.setToolTip(str(self.addr))
-        self.label_email.setText(ensure_string_size(self.email, 260, self.label_email.font()))
+        self.label_email.setText(ensure_string_size(self.email, 160, self.label_email.font()))
         self.label_email.setToolTip(self.email)
 
         self.button_greet.clicked.connect(self._on_greet_clicked)
         self.button_cancel.clicked.connect(self._on_cancel_clicked)
-        self.button_cancel.apply_style()
         self.label_icon.apply_style()
         self.setContextMenuPolicy(Qt.CustomContextMenu)
         self.customContextMenuRequested.connect(self.show_context_menu)
@@ -126,17 +125,19 @@ class UserButton(QWidget, Ui_UserButton):
         if self.user_info.is_revoked:
             self.setToolTip(_("TEXT_USER_IS_REVOKED"))
             self.widget.setStyleSheet("background-color: #DDDDDD;")
+            self.label_revoked.setText(_("TEXT_USER_IS_REVOKED"))
         else:
+            self.label_revoked.setText("")
             self.setToolTip("")
             self.widget.setStyleSheet("background-color: #FFFFFF;")
         if self.user_info.human_handle:
             self.label_email.setText(
-                ensure_string_size(self.user_info.human_handle.email, 260, self.label_email.font())
+                ensure_string_size(self.user_info.human_handle.email, 160, self.label_email.font())
             )
             self.label_email.setToolTip(self.user_info.human_handle.email)
 
         self.label_username.setText(
-            ensure_string_size(self.user_info.short_user_display, 260, self.label_username.font())
+            ensure_string_size(self.user_info.short_user_display, 160, self.label_username.font())
         )
         self.label_username.setToolTip(self.user_info.short_user_display)
         self.label_role.setText(profiles_txt[self.user_info.profile])

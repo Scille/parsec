@@ -12,26 +12,30 @@ from parsec.core.gui.lang import translate
 
 @pytest.mark.gui
 @pytest.mark.trio
-async def test_list_users(aqtbot, running_backend, logged_gui, autoclose_dialog):
+async def test_list_users(aqtbot, running_backend, logged_gui, autoclose_dialog, monkeypatch):
+    monkeypatch.setattr(
+        "parsec.core.gui.users_widget.ensure_string_size", lambda s, size, font: (s[:12] + "...")
+    )
+
     u_w = await logged_gui.test_switch_to_users_widget()
 
     assert u_w.layout_users.count() == 3
 
     item = u_w.layout_users.itemAt(0)
-    assert item.widget().label_username.text() == "Adamy McAdamFace"
-    assert item.widget().label_email.text() == "adam@example.com"
+    assert item.widget().label_username.text() == "Adamy McAdam..."
+    assert item.widget().label_email.text() == "adam@example..."
     assert item.widget().label_role.text() == "Administrator"
     assert item.widget().label_is_current.text() == ""
 
     item = u_w.layout_users.itemAt(1)
-    assert item.widget().label_username.text() == "Alicey McAliceFace"
-    assert item.widget().label_email.text() == "alice@example.com"
+    assert item.widget().label_username.text() == "Alicey McAli..."
+    assert item.widget().label_email.text() == "alice@exampl..."
     assert item.widget().label_is_current.text() == ""
     assert item.widget().label_role.text() == "Administrator"
 
     item = u_w.layout_users.itemAt(2)
-    assert item.widget().label_username.text() == "Boby McBobFace"
-    assert item.widget().label_email.text() == "bob@example.com"
+    assert item.widget().label_username.text() == "Boby McBobFa..."
+    assert item.widget().label_email.text() == "bob@example...."
     assert item.widget().label_is_current.text() == "(you)"
     assert item.widget().label_role.text() == "Standard"
 
@@ -40,8 +44,12 @@ async def test_list_users(aqtbot, running_backend, logged_gui, autoclose_dialog)
 @pytest.mark.trio
 @customize_fixtures(logged_gui_as_admin=True)
 async def test_list_users_and_invitations(
-    aqtbot, running_backend, logged_gui, autoclose_dialog, alice
+    aqtbot, running_backend, logged_gui, autoclose_dialog, alice, monkeypatch
 ):
+    monkeypatch.setattr(
+        "parsec.core.gui.users_widget.ensure_string_size", lambda s, size, font: (s[:12] + "...")
+    )
+
     # Also populate some invitations
     await running_backend.backend.invite.new_for_user(
         alice.organization_id, greeter_user_id=alice.user_id, claimer_email="fry@pe.com"
@@ -59,26 +67,26 @@ async def test_list_users_and_invitations(
     assert u_w.layout_users.count() == 5
 
     item = u_w.layout_users.itemAt(0)
-    assert item.widget().label_email.text() == "amy@pe.com"
+    assert item.widget().label_email.text() == "amy@pe.com..."
 
     item = u_w.layout_users.itemAt(1)
-    assert item.widget().label_email.text() == "fry@pe.com"
+    assert item.widget().label_email.text() == "fry@pe.com..."
 
     item = u_w.layout_users.itemAt(2)
-    assert item.widget().label_username.text() == "Adamy McAdamFace"
-    assert item.widget().label_email.text() == "adam@example.com"
+    assert item.widget().label_username.text() == "Adamy McAdam..."
+    assert item.widget().label_email.text() == "adam@example..."
     assert item.widget().label_role.text() == "Administrator"
     assert item.widget().label_is_current.text() == ""
 
     item = u_w.layout_users.itemAt(3)
-    assert item.widget().label_username.text() == "Alicey McAliceFace"
-    assert item.widget().label_email.text() == "alice@example.com"
+    assert item.widget().label_username.text() == "Alicey McAli..."
+    assert item.widget().label_email.text() == "alice@exampl..."
     assert item.widget().label_is_current.text() == "(you)"
     assert item.widget().label_role.text() == "Administrator"
 
     item = u_w.layout_users.itemAt(4)
-    assert item.widget().label_username.text() == "Boby McBobFace"
-    assert item.widget().label_email.text() == "bob@example.com"
+    assert item.widget().label_username.text() == "Boby McBobFa..."
+    assert item.widget().label_email.text() == "bob@example...."
     assert item.widget().label_is_current.text() == ""
     assert item.widget().label_role.text() == "Standard"
 
@@ -96,7 +104,11 @@ async def test_list_users_offline(aqtbot, logged_gui, autoclose_dialog):
 
 @pytest.mark.gui
 @pytest.mark.trio
-async def test_filter_users(aqtbot, running_backend, logged_gui):
+async def test_filter_users(aqtbot, running_backend, logged_gui, monkeypatch):
+    monkeypatch.setattr(
+        "parsec.core.gui.users_widget.ensure_string_size", lambda s, size, font: (s[:12] + "...")
+    )
+
     def _users_shown(count: int):
         assert u_w.layout_users.count() == count
         items = (u_w.layout_users.itemAt(i) for i in range(u_w.layout_users.count()))
@@ -104,22 +116,22 @@ async def test_filter_users(aqtbot, running_backend, logged_gui):
             widget = item.widget()
             assert widget.label_username.text() in [
                 "Alicey McAliceFace",
-                "Boby McBobFace",
+                "Boby McBobFa...",
                 "Adamy McAdamFace",
             ]
 
     def _all_users_visible(u_w):
         assert u_w.layout_users.count() == 3
         adam_w = u_w.layout_users.itemAt(0).widget()
-        assert adam_w.label_username.text() == "Adamy McAdamFace"
-        assert adam_w.label_email.text() == "adam@example.com"
+        assert adam_w.label_username.text() == "Adamy McAdam..."
+        assert adam_w.label_email.text() == "adam@example..."
         alice_w = u_w.layout_users.itemAt(1).widget()
-        assert alice_w.label_username.text() == "Alicey McAliceFace"
-        assert alice_w.label_email.text() == "alice@example.com"
+        assert alice_w.label_username.text() == "Alicey McAli..."
+        assert alice_w.label_email.text() == "alice@exampl..."
 
         bob_w = u_w.layout_users.itemAt(2).widget()
-        assert bob_w.label_username.text() == "Boby McBobFace"
-        assert bob_w.label_email.text() == "bob@example.com"
+        assert bob_w.label_username.text() == "Boby McBobFa..."
+        assert bob_w.label_email.text() == "bob@example...."
 
         assert alice_w.isVisible() is True
         assert bob_w.isVisible() is True
@@ -137,8 +149,8 @@ async def test_filter_users(aqtbot, running_backend, logged_gui):
     bob_w = u_w.layout_users.itemAt(0).widget()
 
     assert bob_w.isVisible() is True
-    assert bob_w.label_username.text() == "Boby McBobFace"
-    assert bob_w.label_email.text() == "bob@example.com"
+    assert bob_w.label_username.text() == "Boby McBobFa..."
+    assert bob_w.label_email.text() == "bob@example...."
     assert u_w.layout_users.count() == 1
 
     async with aqtbot.wait_signal(u_w.list_success):
@@ -156,11 +168,11 @@ async def test_filter_users(aqtbot, running_backend, logged_gui):
     adam_w = u_w.layout_users.itemAt(0).widget()
 
     assert adam_w.isVisible() is True
-    assert adam_w.label_username.text() == "Adamy McAdamFace"
-    assert adam_w.label_email.text() == "adam@example.com"
+    assert adam_w.label_username.text() == "Adamy McAdam..."
+    assert adam_w.label_email.text() == "adam@example..."
 
     alice_w = u_w.layout_users.itemAt(1).widget()
     assert alice_w.isVisible() is True
-    assert alice_w.label_username.text() == "Alicey McAliceFace"
-    assert alice_w.label_email.text() == "alice@example.com"
+    assert alice_w.label_username.text() == "Alicey McAli..."
+    assert alice_w.label_email.text() == "alice@exampl..."
     assert u_w.layout_users.count() == 2

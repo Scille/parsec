@@ -6,20 +6,20 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>280</width>
-    <height>280</height>
+    <width>200</width>
+    <height>200</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
-    <width>280</width>
-    <height>280</height>
+    <width>200</width>
+    <height>200</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
-    <width>280</width>
-    <height>280</height>
+    <width>200</width>
+    <height>200</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -38,6 +38,20 @@
 #button_cancel {
 	border: none;
 	background: none;
+}
+
+#button_greet {
+	font-size: 13px;
+}
+
+#button_cancel {
+	color: #F44336;
+	background: none;
+	font-size: 12px;
+}
+
+#button_cancel:hover {
+	text-decoration: underline;
 }</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
@@ -60,22 +74,25 @@
     <widget class="QWidget" name="widget" native="true">
      <layout class="QVBoxLayout" name="verticalLayout_2">
       <property name="spacing">
-       <number>10</number>
+       <number>8</number>
       </property>
       <property name="leftMargin">
-       <number>10</number>
+       <number>5</number>
       </property>
       <property name="topMargin">
-       <number>10</number>
+       <number>5</number>
       </property>
       <property name="rightMargin">
-       <number>10</number>
+       <number>5</number>
       </property>
       <property name="bottomMargin">
-       <number>10</number>
+       <number>5</number>
       </property>
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_3">
+        <property name="spacing">
+         <number>0</number>
+        </property>
         <item>
          <spacer name="horizontalSpacer_4">
           <property name="orientation">
@@ -90,83 +107,40 @@
          </spacer>
         </item>
         <item>
-         <widget class="Button" name="button_cancel">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="minimumSize">
-           <size>
-            <width>32</width>
-            <height>32</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>32</width>
-            <height>32</height>
-           </size>
+         <widget class="QPushButton" name="button_cancel">
+          <property name="font">
+           <font>
+            <pointsize>-1</pointsize>
+           </font>
           </property>
           <property name="cursor">
            <cursorShape>PointingHandCursor</cursorShape>
           </property>
-          <property name="toolTip">
+          <property name="text">
            <string>ACTION_CANCEL_USER_INVITATION_TOOLTIP</string>
           </property>
-          <property name="text">
-           <string/>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer_6">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
           </property>
-          <property name="icon">
-           <iconset resource="../rc/resources.qrc">
-            <normaloff>:/icons/images/material/block.svg</normaloff>:/icons/images/material/block.svg</iconset>
-          </property>
-          <property name="iconSize">
+          <property name="sizeHint" stdset="0">
            <size>
-            <width>32</width>
-            <height>32</height>
+            <width>40</width>
+            <height>20</height>
            </size>
           </property>
-          <property name="flat">
-           <bool>true</bool>
-          </property>
-          <property name="color" stdset="0">
-           <color>
-            <red>244</red>
-            <green>67</green>
-            <blue>54</blue>
-           </color>
-          </property>
-          <property name="hover_color" stdset="0">
-           <color>
-            <red>249</red>
-            <green>33</green>
-            <blue>36</blue>
-           </color>
-          </property>
-         </widget>
+         </spacer>
         </item>
        </layout>
       </item>
       <item>
-       <spacer name="verticalSpacer">
-        <property name="orientation">
-         <enum>Qt::Vertical</enum>
-        </property>
-        <property name="sizeType">
-         <enum>QSizePolicy::Fixed</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>20</width>
-          <height>10</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item>
        <layout class="QHBoxLayout" name="horizontalLayout">
+        <property name="spacing">
+         <number>0</number>
+        </property>
         <item>
          <spacer name="horizontalSpacer">
           <property name="orientation">
@@ -184,14 +158,14 @@
          <widget class="IconLabel" name="label_icon">
           <property name="minimumSize">
            <size>
-            <width>64</width>
-            <height>64</height>
+            <width>32</width>
+            <height>32</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
-            <width>64</width>
-            <height>64</height>
+            <width>32</width>
+            <height>32</height>
            </size>
           </property>
           <property name="text">
@@ -262,7 +236,7 @@
         <property name="sizeHint" stdset="0">
          <size>
           <width>20</width>
-          <height>40</height>
+          <height>10</height>
          </size>
         </property>
        </spacer>
@@ -284,6 +258,14 @@
         </item>
         <item>
          <widget class="QPushButton" name="button_greet">
+          <property name="font">
+           <font>
+            <pointsize>-1</pointsize>
+           </font>
+          </property>
+          <property name="cursor">
+           <cursorShape>PointingHandCursor</cursorShape>
+          </property>
           <property name="text">
            <string>ACTION_GREET_USER</string>
           </property>
@@ -313,11 +295,6 @@
   <customwidget>
    <class>IconLabel</class>
    <extends>QLabel</extends>
-   <header>parsec.core.gui.custom_widgets</header>
-  </customwidget>
-  <customwidget>
-   <class>Button</class>
-   <extends>QPushButton</extends>
    <header>parsec.core.gui.custom_widgets</header>
   </customwidget>
  </customwidgets>

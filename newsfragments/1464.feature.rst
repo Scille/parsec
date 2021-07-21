@@ -1,0 +1,1 @@
+Added an explicit message for a revoked user

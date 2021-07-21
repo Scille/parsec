@@ -208,7 +208,10 @@ async def test_mountpoint_open_in_explorer_button(aqtbot, running_backend, logge
 
     def get_wk_button():
         assert w_w.layout_workspaces.count() == 1
-        wk_button = w_w.layout_workspaces.itemAt(0).widget()
+        item = w_w.layout_workspaces.itemAt(0)
+        assert item
+        wk_button = item.widget()
+
         assert isinstance(wk_button, WorkspaceButton)
         return wk_button
 
@@ -295,7 +298,7 @@ async def test_workspace_filter_user(
         assert isinstance(wk_button3, WorkspaceButton)
         assert not w_w.filter_remove_button.isVisible()
 
-    await aqtbot.wait_until(_workspace_listed, timeout=2000)
+    await aqtbot.wait_until(_workspace_listed, timeout=3000)
 
     u_w = await logged_gui.test_switch_to_users_widget()
 
