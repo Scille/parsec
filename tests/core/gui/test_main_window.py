@@ -610,6 +610,14 @@ async def test_outsider_profil_limit(
     await gui.test_switch_to_logged_in(adam)
 
     w_w = await gui.test_switch_to_workspaces_widget()
+
+    def _workspace_button_shown():
+        layout_workspace = w_w.layout_workspaces.itemAt(0)
+        assert layout_workspace is not None
+        workspace_button = layout_workspace.widget()
+        assert not isinstance(workspace_button, QtWidgets.QLabel)
+
+    await aqtbot.wait_until(_workspace_button_shown)
     layout_workspace = w_w.layout_workspaces.itemAt(0)
     workspace_button = layout_workspace.widget()
     assert workspace_button.button_share.isVisible() is False

@@ -443,6 +443,8 @@ def testing_main_window_cls(aqtbot):
                 # Send the click
                 await aqtbot.mouse_click(wk_button, QtCore.Qt.LeftButton)
 
+            # Wait for the spinner to disappear
+            await aqtbot.wait_until(f_w.spinner.isHidden)
             return f_w
 
         async def test_switch_to_logged_in(self, device):

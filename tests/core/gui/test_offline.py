@@ -7,14 +7,16 @@ from parsec.core.gui.lang import translate
 @pytest.mark.gui
 @pytest.mark.trio
 async def test_offline_notification(aqtbot, running_backend, logged_gui):
-
     central_widget = logged_gui.test_get_central_widget()
     assert central_widget is not None
 
     # Assert connected
-    assert central_widget.menu.label_connection_state.text() == translate(
-        "TEXT_BACKEND_STATE_CONNECTED"
-    )
+    def _online():
+        assert central_widget.menu.label_connection_state.text() == translate(
+            "TEXT_BACKEND_STATE_CONNECTED"
+        )
+
+    await aqtbot.wait_until(_online)
 
     # Assert offline
     def _offline():

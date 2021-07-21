@@ -595,13 +595,13 @@ async def test_claim_device_offline_backend(
     with running_backend.offline():
         await aqtbot.run(gui.add_instance, invitation_addr.to_url())
 
-    def _assert_dialogs():
-        assert len(autoclose_dialog.dialogs) == 1
-        assert autoclose_dialog.dialogs == [
-            ("Error", translate("TEXT_INVITATION_BACKEND_NOT_AVAILABLE"))
-        ]
+        def _assert_dialogs():
+            assert len(autoclose_dialog.dialogs) == 1
+            assert autoclose_dialog.dialogs == [
+                ("Error", translate("TEXT_INVITATION_BACKEND_NOT_AVAILABLE"))
+            ]
 
-    await aqtbot.wait_until(_assert_dialogs)
+        await aqtbot.wait_until(_assert_dialogs)
 
 
 @pytest.mark.gui
