@@ -167,7 +167,7 @@ async def _do_folder_stat(workspace_fs, path, default_selection, set_path):
             child_stat = await workspace_fs.path_info(path / child)
         except FSFileNotFoundError:
             # The child entry as been concurrently removed, just ignore it
-            pass
+            continue
         except FSRemoteManifestNotFound as exc:
             # Cannot get informations about this child entry, this can occur if
             # if the manifest is inconsistent (broken data or signature).
@@ -366,6 +366,8 @@ class FilesWidget(QWidget, Ui_FilesWidget):
     ):
         self.current_directory = current_directory
         self.workspace_fs = wk_fs
+        self.load(current_directory)
+
         ws_entry = self.jobs_ctx.run_sync(self.workspace_fs.get_workspace_entry)
         self.current_user_role = ws_entry.role
         self.label_role.setText(get_role_translation(self.current_user_role))
