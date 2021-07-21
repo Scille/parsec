@@ -28,6 +28,9 @@ __all__ = ("TransportError", "Transport")
 
 logger = get_logger()
 WEBSOCKET_HANDSHAKE_TIMEOUT = 3.0
+SUBPROTOCOL_NAME = (
+    "ws.parsec.cloud"
+)  # see https://datatracker.ietf.org/doc/html/rfc6455#section-1.9
 TRANSPORT_TARGET = "/ws"
 
 
@@ -118,13 +121,18 @@ class Transport:
 
         # Because this is a client WebSocket, we need to initiate the connection
         # handshake by sending a Request event.
-        await transport._net_send(Request(host=host, target=TRANSPORT_TARGET))
+        await transport._net_send(
+            Request(host=host, target=TRANSPORT_TARGET, subprotocols=[SUBPROTOCOL_NAME])
+        )
 
         # Get handshake answer
         event = await transport._next_ws_event()
 
         if isinstance(event, AcceptConnection):
             transport.logger.debug("WebSocket negotiation complete", ws_event=event)
+            if event.subprotocol != SUBPROTOCOL_NAME:
+                reason = f"Bad subprotocol selected by server during WebSocket handshake: {event}"
+                raise TransportError(reason)
 
         else:
             transport.logger.warning("Unexpected event during WebSocket handshake", ws_event=event)
@@ -150,7 +158,15 @@ class Transport:
             event = await transport._next_ws_event()
         if isinstance(event, Request):
             transport.logger.debug("Accepting WebSocket upgrade")
-            await transport._net_send(AcceptConnection())
+            # see https://datatracker.ietf.org/doc/html/rfc6455#section-4
+            if SUBPROTOCOL_NAME in event.subprotocols:
+                await transport._net_send(AcceptConnection(subprotocol=SUBPROTOCOL_NAME))
+            else:
+                # Client didn't provide subprotocols (e.g. legacy client version)
+                # or provided unsupported subprotocols, anyway we omit
+                # the Sec-WebSocket-Protocol to inform client and let it
+                # decide whether it should continue or end the connection.
+                await transport._net_send(AcceptConnection())
             return transport
 
         transport.logger.warning("Unexpected event during WebSocket handshake", ws_event=event)

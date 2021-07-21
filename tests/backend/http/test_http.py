@@ -251,7 +251,7 @@ async def test_request_is_too_big(backend_http_send):
 
 
 @pytest.mark.trio
-async def test_upgrade_to_websocket(backend_http_send):
+async def test_upgrade_to_websocket_no_subprotocol(backend_http_send):
     req = (
         b"GET /ws HTTP/1.1\r\n"
         b"connection: upgrade\r\n"
@@ -261,8 +261,80 @@ async def test_upgrade_to_websocket(backend_http_send):
         b"Sec-WebSocket-Version: 13\r\n"
         b"\r\n"
     )
-    status, _, _ = await backend_http_send(req=req, sanity_checks=False)
+    status, headers, _ = await backend_http_send(req=req, sanity_checks=False)
     assert status == (101, "")
+    assert headers == {
+        "upgrade": "WebSocket",
+        "connection": "Upgrade",
+        "sec-websocket-accept": "s3pPLMBiTxaQ9kYGzzhZRbK+xOo=",
+    }
+
+
+@pytest.mark.trio
+async def test_upgrade_to_websocket_with_subprotocol(backend_http_send):
+    req = (
+        b"GET /ws HTTP/1.1\r\n"
+        b"connection: upgrade\r\n"
+        b"upgrade: websocket\r\n"
+        b"host: parsec.example.com\r\n"
+        b"Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==\r\n"
+        b"Sec-WebSocket-Version: 13\r\n"
+        b"Sec-Websocket-Protocol: ws.parsec.cloud\r\n"
+        b"\r\n"
+    )
+    status, headers, _ = await backend_http_send(req=req, sanity_checks=False)
+    assert status == (101, "")
+    assert headers == {
+        "upgrade": "WebSocket",
+        "connection": "Upgrade",
+        "sec-websocket-accept": "s3pPLMBiTxaQ9kYGzzhZRbK+xOo=",
+        "sec-websocket-protocol": "ws.parsec.cloud",
+    }
+
+
+@pytest.mark.trio
+async def test_upgrade_to_websocket_with_multiple_subprotocol(backend_http_send):
+    req = (
+        b"GET /ws HTTP/1.1\r\n"
+        b"connection: upgrade\r\n"
+        b"upgrade: websocket\r\n"
+        b"host: parsec.example.com\r\n"
+        b"Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==\r\n"
+        b"Sec-WebSocket-Version: 13\r\n"
+        b"Sec-Websocket-Protocol: ws.parsec.cloud, dummy.example.com\r\n"
+        b"\r\n"
+    )
+    status, headers, _ = await backend_http_send(req=req, sanity_checks=False)
+    assert status == (101, "")
+    assert headers == {
+        "upgrade": "WebSocket",
+        "connection": "Upgrade",
+        "sec-websocket-accept": "s3pPLMBiTxaQ9kYGzzhZRbK+xOo=",
+        "sec-websocket-protocol": "ws.parsec.cloud",
+    }
+
+
+@pytest.mark.trio
+async def test_upgrade_to_websocket_bad_subprotocol(backend_http_send):
+    # Only "parsec" subprotocol (or no subprotocol at all) is allowed for upgrade
+    req = (
+        b"GET /ws HTTP/1.1\r\n"
+        b"connection: upgrade\r\n"
+        b"upgrade: websocket\r\n"
+        b"host: parsec.example.com\r\n"
+        b"Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==\r\n"
+        b"Sec-WebSocket-Version: 13\r\n"
+        b"Sec-Websocket-Protocol: dummy.example.com\r\n"
+        b"\r\n"
+    )
+    status, headers, _ = await backend_http_send(req=req, sanity_checks=False)
+    # Bad subprotocol leads server to return not sec-websocket-protocol header
+    assert status == (101, "")
+    assert headers == {
+        "upgrade": "WebSocket",
+        "connection": "Upgrade",
+        "sec-websocket-accept": "s3pPLMBiTxaQ9kYGzzhZRbK+xOo=",
+    }
 
 
 @pytest.mark.trio

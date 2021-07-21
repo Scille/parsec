@@ -165,7 +165,8 @@ def test_sas_code():
         "foo.txt",
         "x" * 255,  # Max size
         "飞" * 85,  # Unicode & max size
-        "X1-_é飞" "🌍☄️==🦕🦖💀",  # Probably a bad name for a real folder...
+        "X1-_é飞",
+        "🌍☄️==🦕🦖💀",  # Probably a bad name for a real folder...
         ".a",  # Dot and dot-dot are allowed if they are not alone
         "..a",
         "a..",
