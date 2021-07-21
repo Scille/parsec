@@ -140,14 +140,10 @@ html_theme_options = {
 # html_title.
 # html_short_title = None
 
-# VCS options: https://docs.readthedocs.io/en/latest/vcs.html#github
-html_context = {
-    "display_github": True,  # Integrate GitHub
-    "github_user": "Parsec",  # Username
-    "github_repo": "parsec-cloud",  # Repo name
-    "github_version": "master",  # Version
-    "conf_py_path": "/",  # Path in the checkout to the docs root
-}
+# When building an annotated tag (which is done for the stable releases)
+# readthedocs provide incorrect github url, so we have to overwrite them
+if on_rtd:
+    html_theme_options["github_url"] = "https://github.com/Scille/parsec-cloud"
 
 # The name of an image file (relative to this directory) to place at the
 # top of the sidebar.

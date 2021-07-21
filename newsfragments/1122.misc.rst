@@ -1,0 +1,1 @@
+Fix "Edit on Github" links in documentation
