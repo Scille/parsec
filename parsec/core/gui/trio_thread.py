@@ -150,10 +150,7 @@ class QtToTrioJobScheduler:
         a single execution of the last provided job parameters at the soonest delay.
         """
 
-        async def _throttled_execute(task_status=trio.TASK_STATUS_IGNORED):
-            # Create the job but don't execute it: we have to handle throttle first !
-            job = QtToTrioJob(fn, args, kwargs, qt_on_success, qt_on_error)
-
+        async def _throttled_execute(job, task_status=trio.TASK_STATUS_IGNORED):
             # Only modify `_throttling_scheduled_jobs` from the trio
             # thread to avoid concurrent acces with the Qt thread
             # Note we might be overwritting another job here, it is fine given
@@ -183,7 +180,13 @@ class QtToTrioJobScheduler:
                 # Job scheduler has been closed, nothing more can be done
                 pass
 
-        self.nursery.start_soon(_throttled_execute)
+        # Create the job but don't execute it: we have to handle throttle first !
+        job = QtToTrioJob(fn, args, kwargs, qt_on_success, qt_on_error)
+        if self.nursery._closed:
+            job.set_cancelled(JobSchedulerNotAvailable())
+        else:
+            self.nursery.start_soon(_throttled_execute, job)
+        return job
 
     def submit_job(self, qt_on_success, qt_on_error, fn, *args, **kwargs):
         job = QtToTrioJob(fn, args, kwargs, qt_on_success, qt_on_error)
