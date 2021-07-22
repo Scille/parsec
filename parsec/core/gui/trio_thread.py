@@ -139,6 +139,9 @@ class QtToTrioJobScheduler:
         self._throttling_scheduled_jobs = {}
         self._throttling_last_executed = {}
 
+    def close(self):
+        self.nursery.cancel_scope.cancel()
+
     def submit_throttled_job(
         self, throttling_id: str, delay: float, qt_on_success, qt_on_error, fn, *args, **kwargs
     ):

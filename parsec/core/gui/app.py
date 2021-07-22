@@ -155,6 +155,7 @@ async def _run_gui(config: CoreConfig, start_arg: str = None, diagnose: bool = F
     async with run_trio_job_scheduler() as jobs_ctx:
         win = MainWindow(
             jobs_ctx=jobs_ctx,
+            quit_callback=jobs_ctx.close,
             event_bus=event_bus,
             config=config,
             minimize_on_close=config.gui_tray_enabled and systray_available(),
@@ -191,7 +192,6 @@ async def _run_gui(config: CoreConfig, start_arg: str = None, diagnose: bool = F
 
         def kill_window(*args):
             win.close_app(force=True)
-            QApplication.quit()
 
         signal.signal(signal.SIGINT, kill_window)
 

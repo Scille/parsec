@@ -251,7 +251,7 @@ def gui_factory(
         switch_language(core_config, "en")
 
         main_w = testing_main_window_cls(
-            job_scheduler, event_bus, core_config, minimize_on_close=True
+            job_scheduler, job_scheduler.close, event_bus, core_config, minimize_on_close=True
         )
         aqtbot.qtbot.add_widget(main_w)
         main_w.show_window(skip_dialogs=skip_dialogs)
