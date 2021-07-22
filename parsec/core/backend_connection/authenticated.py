@@ -294,11 +294,12 @@ class BackendAuthenticatedConn:
                         f"Error while fetching organization config: {rep}"
                     )
 
-            self._organization_config = OrganizationConfig(
-                expiration_date=rep["expiration_date"],
-                user_profile_outsider_allowed=rep["user_profile_outsider_allowed"],
-                active_users_limit=rep["active_users_limit"],
-            )
+            else:
+                self._organization_config = OrganizationConfig(
+                    expiration_date=rep.get("expiration_date"),
+                    user_profile_outsider_allowed=rep["user_profile_outsider_allowed"],
+                    active_users_limit=rep["active_users_limit"],
+                )
 
             rep = await cmds.events_subscribe(transport)
             if rep["status"] != "ok":

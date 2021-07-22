@@ -51,15 +51,13 @@ class MemoryOrganizationComponent(BaseOrganizationComponent):
         self,
         id: OrganizationID,
         bootstrap_token: str,
-        expiration_date: Optional[DateTime] = None,
+        expiration_date: Union[UnsetType, Optional[DateTime]] = Unset,
         active_users_limit: Optional[int] = None,
     ) -> None:
         org = self._organizations.get(id)
-
         # Allow overwritting of not-yet-bootstrapped organization
         if org and org.root_verify_key:
             raise OrganizationAlreadyExistsError()
-
         self._organizations[id] = Organization(
             organization_id=id,
             bootstrap_token=bootstrap_token,

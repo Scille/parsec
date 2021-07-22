@@ -60,7 +60,7 @@ class OrganizationExpiredError(OrganizationError):
 class Organization:
     organization_id: OrganizationID
     bootstrap_token: str
-    expiration_date: Optional[DateTime] = None
+    expiration_date: Union[UnsetType, Optional[DateTime]] = Unset
     root_verify_key: Optional[VerifyKey] = None
     user_profile_outsider_allowed: bool = False
     active_users_limit: Optional[int] = None
@@ -70,7 +70,7 @@ class Organization:
 
     @property
     def is_expired(self):
-        return self.expiration_date is not None and self.expiration_date <= DateTime.now()
+        return isinstance(self.expiration_date, DateTime) and self.expiration_date <= DateTime.now()
 
     def evolve(self, **kwargs):
         return attr.evolve(self, **kwargs)
@@ -98,7 +98,7 @@ class BaseOrganizationComponent:
         msg = apiv1_organization_create_serializer.req_load(msg)
 
         bootstrap_token = token_hex(self.bootstrap_token_size)
-        expiration_date = msg.get("expiration_date", None)
+        expiration_date = msg.get("expiration_date", Unset)
         default_users_limit = self._config.default_users_limit
         try:
             await self.create(
@@ -116,7 +116,7 @@ class BaseOrganizationComponent:
             "bootstrap_token": bootstrap_token,
             "status": "ok",
         }
-        if expiration_date:
+        if isinstance(expiration_date, DateTime):
             rep["expiration_date"] = expiration_date
 
         return apiv1_organization_create_serializer.rep_dump(rep)
@@ -131,15 +131,18 @@ class BaseOrganizationComponent:
 
         except OrganizationNotFoundError:
             return {"status": "not_found"}
-        return apiv1_organization_status_serializer.rep_dump(
-            {
-                "is_bootstrapped": organization.is_bootstrapped(),
-                "expiration_date": organization.expiration_date,
-                "user_profile_outsider_allowed": organization.user_profile_outsider_allowed,
-                "active_users_limit": organization.active_users_limit,
-                "status": "ok",
-            }
-        )
+
+        rep = {
+            "is_bootstrapped": organization.is_bootstrapped(),
+            "user_profile_outsider_allowed": organization.user_profile_outsider_allowed,
+            "active_users_limit": organization.active_users_limit,
+            "status": "ok",
+        }
+
+        if isinstance(organization.expiration_date, DateTime):
+            rep["expiration_date"] = organization.expiration_date
+
+        return apiv1_organization_status_serializer.rep_dump(rep)
 
     @api("organization_config", handshake_types=[HandshakeType.AUTHENTICATED])
     @catch_protocol_errors
@@ -152,14 +155,16 @@ class BaseOrganizationComponent:
         except OrganizationNotFoundError:
             return {"status": "not_found"}
 
-        return organization_config_serializer.rep_dump(
-            {
-                "expiration_date": organization.expiration_date,
-                "user_profile_outsider_allowed": organization.user_profile_outsider_allowed,
-                "active_users_limit": organization.active_users_limit,
-                "status": "ok",
-            }
-        )
+        rep = {
+            "user_profile_outsider_allowed": organization.user_profile_outsider_allowed,
+            "active_users_limit": organization.active_users_limit,
+            "status": "ok",
+        }
+
+        if isinstance(organization.expiration_date, DateTime):
+            rep["expiration_date"] = organization.expiration_date
+
+        return organization_config_serializer.rep_dump(rep)
 
     @api("organization_stats", handshake_types=[HandshakeType.AUTHENTICATED])
     @catch_protocol_errors
@@ -361,7 +366,7 @@ class BaseOrganizationComponent:
         self,
         id: OrganizationID,
         bootstrap_token: str,
-        expiration_date: Optional[DateTime] = None,
+        expiration_date: Union[UnsetType, Optional[DateTime]] = Unset,
         active_users_limit: Optional[int] = None,
     ) -> None:
         """

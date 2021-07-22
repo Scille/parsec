@@ -147,7 +147,7 @@ class PGOrganizationComponent(BaseOrganizationComponent):
         self,
         id: OrganizationID,
         bootstrap_token: str,
-        expiration_date: Optional[DateTime] = None,
+        expiration_date: Union[UnsetType, Optional[DateTime]] = Unset,
         active_users_limit: Optional[int] = None,
     ) -> None:
         async with self.dbh.pool.acquire() as conn:
@@ -156,7 +156,7 @@ class PGOrganizationComponent(BaseOrganizationComponent):
                     *_q_insert_organization(
                         organization_id=id,
                         bootstrap_token=bootstrap_token,
-                        expiration_date=expiration_date,
+                        expiration_date=expiration_date if expiration_date is not Unset else None,
                         active_users_limit=active_users_limit,
                     )
                 )

@@ -24,6 +24,7 @@ from parsec.core.types import LocalDevice, LocalUserManifest, BackendOrganizatio
 from parsec.core.local_device import generate_new_device
 from parsec.backend.user import User as BackendUser, Device as BackendDevice
 from parsec.backend.realm import RealmGrantedRole
+from parsec.backend.utils import Unset
 
 from tests.common import freeze_time, addr_with_device_subdomain
 
@@ -60,7 +61,7 @@ def organization_factory(backend_addr):
     organizations = set()
     count = 0
 
-    def _organization_factory(orgname=None, expiration_date=None):
+    def _organization_factory(orgname=None):
         nonlocal count
 
         if not orgname:
@@ -70,15 +71,12 @@ def organization_factory(backend_addr):
         assert orgname not in organizations
         organization_id = OrganizationID(orgname)
         organizations.add(organization_id)
-
         bootstrap_token = f"<{orgname}-bootstrap-token>"
         bootstrap_addr = BackendOrganizationBootstrapAddr.build(
             backend_addr, organization_id=organization_id, token=bootstrap_token
         )
-
         root_signing_key = SigningKey.generate()
         addr = bootstrap_addr.generate_organization_addr(root_signing_key.verify_key)
-
         return OrganizationFullData(bootstrap_addr, addr, root_signing_key)
 
     return _organization_factory
@@ -185,7 +183,7 @@ def otherorg(organization_factory):
 
 @pytest.fixture
 def expiredorg(organization_factory):
-    expired_org = organization_factory("ExpiredOrg", pendulum.datetime(2010, 1, 1))
+    expired_org = organization_factory("ExpiredOrg")
     return expired_org
 
 
@@ -553,7 +551,7 @@ def backend_data_binder_factory(request, backend_addr, initial_user_manifest_sta
             org: OrganizationFullData,
             first_device: LocalDevice = None,
             initial_user_manifest_in_v0: bool = False,
-            expiration_date: datetime = None,
+            expiration_date: datetime = Unset,
         ):
             bootstrap_token = f"<{org.organization_id}-bootstrap-token>"
             await self.backend.organization.create(
