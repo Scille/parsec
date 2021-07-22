@@ -10,7 +10,6 @@ import pendulum
 
 from parsec.core.gui.lang import get_qlocale, translate as _, format_datetime
 from parsec.core.gui.custom_dialogs import show_error, GreyedDialog
-from parsec.core.gui.trio_thread import ThreadSafeQtSignal
 from parsec.core.gui.ui.timestamped_workspace_widget import Ui_TimestampedWorkspaceWidget
 
 
@@ -40,8 +39,8 @@ class TimestampedWorkspaceWidget(QWidget, Ui_TimestampedWorkspaceWidget):
         self.get_creation_timestamp_success.connect(self.enable_with_timestamp)
         self.get_creation_timestamp_error.connect(self.on_error)
         self.limits_job = self.jobs_ctx.submit_job(
-            ThreadSafeQtSignal(self, "get_creation_timestamp_success"),
-            ThreadSafeQtSignal(self, "get_creation_timestamp_error"),
+            self.get_creation_timestamp_success,
+            self.get_creation_timestamp_error,
             _do_workspace_get_creation_timestamp,
             workspace_fs=workspace_fs,
         )
@@ -65,7 +64,7 @@ class TimestampedWorkspaceWidget(QWidget, Ui_TimestampedWorkspaceWidget):
 
     def cancel(self):
         if self.limits_job:
-            self.limits_job.cancel_and_join()
+            self.limits_job.cancel()
 
     def set_time_limits(self):
         selected_date = self.calendar_widget.selectedDate()

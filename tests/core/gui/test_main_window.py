@@ -154,7 +154,7 @@ async def test_link_file(aqtbot, logged_gui_with_files):
     logged_gui, w_w, f_w = logged_gui_with_files
     url = f_w.workspace_fs.generate_file_link(f_w.current_directory)
 
-    await aqtbot.run(logged_gui.add_instance, str(url))
+    logged_gui.add_instance(str(url))
 
     def _folder_ready():
         assert f_w.isVisible()
@@ -176,7 +176,7 @@ async def test_link_file_unmounted(aqtbot, logged_gui_with_files):
     core = logged_gui.test_get_core()
     url = f_w.workspace_fs.generate_file_link(f_w.current_directory)
 
-    await aqtbot.run(logged_gui.add_instance, str(url))
+    logged_gui.add_instance(str(url))
 
     def _folder_ready():
         assert f_w.isVisible()
@@ -200,7 +200,7 @@ async def test_link_file_unmounted(aqtbot, logged_gui_with_files):
 
     await aqtbot.wait_until(_unmounted)
 
-    await aqtbot.run(logged_gui.add_instance, str(url))
+    logged_gui.add_instance(str(url))
 
     await aqtbot.wait_until(_mounted)
 
@@ -211,7 +211,7 @@ async def test_link_file_invalid_path(aqtbot, autoclose_dialog, logged_gui_with_
     logged_gui, w_w, f_w = logged_gui_with_files
     url = f_w.workspace_fs.generate_file_link("/unknown")
 
-    await aqtbot.run(logged_gui.add_instance, str(url))
+    logged_gui.add_instance(str(url))
 
     def _assert_dialogs():
         assert len(autoclose_dialog.dialogs) == 1
@@ -235,7 +235,7 @@ async def test_link_file_invalid_url(aqtbot, autoclose_dialog, logged_gui_with_f
     else:
         assert False
 
-    await aqtbot.run(logged_gui.add_instance, url)
+    logged_gui.add_instance(url)
 
     def _assert_dialogs():
         assert len(autoclose_dialog.dialogs) == 1
@@ -259,7 +259,7 @@ async def test_link_file_disconnected(
 
     # Log out and send link
     await gui.test_logout_and_switch_to_login_widget()
-    await aqtbot.run(gui.add_instance, addr.to_url())
+    gui.add_instance(addr.to_url())
 
     def _assert_dialogs():
         assert len(autoclose_dialog.dialogs) == 1
@@ -323,7 +323,7 @@ async def test_link_file_disconnected_cancel_login(
 
     # Log out and send link
     await gui.test_logout_and_switch_to_login_widget()
-    await aqtbot.run(gui.add_instance, str(url))
+    gui.add_instance(str(url))
 
     def _assert_dialogs():
         assert len(autoclose_dialog.dialogs) == 1
@@ -370,7 +370,7 @@ async def test_link_file_disconnected_cancel_login(
 async def test_link_organization(
     aqtbot, logged_gui, catch_create_org_widget, organization_bootstrap_addr
 ):
-    await aqtbot.run(logged_gui.add_instance, organization_bootstrap_addr.to_url())
+    logged_gui.add_instance(organization_bootstrap_addr.to_url())
     co_w = await catch_create_org_widget()
     assert co_w
     assert logged_gui.tab_center.count() == 2
@@ -382,7 +382,7 @@ async def test_link_organization_disconnected(
     aqtbot, logged_gui, catch_create_org_widget, organization_bootstrap_addr
 ):
     await logged_gui.test_logout_and_switch_to_login_widget()
-    await aqtbot.run(logged_gui.add_instance, organization_bootstrap_addr.to_url())
+    logged_gui.add_instance(organization_bootstrap_addr.to_url())
     co_w = await catch_create_org_widget()
     assert co_w
     assert logged_gui.tab_center.count() == 1
@@ -399,7 +399,7 @@ async def test_link_claim_device(
     else:
         url = device_invitation_addr.to_url()
 
-    await aqtbot.run(logged_gui.add_instance, url)
+    logged_gui.add_instance(url)
     cd_w = await catch_claim_device_widget()
     assert cd_w
     assert logged_gui.tab_center.count() == 2
@@ -411,7 +411,7 @@ async def test_link_claim_device_disconnected(
     aqtbot, logged_gui, catch_claim_device_widget, device_invitation_addr
 ):
     await logged_gui.test_logout_and_switch_to_login_widget()
-    await aqtbot.run(logged_gui.add_instance, device_invitation_addr.to_url())
+    logged_gui.add_instance(device_invitation_addr.to_url())
     cd_w = await catch_claim_device_widget()
     assert cd_w
     assert logged_gui.tab_center.count() == 1
@@ -428,7 +428,7 @@ async def test_link_claim_user(
     else:
         url = user_invitation_addr.to_url()
 
-    await aqtbot.run(logged_gui.add_instance, url)
+    logged_gui.add_instance(url)
     cd_w = await catch_claim_user_widget()
     assert cd_w
     assert logged_gui.tab_center.count() == 2
@@ -440,7 +440,7 @@ async def test_link_claim_user_disconnected(
     aqtbot, logged_gui, catch_claim_user_widget, user_invitation_addr
 ):
     await logged_gui.test_logout_and_switch_to_login_widget()
-    await aqtbot.run(logged_gui.add_instance, user_invitation_addr.to_url())
+    logged_gui.add_instance(user_invitation_addr.to_url())
     cd_w = await catch_claim_user_widget()
     assert cd_w
     assert logged_gui.tab_center.count() == 1
@@ -610,6 +610,14 @@ async def test_outsider_profil_limit(
     await gui.test_switch_to_logged_in(adam)
 
     w_w = await gui.test_switch_to_workspaces_widget()
+
+    def _workspace_button_shown():
+        layout_workspace = w_w.layout_workspaces.itemAt(0)
+        assert layout_workspace is not None
+        workspace_button = layout_workspace.widget()
+        assert not isinstance(workspace_button, QtWidgets.QLabel)
+
+    await aqtbot.wait_until(_workspace_button_shown)
     layout_workspace = w_w.layout_workspaces.itemAt(0)
     workspace_button = layout_workspace.widget()
     assert workspace_button.button_share.isVisible() is False

@@ -136,7 +136,7 @@ async def test_login_device_list(aqtbot, gui_factory, autoclose_dialog, core_con
 @pytest.mark.gui
 @pytest.mark.trio
 async def test_login_no_available_devices(
-    aqtbot, gui_factory, autoclose_dialog, core_config, alice, qt_thread_gateway
+    aqtbot, gui_factory, autoclose_dialog, core_config, alice
 ):
     password = "P@ssw0rd"
     save_device_with_password(core_config.config_dir, alice, password)
@@ -149,10 +149,7 @@ async def test_login_no_available_devices(
 
     lw = gui.test_get_login_widget()
 
-    def _reload_devices():
-        lw.reload_devices()
-
-    await qt_thread_gateway.send_action(_reload_devices)
+    lw.reload_devices()
 
     no_device_w = lw.widget.layout().itemAt(0).widget()
     assert isinstance(no_device_w, LoginNoDevicesWidget)

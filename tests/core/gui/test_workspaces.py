@@ -262,15 +262,7 @@ async def test_mountpoint_open_in_explorer_button(aqtbot, running_backend, logge
 @pytest.mark.gui
 @pytest.mark.trio
 async def test_workspace_filter_user(
-    aqtbot,
-    running_backend,
-    logged_gui,
-    autoclose_dialog,
-    qt_thread_gateway,
-    alice_user_fs,
-    bob,
-    bob_user_fs,
-    alice,
+    aqtbot, running_backend, logged_gui, autoclose_dialog, alice_user_fs, bob, bob_user_fs, alice
 ):
     w_w = await logged_gui.test_switch_to_workspaces_widget()
     wid_alice = await alice_user_fs.workspace_create("Workspace1")
@@ -339,7 +331,6 @@ async def test_workspace_filter_user_new_workspace(
     running_backend,
     logged_gui,
     autoclose_dialog,
-    qt_thread_gateway,
     alice_user_fs,
     bob,
     bob_user_fs,

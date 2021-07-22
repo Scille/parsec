@@ -196,6 +196,10 @@ def pytest_collection_modifyitems(config, items):
     for item in items:
         if "trio" in item.keywords:
             item.fixturenames.append("task_monitoring")
+        if "gui" in item.keywords and "trio" in item.keywords:
+            import qtrio
+
+            item.add_marker(pytest.mark.trio(run=qtrio.run))
 
 
 @pytest.fixture

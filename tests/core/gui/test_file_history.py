@@ -39,9 +39,7 @@ async def test_file_history(
     await aqtbot.wait_until(_entry_available)
 
     # First select the entry...
-    await aqtbot.run(
-        f_w.table_files.setRangeSelected, QtWidgets.QTableWidgetSelectionRange(1, 0, 1, 0), True
-    )
+    f_w.table_files.setRangeSelected(QtWidgets.QTableWidgetSelectionRange(1, 0, 1, 0), True)
 
     def _entry_selected():
         assert f_w.table_files.selectedItems()
@@ -49,7 +47,7 @@ async def test_file_history(
     await aqtbot.wait_until(_entry_selected)
 
     # ...then ask for history
-    await aqtbot.run(f_w.table_files.show_history_clicked.emit)
+    f_w.table_files.show_history_clicked.emit()
 
     hf_w = await catch_file_history_widget()
 

@@ -18,7 +18,7 @@ from parsec.core.backend_connection import (
     BackendInvitationOnExistingMember,
 )
 
-from parsec.core.gui.trio_thread import JobResultError, ThreadSafeQtSignal, QtToTrioJob
+from parsec.core.gui.trio_thread import JobResultError, QtToTrioJob
 from parsec.core.gui.custom_dialogs import show_error, show_info, ask_question, get_text_input
 from parsec.core.gui.custom_widgets import ensure_string_size
 from parsec.core.gui.flow_layout import FlowLayout
@@ -274,8 +274,8 @@ class UsersWidget(QWidget, Ui_UsersWidget):
         self.button_users_filter.setEnabled(False)
         self.line_edit_search.setEnabled(False)
         self.jobs_ctx.submit_job(
-            ThreadSafeQtSignal(self, "list_success", QtToTrioJob),
-            ThreadSafeQtSignal(self, "list_error", QtToTrioJob),
+            self.list_success,
+            self.list_error,
             _do_list_users_and_invitations,
             core=self.core,
             page=self._page,
@@ -295,8 +295,8 @@ class UsersWidget(QWidget, Ui_UsersWidget):
             return
 
         self.jobs_ctx.submit_job(
-            ThreadSafeQtSignal(self, "invite_user_success", QtToTrioJob),
-            ThreadSafeQtSignal(self, "invite_user_error", QtToTrioJob),
+            self.invite_user_success,
+            self.invite_user_error,
             _do_invite_user,
             core=self.core,
             email=user_email,
@@ -335,8 +335,8 @@ class UsersWidget(QWidget, Ui_UsersWidget):
         if r != _("TEXT_USER_INVITE_CANCEL_INVITE_ACCEPT"):
             return
         self.jobs_ctx.submit_job(
-            ThreadSafeQtSignal(self, "cancel_invitation_success", QtToTrioJob),
-            ThreadSafeQtSignal(self, "cancel_invitation_error", QtToTrioJob),
+            self.cancel_invitation_success,
+            self.cancel_invitation_error,
             _do_cancel_invitation,
             core=self.core,
             token=token,
@@ -390,8 +390,8 @@ class UsersWidget(QWidget, Ui_UsersWidget):
         if result != _("ACTION_USER_REVOCATION_CONFIRM"):
             return
         self.jobs_ctx.submit_job(
-            ThreadSafeQtSignal(self, "revoke_success", QtToTrioJob),
-            ThreadSafeQtSignal(self, "revoke_error", QtToTrioJob),
+            self.revoke_success,
+            self.revoke_error,
             _do_revoke_user,
             core=self.core,
             user_info=user_info,
@@ -524,8 +524,8 @@ class UsersWidget(QWidget, Ui_UsersWidget):
         self.button_next_page.hide()
         self.spinner.show()
         self.jobs_ctx.submit_job(
-            ThreadSafeQtSignal(self, "list_success", QtToTrioJob),
-            ThreadSafeQtSignal(self, "list_error", QtToTrioJob),
+            self.list_success,
+            self.list_error,
             _do_list_users_and_invitations,
             core=self.core,
             page=self._page,

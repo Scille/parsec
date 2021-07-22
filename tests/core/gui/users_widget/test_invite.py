@@ -104,7 +104,7 @@ async def test_revoke_user(
     )
 
     if online:
-        await aqtbot.run(bob_w.revoke_clicked.emit, bob_w.user_info)
+        bob_w.revoke_clicked.emit(bob_w.user_info)
 
         def _revocation_done():
             assert bob_w.user_info.is_revoked is True
@@ -119,7 +119,7 @@ async def test_revoke_user(
 
     else:
         with running_backend.offline():
-            await aqtbot.run(bob_w.revoke_clicked.emit, bob_w.user_info)
+            bob_w.revoke_clicked.emit(bob_w.user_info)
 
             def _revocation_error():
                 assert bob_w.user_info.is_revoked is False
@@ -149,7 +149,7 @@ async def test_revoke_user_not_allowed(
         lambda *args, **kwargs: _("ACTION_USER_REVOCATION_CONFIRM"),
     )
 
-    await aqtbot.run(alice_w.revoke_clicked.emit, alice_w.user_info)
+    alice_w.revoke_clicked.emit(alice_w.user_info)
 
     def _revocation_error():
         assert alice_w.user_info.is_revoked is False

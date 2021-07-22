@@ -104,10 +104,10 @@ async def files_widget_testbed(monkeypatch, aqtbot, logged_gui):
                         QtWidgets.QTableWidgetSelectionRange(top, 0, bottom, 0), True
                     )
 
-            await aqtbot.run(_do_selection)
+            _do_selection()
 
         async def reset_selection(self):
-            await aqtbot.run(f_w.table_files.reset)
+            f_w.table_files.reset()
 
         async def copy(self, selection=None):
             if selection is not None:
@@ -505,9 +505,7 @@ async def test_cut_dir_in_itself(aqtbot, autoclose_dialog, files_widget_testbed)
 
 @pytest.mark.gui
 @pytest.mark.trio
-async def test_drag_and_drop(
-    qt_thread_gateway, tmpdir, aqtbot, autoclose_dialog, files_widget_testbed
-):
+async def test_drag_and_drop(tmpdir, aqtbot, autoclose_dialog, files_widget_testbed):
     tb = files_widget_testbed
     f_w = files_widget_testbed.files_widget
 
@@ -529,7 +527,7 @@ async def test_drag_and_drop(
 
     # Good drap&drop
 
-    await qt_thread_gateway.send_action(_import_file)
+    _import_file()
     await tb.check_files_view(path="/", expected_entries=["file1.txt"])
 
     # Drap&drop in readonly workspace is not allowed
@@ -537,7 +535,7 @@ async def test_drag_and_drop(
     # Quick hack to have a read-only workspace ;-)
     f_w.table_files.current_user_role = WorkspaceRole.READER
 
-    await qt_thread_gateway.send_action(_import_file)
+    _import_file()
 
     def _import_failed():
         assert autoclose_dialog.dialogs == [("Error", _("TEXT_FILE_DROP_WORKSPACE_IS_READ_ONLY"))]
@@ -695,7 +693,7 @@ async def test_use_file_link(aqtbot, autoclose_dialog, files_widget_testbed):
 
     # Create and use file link
     url = f_w.workspace_fs.generate_file_link("/foo/bar.txt")
-    await aqtbot.run(tb.logged_gui.add_instance, str(url))
+    tb.logged_gui.add_instance(str(url))
 
     def _selection_on_file():
         assert tb.pwd() == "/foo"
