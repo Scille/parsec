@@ -1,0 +1,1 @@
+Change Parsec server license to Business Source License 1.1 (BSLv1.1).

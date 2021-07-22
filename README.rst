@@ -36,8 +36,8 @@ Homepage: https://parsec.cloud
 
 Documentation: https://parsec-cloud.readthedocs.org.
 
-Parsec is a free software (AGPL v3) aiming at easily share your work and
-data in the cloud in total privacy thanks to cryptographic security.
+Parsec allows you to easily share your work and data in the cloud in total
+privacy thanks to end-to-end cryptographic security.
 
 
 .. image:: docs/parsec_snapshot.png

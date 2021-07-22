@@ -38,6 +38,7 @@ import math
 
 PROJECT_DIR = pathlib.Path(__file__).resolve().parent.parent
 HISTORY_FILE = PROJECT_DIR / "HISTORY.rst"
+BSL_LICENSE_FILE = PROJECT_DIR / "licenses/BSL-Scille.txt"
 VERSION_FILE = PROJECT_DIR / "parsec/_version.py"
 FRAGMENTS_DIR = PROJECT_DIR / "newsfragments"
 FRAGMENT_TYPES = {
@@ -210,12 +211,26 @@ def get_version_from_code():
     return Version(__version__)
 
 
-def replace_code_version(new_version: Version):
-    version_txt = (VERSION_FILE).read_text()
+def update_version_file(new_version: Version) -> None:
+    version_txt = VERSION_FILE.read_text()
     updated_version_txt = re.sub(
         r'__version__\W=\W".*"', f'__version__ = "{new_version}"', version_txt
     )
-    (VERSION_FILE).write_text(updated_version_txt)
+    assert updated_version_txt != version_txt
+    VERSION_FILE.write_text(updated_version_txt)
+
+
+def update_license_file(new_version: Version, new_release_date: str) -> None:
+    license_txt = BSL_LICENSE_FILE.read_text()
+    half_updated_license_txt = re.sub(
+        r"Change Date:.*", f"Change Date:  {new_release_date}", license_txt
+    )
+    assert half_updated_license_txt != license_txt
+    full_updated_version_txt = re.sub(
+        r"Licensed Work:.*", f"Licensed Work:  Parsec {new_version}", half_updated_license_txt
+    )
+    assert full_updated_version_txt != half_updated_license_txt
+    BSL_LICENSE_FILE.write_text(full_updated_version_txt)
 
 
 def collect_newsfragments():
@@ -242,13 +257,15 @@ def build_release(version, stage_pause):
             f"Previous version incompatible with new one ({old_version} vs {version})"
         )
 
+    release_date = date.today().isoformat()
+
     # Check repo is clean
     stdout = run_git("status --porcelain --untracked-files=no")
     if stdout.strip():
         raise ReleaseError("Repository is not clean, aborting")
 
     # Update __version__
-    replace_code_version(version)
+    update_version_file(version)
 
     # Update HISTORY.rst
     history_txt = HISTORY_FILE.read_text()
@@ -261,7 +278,7 @@ def build_release(version, stage_pause):
         history_body = history_txt
 
     newsfragments = collect_newsfragments()
-    new_entry_title = f"Parsec {version} ({date.today().isoformat()})"
+    new_entry_title = f"Parsec {version} ({release_date})"
     new_entry = f"\n\n{new_entry_title}\n{len(new_entry_title) * '-'}\n"
     issues_per_type = defaultdict(list)
     for fragment in newsfragments:
@@ -288,6 +305,9 @@ def build_release(version, stage_pause):
     updated_history_txt = f"{history_header}{new_entry}{history_body}".strip() + "\n"
     HISTORY_FILE.write_text(updated_history_txt)
 
+    # Update BSL license date marker & version info
+    update_license_file(version, release_date)
+
     # Make git commit
     commit_msg = f"Bump version {old_version} -> {version}"
     print(f"Create commit `{commit_msg}`")
@@ -311,7 +331,8 @@ def build_release(version, stage_pause):
     print(f"Create commit `{commit_msg}`")
     if stage_pause:
         input("Pausing, press enter when ready")
-    replace_code_version(dev_version)
+    update_version_file(dev_version)
+    update_license_file(dev_version, release_date)
     run_git(f"add {VERSION_FILE.absolute()}")
     # Disable pre-commit hooks given this commit wouldn't pass `releaser check`
     run_git(f"commit -m '{commit_msg}' --no-verify")

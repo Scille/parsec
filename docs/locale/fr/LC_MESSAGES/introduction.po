@@ -24,12 +24,12 @@ msgstr "Introduction"
 
 #: ../../introduction.rst:8
 msgid ""
-"Parsec is a free software (AGPL v3) aiming at easily share your work and data in "
-"the cloud in a total privacy thanks to end-to-end cryptographic security."
+"Parsec allows you to easily share your work and data in the cloud in total "
+"privacy thanks to end-to-end cryptographic security."
+
 msgstr ""
-"Parsec est un logiciel libre (AGPL v3) visant à permettre de partager votre "
-"travail et vos données dans le cloud en toute confidentialité par le biais d'un "
-"système de chiffrement de bout en bout."
+"Parsec vous permet de partager votre travail et vos données dans le cloud "
+"en toute confidentialité via une technologie de chiffrement de bout en bout."
 
 #: ../../introduction.rst:16
 msgid "Key features:"
