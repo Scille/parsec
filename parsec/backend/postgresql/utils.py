@@ -2,26 +2,6 @@
 
 import re
 from functools import wraps
-from parsec.api.data import UserProfile
-from parsec.api.protocol import (
-    RealmRole,
-    MaintenanceType,
-    InvitationType,
-    InvitationStatus,
-    InvitationDeletedReason,
-)
-from parsec.backend.invite import ConduitState
-from parsec.backend.backend_events import BackendEvent
-
-
-STR_TO_INVITATION_TYPE = {x.value: x for x in InvitationType}
-STR_TO_INVITATION_STATUS = {x.value: x for x in InvitationStatus}
-STR_TO_INVITATION_DELETED_REASON = {x.value: x for x in InvitationDeletedReason}
-STR_TO_INVITATION_CONDUIT_STATE = {x.value: x for x in ConduitState}
-STR_TO_BACKEND_EVENTS = {x.value: x for x in BackendEvent}
-STR_TO_USER_PROFILE = {profile.value: profile for profile in UserProfile}
-STR_TO_REALM_ROLE = {role.value: role for role in RealmRole}
-STR_TO_REALM_MAINTENANCE_TYPE = {type.value: type for type in MaintenanceType}
 
 
 class Q:

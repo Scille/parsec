@@ -4,7 +4,7 @@ import pendulum
 from uuid import UUID
 from typing import Dict, List, Optional
 
-from parsec.api.protocol import DeviceID, UserID, OrganizationID, RealmRole
+from parsec.api.protocol import DeviceID, UserID, OrganizationID, RealmRole, MaintenanceType
 from parsec.backend.realm import RealmStatus, RealmAccessError, RealmNotFoundError
 from parsec.backend.postgresql.utils import (
     Q,
@@ -16,8 +16,6 @@ from parsec.backend.postgresql.utils import (
     q_device,
     q_realm,
     q_realm_internal_id,
-    STR_TO_REALM_ROLE,
-    STR_TO_REALM_MAINTENANCE_TYPE,
 )
 from parsec.backend.realm import RealmStats
 
@@ -113,8 +111,11 @@ async def query_get_status(
     if not ret["has_access"]:
         raise RealmAccessError()
 
+    maintenance_type = (
+        MaintenanceType(ret["maintenance_type"]) if ret["maintenance_type"] is not None else None
+    )
     return RealmStatus(
-        maintenance_type=STR_TO_REALM_MAINTENANCE_TYPE.get(ret["maintenance_type"]),
+        maintenance_type=maintenance_type,
         maintenance_started_on=ret["maintenance_started_on"],
         maintenance_started_by=ret["maintenance_started_by"],
         encryption_revision=ret["encryption_revision"],
@@ -160,7 +161,7 @@ async def query_get_current_roles(
         # Existing group must have at least one owner user
         raise RealmNotFoundError(f"Realm `{realm_id}` doesn't exist")
 
-    return {UserID(user_id): STR_TO_REALM_ROLE[role] for user_id, role in ret if role is not None}
+    return {UserID(user_id): RealmRole(role) for user_id, role in ret if role is not None}
 
 
 @query()
@@ -198,8 +199,4 @@ async def query_get_realms_for_user(
     conn, organization_id: OrganizationID, user: UserID
 ) -> Dict[UUID, Optional[RealmRole]]:
     rep = await conn.fetch(*_q_get_realms_for_user(organization_id=organization_id, user_id=user))
-    return {
-        row["realm_id"]: STR_TO_REALM_ROLE.get(row["role"])
-        for row in rep
-        if row["role"] is not None
-    }
+    return {row["realm_id"]: RealmRole(row["role"]) for row in rep if row["role"] is not None}

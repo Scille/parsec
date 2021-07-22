@@ -3,6 +3,7 @@
 from typing import Tuple, Optional
 
 from parsec.api.protocol import OrganizationID, UserID, DeviceID, HumanHandle
+from parsec.api.data import UserProfile
 from parsec.backend.user import User, Device, Trustchain, UserNotFoundError, GetUserAndDevicesResult
 from parsec.backend.postgresql.utils import (
     Q,
@@ -11,7 +12,6 @@ from parsec.backend.postgresql.utils import (
     q_device,
     q_user_internal_id,
     q_human,
-    STR_TO_USER_PROFILE,
 )
 
 
@@ -181,7 +181,7 @@ async def _get_user(conn, organization_id: OrganizationID, user_id: UserID) -> U
     return User(
         user_id=user_id,
         human_handle=human_handle,
-        profile=STR_TO_USER_PROFILE[row["profile"]],
+        profile=UserProfile(row["profile"]),
         user_certificate=row["user_certificate"],
         redacted_user_certificate=row["redacted_user_certificate"],
         user_certifier=row["user_certifier"],
@@ -337,7 +337,7 @@ async def query_get_user_with_device(
     user = User(
         user_id=device_id.user_id,
         human_handle=human_handle,
-        profile=STR_TO_USER_PROFILE[u_row["profile"]],
+        profile=UserProfile(u_row["profile"]),
         user_certificate=u_row["user_certificate"],
         redacted_user_certificate=u_row["redacted_user_certificate"],
         user_certifier=u_row["user_certifier"],

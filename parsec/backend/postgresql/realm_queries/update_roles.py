@@ -23,7 +23,6 @@ from parsec.backend.postgresql.utils import (
     q_device_internal_id,
     q_realm,
     q_realm_internal_id,
-    STR_TO_REALM_ROLE,
 )
 
 
@@ -121,8 +120,11 @@ async def query_update_roles(
     assert author_id
     assert user_id
 
-    author_role = STR_TO_REALM_ROLE.get(author_role)
-    existing_user_role = STR_TO_REALM_ROLE.get(existing_user_role)
+    if author_role is not None:
+        author_role = RealmRole(author_role)
+    if existing_user_role is not None:
+        existing_user_role = RealmRole(existing_user_role)
+
     owner_only = (RealmRole.OWNER,)
     owner_or_manager = (RealmRole.OWNER, RealmRole.MANAGER)
 

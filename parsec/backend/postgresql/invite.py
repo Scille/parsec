@@ -32,7 +32,6 @@ from parsec.backend.postgresql.utils import (
     q_organization_internal_id,
     q_user,
     q_user_internal_id,
-    STR_TO_INVITATION_CONDUIT_STATE,
 )
 from parsec.backend.postgresql.user_queries.find import query_retrieve_active_human_by_email
 
@@ -274,7 +273,7 @@ async def _conduit_talk(
             raise InvitationNotFoundError(token)
 
         row_id = row["_id"]
-        curr_conduit_state = STR_TO_INVITATION_CONDUIT_STATE[row["conduit_state"]]
+        curr_conduit_state = ConduitState(row["conduit_state"])
         curr_greeter_payload = row["conduit_greeter_payload"]
         curr_claimer_payload = row["conduit_claimer_payload"]
 
@@ -353,7 +352,7 @@ async def _conduit_listen(conn, ctx: ConduitListenCtx) -> Optional[bytes]:
             raise InvitationNotFoundError()
 
         row_id = row["_id"]
-        curr_conduit_state = STR_TO_INVITATION_CONDUIT_STATE[row["conduit_state"]]
+        curr_conduit_state = ConduitState(row["conduit_state"])
 
         if row["deleted_on"]:
             raise InvitationAlreadyDeletedError()

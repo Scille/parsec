@@ -17,11 +17,7 @@ import importlib_resources
 from parsec.event_bus import EventBus
 from parsec.serde import packb, unpackb
 from parsec.utils import start_task, TaskStatus
-from parsec.backend.postgresql.utils import (
-    STR_TO_REALM_ROLE,
-    STR_TO_INVITATION_STATUS,
-    STR_TO_BACKEND_EVENTS,
-)
+from parsec.api.protocol import RealmRole, InvitationStatus
 from parsec.backend.postgresql import migrations as migrations_module
 from parsec.backend.backend_events import BackendEvent
 
@@ -203,12 +199,14 @@ class PGHandler:
         signal = data.pop("__signal__")
         logger.debug("notif received", pid=pid, channel=channel, payload=payload)
         # Convert strings to enums
-        signal = STR_TO_BACKEND_EVENTS[signal]
+        signal = BackendEvent(signal)
         # Kind of a hack, but fine enough for the moment
         if signal == BackendEvent.REALM_ROLES_UPDATED:
-            data["role"] = STR_TO_REALM_ROLE.get(data.pop("role_str"))
+            role_str = data.pop("role_str")
+            data["role"] = RealmRole(role_str) if role_str is not None else None
         elif signal == BackendEvent.INVITE_STATUS_CHANGED:
-            data["status"] = STR_TO_INVITATION_STATUS.get(data.pop("status_str"))
+            status_str = data.pop("status_str")
+            data["status"] = InvitationStatus(status_str) if status_str is not None else None
         self.event_bus.send(signal, **data)
 
     async def teardown(self):

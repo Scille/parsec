@@ -5,7 +5,7 @@ from uuid import UUID
 from typing import Dict
 
 from parsec.backend.backend_events import BackendEvent
-from parsec.api.protocol import DeviceID, UserID, OrganizationID, RealmRole
+from parsec.api.protocol import DeviceID, UserID, OrganizationID, RealmRole, MaintenanceType
 from parsec.backend.realm import (
     RealmStatus,
     RealmAccessError,
@@ -26,8 +26,6 @@ from parsec.backend.postgresql.utils import (
     q_device_internal_id,
     q_realm,
     q_realm_internal_id,
-    STR_TO_REALM_ROLE,
-    STR_TO_REALM_MAINTENANCE_TYPE,
 )
 
 
@@ -47,8 +45,11 @@ async def get_realm_status(conn, organization_id: OrganizationID, realm_id: UUID
     if not rep:
         raise RealmNotFoundError(f"Realm `{realm_id}` doesn't exist")
 
+    maintenance_type = (
+        MaintenanceType(rep["maintenance_type"]) if rep["maintenance_type"] is not None else None
+    )
     return RealmStatus(
-        maintenance_type=STR_TO_REALM_MAINTENANCE_TYPE.get(rep["maintenance_type"]),
+        maintenance_type=maintenance_type,
         maintenance_started_on=rep["maintenance_started_on"],
         maintenance_started_by=rep["maintenance_started_by"],
         encryption_revision=rep["encryption_revision"],
@@ -95,7 +96,7 @@ async def _get_realm_role_for_not_revoked(conn, organization_id, realm_id, users
             return None
         if row["role"] is None:
             return None
-        return STR_TO_REALM_ROLE[row["role"]]
+        return RealmRole(row["role"])
 
     if users:
         rep = await conn.fetch(

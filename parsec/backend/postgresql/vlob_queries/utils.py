@@ -6,7 +6,6 @@ from parsec.backend.postgresql.utils import (
     q_realm_internal_id,
     q_user_internal_id,
     q_organization_internal_id,
-    STR_TO_REALM_ROLE,
 )
 from parsec.backend.realm import RealmRole
 from parsec.backend.vlob import (
@@ -90,7 +89,8 @@ async def _check_realm_access(conn, organization_id, realm_id, author, allowed_r
     if not rep:
         raise VlobNotFoundError(f"User `{author.user_id}` doesn't exist")
 
-    if STR_TO_REALM_ROLE.get(rep[0]) not in allowed_roles:
+    role = RealmRole(rep[0]) if rep[0] is not None else None
+    if role not in allowed_roles:
         raise VlobAccessError()
 
 
