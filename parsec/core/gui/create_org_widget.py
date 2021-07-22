@@ -212,7 +212,7 @@ class CreateOrgWidget(QWidget, Ui_CreateOrgWidget):
     def on_close(self):
         self.status = None
         if self.create_job:
-            self.create_job.cancel_and_join()
+            self.create_job.cancel()
 
     def _on_previous_clicked(self):
         self.user_widget.show()

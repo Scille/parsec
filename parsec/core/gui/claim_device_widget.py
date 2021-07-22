@@ -339,13 +339,13 @@ class ClaimDeviceCodeExchangeWidget(QWidget, Ui_ClaimDeviceCodeExchangeWidget):
 
     def cancel(self):
         if self.signify_trust_job:
-            self.signify_trust_job.cancel_and_join()
+            self.signify_trust_job.cancel()
         if self.wait_peer_trust_job:
-            self.wait_peer_trust_job.cancel_and_join()
+            self.wait_peer_trust_job.cancel()
         if self.get_claimer_sas_job:
-            self.get_claimer_sas_job.cancel_and_join()
+            self.get_claimer_sas_job.cancel()
         if self.get_greeter_sas_job:
-            self.get_greeter_sas_job.cancel_and_join()
+            self.get_greeter_sas_job.cancel()
 
 
 class ClaimDeviceProvideInfoWidget(QWidget, Ui_ClaimDeviceProvideInfoWidget):
@@ -428,7 +428,7 @@ class ClaimDeviceProvideInfoWidget(QWidget, Ui_ClaimDeviceProvideInfoWidget):
 
     def cancel(self):
         if self.claim_job:
-            self.claim_job.cancel_and_join()
+            self.claim_job.cancel()
 
 
 class ClaimDeviceInstructionsWidget(QWidget, Ui_ClaimDeviceInstructionsWidget):
@@ -487,7 +487,7 @@ class ClaimDeviceInstructionsWidget(QWidget, Ui_ClaimDeviceInstructionsWidget):
 
     def cancel(self):
         if self.wait_peer_job:
-            self.wait_peer_job.cancel_and_join()
+            self.wait_peer_job.cancel()
 
 
 class ClaimDeviceWidget(QWidget, Ui_ClaimDeviceWidget):
@@ -654,9 +654,9 @@ class ClaimDeviceWidget(QWidget, Ui_ClaimDeviceWidget):
             if current_page and getattr(current_page, "cancel", None):
                 current_page.cancel()
         if self.retrieve_info_job:
-            self.retrieve_info_job.cancel_and_join()
+            self.retrieve_info_job.cancel()
         if self.claimer_job:
-            self.claimer_job.cancel_and_join()
+            self.claimer_job.cancel()
 
     def on_close(self):
         self.cancel()

@@ -64,7 +64,7 @@ class TimestampedWorkspaceWidget(QWidget, Ui_TimestampedWorkspaceWidget):
 
     def cancel(self):
         if self.limits_job:
-            self.limits_job.cancel_and_join()
+            self.limits_job.cancel()
 
     def set_time_limits(self):
         selected_date = self.calendar_widget.selectedDate()

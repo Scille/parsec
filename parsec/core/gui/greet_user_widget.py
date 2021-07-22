@@ -660,7 +660,7 @@ class GreetUserWidget(QWidget, Ui_GreetUserWidget):
             if current_page and getattr(current_page, "cancel", None):
                 current_page.cancel()
         if self.greeter_job:
-            self.greeter_job.cancel_and_join()
+            self.greeter_job.cancel()
 
     def on_close(self):
         self.cancel()

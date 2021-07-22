@@ -685,7 +685,7 @@ class FilesWidget(QWidget, Ui_FilesWidget):
         assert self.import_job
         assert self.loading_dialog
 
-        self.import_job.cancel_and_join()
+        self.import_job.cancel()
 
     def _on_import_progress(self, file_name, progress):
         if not self.loading_dialog:

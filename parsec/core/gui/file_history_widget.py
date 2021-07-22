@@ -146,7 +146,7 @@ class FileHistoryWidget(QWidget, Ui_FileHistoryWidget):
 
     def on_close(self):
         if self.versions_job:
-            self.versions_job.cancel_and_join()
+            self.versions_job.cancel()
 
     @classmethod
     def show_modal(

@@ -250,5 +250,5 @@ class CheckNewVersion(QDialog, Ui_NewVersionDialog):
 
     def closeEvent(self, event):
         if self.version_job:
-            self.version_job.cancel_and_join()
+            self.version_job.cancel()
         event.accept()

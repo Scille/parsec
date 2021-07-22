@@ -128,10 +128,6 @@ class QtToTrioJob:
     def cancel(self):
         self.cancel_scope.cancel()
 
-    def cancel_and_join(self):
-        # XXX: Quick fix, joining cannot be done in a callback
-        self.cancel_scope.cancel()
-
 
 class QtToTrioJobScheduler:
     def __init__(self, nursery):
