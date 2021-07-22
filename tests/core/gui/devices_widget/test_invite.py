@@ -242,7 +242,7 @@ async def test_invite_and_greet_device(
 
         # Pretend we have choosen the right code
         # TODO: click on button instead of sending the corresponding event
-        await aqtbot.run(gdce_w.code_input_widget.good_code_clicked.emit)
+        gdce_w.code_input_widget.good_code_clicked.emit()
 
         def _wait_claimer_info():
             assert gdce_w.label_wait_info.isVisible()

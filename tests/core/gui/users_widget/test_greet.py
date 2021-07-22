@@ -219,7 +219,7 @@ def GreetUserTestBed(
             guce_w = self.greet_user_code_exchange_widget
 
             # Pretent we have clicked on the right choice
-            await aqtbot.run(guce_w.code_input_widget.good_code_clicked.emit)
+            guce_w.code_input_widget.good_code_clicked.emit()
 
             self.claimer_in_progress_ctx = await self.claimer_in_progress_ctx.do_wait_peer_trust()
 
@@ -358,7 +358,7 @@ async def test_greet_user_offline(
             guce_w = self.greet_user_code_exchange_widget
 
             with running_backend.offline():
-                await aqtbot.run(guce_w.code_input_widget.good_code_clicked.emit)
+                guce_w.code_input_widget.good_code_clicked.emit()
                 await aqtbot.wait_until(partial(self._greet_aborted, expected_message))
 
             return None
@@ -427,7 +427,7 @@ async def test_greet_user_reset_by_peer(aqtbot, GreetUserTestBed, autoclose_dial
             guce_w = self.greet_user_code_exchange_widget
 
             # Pretent we have click on the right choice
-            await aqtbot.run(guce_w.code_input_widget.good_code_clicked.emit)
+            guce_w.code_input_widget.good_code_clicked.emit()
 
             async with self._reset_claimer():
                 await aqtbot.wait_until(partial(self._greet_restart, expected_message))
@@ -527,7 +527,7 @@ async def test_greet_user_invitation_cancelled(
 
             await self._cancel_invitation()
 
-            await aqtbot.run(guce_w.code_input_widget.good_code_clicked.emit)
+            guce_w.code_input_widget.good_code_clicked.emit()
             await aqtbot.wait_until(partial(self._greet_restart, expected_message))
 
             return None

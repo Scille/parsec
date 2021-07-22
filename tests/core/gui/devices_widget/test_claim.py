@@ -88,7 +88,7 @@ def ClaimDeviceTestBed(
 
             # Switch to device claim page
 
-            await aqtbot.run(gui.add_instance, invitation_addr.to_url())
+            gui.add_instance(invitation_addr.to_url())
 
             cd_w = await catch_claim_device_widget()
             assert isinstance(cd_w, ClaimDeviceWidget)
@@ -183,7 +183,7 @@ def ClaimDeviceTestBed(
             cdce_w = self.claim_device_code_exchange_widget
 
             # Pretend we have choosen the right code
-            await aqtbot.run(cdce_w.code_input_widget.good_code_clicked.emit)
+            cdce_w.code_input_widget.good_code_clicked.emit()
 
             self.greeter_in_progress_ctx = await self.greeter_in_progress_ctx.do_wait_peer_trust()
             claimer_sas = self.greeter_in_progress_ctx.claimer_sas
@@ -222,7 +222,7 @@ def ClaimDeviceTestBed(
             cdpi_w = self.claim_device_provide_info_widget
             device_label = self.requested_device_label
 
-            await aqtbot.run(cdpi_w.line_edit_device.clear)
+            cdpi_w.line_edit_device.clear()
 
             assert not cdpi_w.button_ok.isEnabled()
 
@@ -324,7 +324,7 @@ async def test_claim_device_offline(
 
             with running_backend.offline():
                 assert not autoclose_dialog.dialogs
-                await aqtbot.run(cdce_w.code_input_widget.good_code_clicked.emit)
+                cdce_w.code_input_widget.good_code_clicked.emit()
                 await aqtbot.wait_until(partial(self._claim_aborted, expected_message))
             return None
 
@@ -341,7 +341,7 @@ async def test_claim_device_offline(
             device_label = self.requested_device_label
 
             with running_backend.offline():
-                await aqtbot.run(cdpi_w.line_edit_device.clear)
+                cdpi_w.line_edit_device.clear()
                 await aqtbot.key_clicks(cdpi_w.line_edit_device, device_label)
                 await aqtbot.key_clicks(cdpi_w.widget_password.line_edit_password, self.password)
                 await aqtbot.key_clicks(
@@ -400,7 +400,7 @@ async def test_claim_device_reset_by_peer(
             expected_message = translate("TEXT_CLAIM_DEVICE_PEER_RESET")
 
             async with self._reset_greeter():
-                await aqtbot.run(cdce_w.code_input_widget.good_code_clicked.emit)
+                cdce_w.code_input_widget.good_code_clicked.emit()
                 await aqtbot.wait_until(partial(self._claim_restart, expected_message))
 
             await self.bootstrap_after_restart()
@@ -420,7 +420,7 @@ async def test_claim_device_reset_by_peer(
             device_label = self.requested_device_label
 
             async with self._reset_greeter():
-                await aqtbot.run(cdpi_w.line_edit_device.clear)
+                cdpi_w.line_edit_device.clear()
                 await aqtbot.key_clicks(cdpi_w.line_edit_device, device_label)
                 await aqtbot.key_clicks(cdpi_w.widget_password.line_edit_password, self.password)
                 await aqtbot.key_clicks(
@@ -501,7 +501,7 @@ async def test_claim_device_invitation_cancelled(
             cdce_w = self.claim_device_code_exchange_widget
             await self._cancel_invitation()
 
-            await aqtbot.run(cdce_w.code_input_widget.good_code_clicked.emit)
+            cdce_w.code_input_widget.good_code_clicked.emit()
             await aqtbot.wait_until(partial(self._claim_restart, expected_message))
 
             return None
@@ -521,7 +521,7 @@ async def test_claim_device_invitation_cancelled(
 
             await self._cancel_invitation()
 
-            await aqtbot.run(cdpi_w.line_edit_device.clear)
+            cdpi_w.line_edit_device.clear()
             await aqtbot.key_clicks(cdpi_w.line_edit_device, device_label)
             await aqtbot.key_clicks(cdpi_w.widget_password.line_edit_password, self.password)
             await aqtbot.key_clicks(cdpi_w.widget_password.line_edit_password_check, self.password)
@@ -568,7 +568,7 @@ async def test_claim_device_already_deleted(
         reason=InvitationDeletedReason.CANCELLED,
     )
 
-    await aqtbot.run(gui.add_instance, invitation_addr.to_url())
+    gui.add_instance(invitation_addr.to_url())
 
     def _assert_dialogs():
         assert len(autoclose_dialog.dialogs) == 1
@@ -593,7 +593,7 @@ async def test_claim_device_offline_backend(
         token=invitation.token,
     )
     with running_backend.offline():
-        await aqtbot.run(gui.add_instance, invitation_addr.to_url())
+        gui.add_instance(invitation_addr.to_url())
 
         def _assert_dialogs():
             assert len(autoclose_dialog.dialogs) == 1
@@ -617,7 +617,7 @@ async def test_claim_device_unknown_invitation(
         token=uuid4(),
     )
 
-    await aqtbot.run(gui.add_instance, invitation_addr.to_url())
+    gui.add_instance(invitation_addr.to_url())
 
     def _assert_dialogs():
         assert len(autoclose_dialog.dialogs) == 1

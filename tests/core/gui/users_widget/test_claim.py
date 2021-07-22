@@ -96,7 +96,7 @@ def ClaimUserTestBed(
 
             # Switch to users claim page
 
-            await aqtbot.run(gui.add_instance, invitation_addr.to_url())
+            gui.add_instance(invitation_addr.to_url())
 
             cu_w = await catch_claim_user_widget()
             assert isinstance(cu_w, ClaimUserWidget)
@@ -190,7 +190,7 @@ def ClaimUserTestBed(
             cuce_w = self.claim_user_code_exchange_widget
 
             # Pretend we have choosen the right code
-            await aqtbot.run(cuce_w.code_input_widget.good_code_clicked.emit)
+            cuce_w.code_input_widget.good_code_clicked.emit()
 
             self.greeter_in_progress_ctx = await self.greeter_in_progress_ctx.do_wait_peer_trust()
             claimer_sas = self.greeter_in_progress_ctx.claimer_sas
@@ -233,7 +233,7 @@ def ClaimUserTestBed(
 
             await aqtbot.key_clicks(cupi_w.line_edit_user_email, human_email)
             await aqtbot.key_clicks(cupi_w.line_edit_user_full_name, human_label)
-            await aqtbot.run(cupi_w.line_edit_device.clear)
+            cupi_w.line_edit_device.clear()
             await aqtbot.key_clicks(cupi_w.line_edit_device, device_label)
             await aqtbot.mouse_click(cupi_w.button_ok, QtCore.Qt.LeftButton)
 
@@ -365,7 +365,7 @@ async def test_claim_user_offline(
 
             with running_backend.offline():
                 assert not autoclose_dialog.dialogs
-                await aqtbot.run(cuce_w.code_input_widget.good_code_clicked.emit)
+                cuce_w.code_input_widget.good_code_clicked.emit()
                 await aqtbot.wait_until(partial(self._claim_aborted, expected_message))
             return None
 
@@ -386,7 +386,7 @@ async def test_claim_user_offline(
             with running_backend.offline():
                 await aqtbot.key_clicks(cupi_w.line_edit_user_email, human_email)
                 await aqtbot.key_clicks(cupi_w.line_edit_user_full_name, human_label)
-                await aqtbot.run(cupi_w.line_edit_device.clear)
+                cupi_w.line_edit_device.clear()
                 await aqtbot.key_clicks(cupi_w.line_edit_device, device_label)
                 await aqtbot.mouse_click(cupi_w.button_ok, QtCore.Qt.LeftButton)
                 await aqtbot.wait_until(partial(self._claim_aborted, expected_message))
@@ -442,7 +442,7 @@ async def test_claim_user_reset_by_peer(
             cuce_w = self.claim_user_code_exchange_widget
 
             async with self._reset_greeter():
-                await aqtbot.run(cuce_w.code_input_widget.good_code_clicked.emit)
+                cuce_w.code_input_widget.good_code_clicked.emit()
                 await aqtbot.wait_until(partial(self._claim_restart, expected_message))
 
             await self.bootstrap_after_restart()
@@ -466,7 +466,7 @@ async def test_claim_user_reset_by_peer(
             async with self._reset_greeter():
                 await aqtbot.key_clicks(cupi_w.line_edit_user_email, human_email)
                 await aqtbot.key_clicks(cupi_w.line_edit_user_full_name, human_label)
-                await aqtbot.run(cupi_w.line_edit_device.clear)
+                cupi_w.line_edit_device.clear()
                 await aqtbot.key_clicks(cupi_w.line_edit_device, device_label)
                 await aqtbot.mouse_click(cupi_w.button_ok, QtCore.Qt.LeftButton)
                 await aqtbot.wait_until(partial(self._claim_restart, expected_message))
@@ -545,7 +545,7 @@ async def test_claim_user_invitation_cancelled(
             cuce_w = self.claim_user_code_exchange_widget
             await self._cancel_invitation()
 
-            await aqtbot.run(cuce_w.code_input_widget.good_code_clicked.emit)
+            cuce_w.code_input_widget.good_code_clicked.emit()
             await aqtbot.wait_until(partial(self._claim_restart, expected_message))
 
             return None
@@ -569,7 +569,7 @@ async def test_claim_user_invitation_cancelled(
 
             await aqtbot.key_clicks(cupi_w.line_edit_user_email, human_email)
             await aqtbot.key_clicks(cupi_w.line_edit_user_full_name, human_label)
-            await aqtbot.run(cupi_w.line_edit_device.clear)
+            cupi_w.line_edit_device.clear()
             await aqtbot.key_clicks(cupi_w.line_edit_device, device_label)
             await aqtbot.mouse_click(cupi_w.button_ok, QtCore.Qt.LeftButton)
             await aqtbot.wait_until(partial(self._claim_restart, expected_message))
@@ -617,7 +617,7 @@ async def test_claim_user_already_deleted(
         reason=InvitationDeletedReason.CANCELLED,
     )
 
-    await aqtbot.run(gui.add_instance, invitation_addr.to_url())
+    gui.add_instance(invitation_addr.to_url())
 
     def _assert_dialogs():
         assert len(autoclose_dialog.dialogs) == 1
@@ -642,7 +642,7 @@ async def test_claim_user_offline_backend(
         token=invitation.token,
     )
     with running_backend.offline():
-        await aqtbot.run(gui.add_instance, invitation_addr.to_url())
+        gui.add_instance(invitation_addr.to_url())
 
         def _assert_dialogs():
             assert len(autoclose_dialog.dialogs) == 1
@@ -666,7 +666,7 @@ async def test_claim_user_unknown_invitation(
         token=uuid4(),
     )
 
-    await aqtbot.run(gui.add_instance, invitation_addr.to_url())
+    gui.add_instance(invitation_addr.to_url())
 
     def _assert_dialogs():
         assert len(autoclose_dialog.dialogs) == 1

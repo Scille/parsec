@@ -585,7 +585,7 @@ async def test_create_organization_with_boostrap_token(
     for bootstrap_addr in (bad_bootstrap_addr, good_bootstrap_addr):
         autoclose_dialog.reset()
 
-        await aqtbot.run(gui.add_instance, bootstrap_addr.to_url())
+        gui.add_instance(bootstrap_addr.to_url())
 
         co_w = await catch_create_org_widget()
 

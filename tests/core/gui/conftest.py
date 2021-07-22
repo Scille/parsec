@@ -39,9 +39,6 @@ class AsyncQtBot:
     def __init__(self, qtbot):
         self.qtbot = qtbot
 
-    async def run(self, fn, *args, **kwargs):
-        return fn(*args, **kwargs)
-
     def __getattr__(self, name):
         words = name.split("_")
         camel_name = words[0] + "".join(word.title() for word in words[1:])
@@ -455,7 +452,7 @@ def testing_main_window_cls(aqtbot):
 
             lw = self.test_get_login_widget()
             # Reload to take into account the new saved device
-            await aqtbot.run(lw.reload_devices)
+            lw.reload_devices()
             tabw = self.test_get_tab()
 
             accounts_w = lw.widget.layout().itemAt(0).widget()

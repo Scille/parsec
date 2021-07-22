@@ -104,10 +104,10 @@ async def files_widget_testbed(monkeypatch, aqtbot, logged_gui):
                         QtWidgets.QTableWidgetSelectionRange(top, 0, bottom, 0), True
                     )
 
-            await aqtbot.run(_do_selection)
+            _do_selection()
 
         async def reset_selection(self):
-            await aqtbot.run(f_w.table_files.reset)
+            f_w.table_files.reset()
 
         async def copy(self, selection=None):
             if selection is not None:
@@ -693,7 +693,7 @@ async def test_use_file_link(aqtbot, autoclose_dialog, files_widget_testbed):
 
     # Create and use file link
     url = f_w.workspace_fs.generate_file_link("/foo/bar.txt")
-    await aqtbot.run(tb.logged_gui.add_instance, str(url))
+    tb.logged_gui.add_instance(str(url))
 
     def _selection_on_file():
         assert tb.pwd() == "/foo"
