@@ -1,18 +1,24 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2016-2021 Scille SAS
 
-from parsec.core.core_events import CoreEvent
 import os
 import errno
 import trio
+from functools import partial
+from pathlib import PurePath
 from typing import Optional
+from pendulum import DateTime
 from structlog import get_logger
 from contextlib import contextmanager
 from stat import S_IRWXU, S_IFDIR, S_IFREG
 from fuse import FuseOSError, Operations, LoggingMixIn, fuse_get_context, fuse_exit
 
 
+from parsec.event_bus import EventBus
+from parsec.api.data import EntryID
 from parsec.core.types import FsPath
+from parsec.core.core_events import CoreEvent
 from parsec.core.fs import FSLocalOperationError, FSRemoteOperationError
+from parsec.core.mountpoint.thread_fs_access import ThreadFSAccess
 
 
 logger = get_logger()
@@ -33,7 +39,14 @@ def is_banned(name):
 
 
 @contextmanager
-def translate_error(event_bus, operation, path):
+def translate_error(
+    event_bus: EventBus,
+    operation: str,
+    path: FsPath,
+    mountpoint: PurePath,
+    workspace_id: EntryID,
+    timestamp: Optional[DateTime],
+):
     try:
         yield
 
@@ -44,13 +57,34 @@ def translate_error(event_bus, operation, path):
         raise FuseOSError(exc.errno) from exc
 
     except FSRemoteOperationError as exc:
-        event_bus.send(CoreEvent.MOUNTPOINT_REMOTE_ERROR, exc=exc, operation=operation, path=path)
+        event_bus.send(
+            CoreEvent.MOUNTPOINT_REMOTE_ERROR,
+            exc=exc,
+            operation=operation,
+            path=path,
+            mountpoint=mountpoint,
+            workspace_id=workspace_id,
+            timestamp=timestamp,
+        )
         raise FuseOSError(exc.errno) from exc
 
     except Exception as exc:
-        logger.exception("Unhandled exception in fuse mountpoint")
+        logger.exception(
+            "Unhandled exception in fuse mountpoint",
+            operation=operation,
+            path=str(path),
+            mountpoint=str(mountpoint),
+            workspace_id=workspace_id,
+            timestamp=timestamp,
+        )
         event_bus.send(
-            CoreEvent.MOUNTPOINT_UNHANDLED_ERROR, exc=exc, operation=operation, path=path
+            CoreEvent.MOUNTPOINT_UNHANDLED_ERROR,
+            exc=exc,
+            operation=operation,
+            path=path,
+            mountpoint=mountpoint,
+            workspace_id=workspace_id,
+            timestamp=timestamp,
         )
         # Use EINVAL as fallback error code, since this is what fusepy does.
         raise FuseOSError(errno.EINVAL) from exc
@@ -61,21 +95,36 @@ def translate_error(event_bus, operation, path):
 
 
 class FuseOperations(LoggingMixIn, Operations):
-    def __init__(self, event_bus, fs_access):
+    def __init__(
+        self,
+        event_bus: EventBus,
+        fs_access: ThreadFSAccess,
+        mountpoint: PurePath,
+        workspace_id: EntryID,
+        timestamp: Optional[DateTime],
+    ):
         super().__init__()
         self.event_bus = event_bus
         self.fs_access = fs_access
         self.fds = {}
         self._need_exit = False
+        self._translate_error = partial(
+            translate_error,
+            event_bus=self.event_bus,
+            mountpoint=mountpoint,
+            workspace_id=workspace_id,
+            timestamp=timestamp,
+        )
 
-    def __call__(self, name, path, *args, **kwargs):
+    def __call__(self, operation: str, path: Optional[str], *args, **kwargs):
         # The path argument might be None or "-" in some special cases
         # related to `release` and `releasedir` (when the file descriptor
         # is available but the corresponding path is not). In those cases,
         # we can simply ignore the path.
         path = FsPath(path) if path not in (None, "-") else None
-        with translate_error(self.event_bus, name, path):
-            return super().__call__(name, path, *args, **kwargs)
+        path_or_placeholder = path or FsPath("/<unknown>")
+        with self._translate_error(operation=operation, path=path_or_placeholder):
+            return super().__call__(operation, path, *args, **kwargs)
 
     def schedule_exit(self):
         # TODO: Currently call fuse_exit from a non fuse thread is not possible

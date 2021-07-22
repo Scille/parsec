@@ -1,7 +1,9 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2016-2021 Scille SAS
 
+from pathlib import PurePath
 import attr
-from typing import Tuple, Iterable, Union
+from typing import Tuple, Iterable, Union, TypeVar
+from trio import Path as TrioPath
 
 from parsec.serde import BaseSchema, MsgpackSerializer
 from parsec.api.data import BaseData, EntryName
@@ -79,6 +81,11 @@ class FsPath:
     @property
     def parts(self) -> Tuple[EntryName, ...]:
         return self._parts
+
+    T = TypeVar("T", PurePath, TrioPath)
+
+    def with_mountpoint(self, mountpoint: T) -> T:
+        return mountpoint / "/".join(self._parts)
 
 
 AnyPath = Union[FsPath, str]

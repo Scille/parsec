@@ -5,6 +5,7 @@ import sys
 import errno
 import pytest
 import trio
+from pathlib import Path
 
 from parsec.core.mountpoint import mountpoint_manager_factory
 from parsec.test_utils import create_inconsistent_workspace
@@ -22,7 +23,9 @@ async def test_inconsistent_folder_no_network(base_mountpoint, running_backend, 
         alice_user_fs, alice_user_fs.event_bus, base_mountpoint
     ) as alice_mountpoint_manager:
         workspace = await create_inconsistent_workspace(alice_user_fs)
-        mountpoint_path = await alice_mountpoint_manager.mount_workspace(workspace.workspace_id)
+        mountpoint_path = Path(
+            await alice_mountpoint_manager.mount_workspace(workspace.workspace_id)
+        )
         with running_backend.offline():
             await trio.to_thread.run_sync(
                 _os_tests, mountpoint_path, errno.EHOSTUNREACH, WINDOWS_ERROR_HOST_UNREACHABLE
@@ -36,7 +39,9 @@ async def test_inconsistent_folder_with_network(base_mountpoint, running_backend
         alice_user_fs, alice_user_fs.event_bus, base_mountpoint
     ) as alice_mountpoint_manager:
         workspace = await create_inconsistent_workspace(alice_user_fs)
-        mountpoint_path = await alice_mountpoint_manager.mount_workspace(workspace.workspace_id)
+        mountpoint_path = Path(
+            await alice_mountpoint_manager.mount_workspace(workspace.workspace_id)
+        )
         await trio.to_thread.run_sync(
             _os_tests, mountpoint_path, errno.EACCES, WINDOWS_ERROR_PERMISSION_DENIED
         )

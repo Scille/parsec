@@ -106,7 +106,7 @@ def test_folder_operations(tmpdir, caplog, hypothesis_settings, mountpoint_servi
 
             async def _bootstrap(user_fs, mountpoint_manager):
                 wid = await user_fs.workspace_create("w")
-                self.parsec_root = await mountpoint_manager.mount_workspace(wid)
+                self.parsec_root = Path(await mountpoint_manager.mount_workspace(wid))
 
             self.mountpoint_service = mountpoint_service_factory(_bootstrap)
 

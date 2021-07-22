@@ -1,7 +1,9 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2016-2021 Scille SAS
 
-from parsec.core.core_events import CoreEvent
-import functools
+from functools import partial, wraps
+from typing import Optional
+from pendulum import DateTime
+from pathlib import PurePath
 from contextlib import contextmanager
 from trio import Cancelled, RunFinishedError
 from structlog import get_logger
@@ -13,10 +15,14 @@ from winfspy import (
 )
 from winfspy.plumbing import dt_to_filetime, NTSTATUS, SecurityDescriptor
 
+from parsec.api.data import EntryID
+from parsec.event_bus import EventBus
 from parsec.core.types import FsPath
+from parsec.core.core_events import CoreEvent
 from parsec.core.fs import FSLocalOperationError, FSRemoteOperationError
 from parsec.core.fs.workspacefs.sync_transactions import DEFAULT_BLOCK_SIZE
 from parsec.core.mountpoint.winify import winify_entry_name, unwinify_entry_name
+from parsec.core.mountpoint.thread_fs_access import ThreadFSAccess
 
 
 logger = get_logger()
@@ -36,7 +42,14 @@ def _parsec_to_winpath(path: FsPath) -> str:
 
 
 @contextmanager
-def translate_error(event_bus, operation, path):
+def translate_error(
+    event_bus: EventBus,
+    operation: str,
+    path: FsPath,
+    mountpoint: PurePath,
+    workspace_id: EntryID,
+    timestamp: Optional[DateTime],
+):
     try:
         yield
 
@@ -47,7 +60,15 @@ def translate_error(event_bus, operation, path):
         raise NTStatusError(exc.ntstatus) from exc
 
     except FSRemoteOperationError as exc:
-        event_bus.send(CoreEvent.MOUNTPOINT_REMOTE_ERROR, exc=exc, operation=operation, path=path)
+        event_bus.send(
+            CoreEvent.MOUNTPOINT_REMOTE_ERROR,
+            exc=exc,
+            operation=operation,
+            path=path,
+            mountpoint=mountpoint,
+            workspace_id=workspace_id,
+            timestamp=timestamp,
+        )
         raise NTStatusError(exc.ntstatus) from exc
 
     except (Cancelled, RunFinishedError) as exc:
@@ -56,9 +77,22 @@ def translate_error(event_bus, operation, path):
         raise NTStatusError(NTSTATUS.STATUS_NO_SUCH_DEVICE) from exc
 
     except Exception as exc:
-        logger.exception("Unhandled exception in winfsp mountpoint", operation=operation, path=path)
+        logger.exception(
+            "Unhandled exception in winfsp mountpoint",
+            operation=operation,
+            path=str(path),
+            mountpoint=str(mountpoint),
+            workspace_id=workspace_id,
+            timestamp=timestamp,
+        )
         event_bus.send(
-            CoreEvent.MOUNTPOINT_UNHANDLED_ERROR, exc=exc, operation=operation, path=path
+            CoreEvent.MOUNTPOINT_UNHANDLED_ERROR,
+            exc=exc,
+            operation=operation,
+            path=path,
+            mountpoint=mountpoint,
+            workspace_id=workspace_id,
+            timestamp=timestamp,
         )
         raise NTStatusError(NTSTATUS.STATUS_INTERNAL_ERROR) from exc
 
@@ -129,17 +163,25 @@ def handle_error(func):
     """A decorator to handle error in wfspy operations"""
     operation = func.__name__
 
-    @functools.wraps(func)
+    @wraps(func)
     def wrapper(self, arg, *args, **kwargs):
         path = arg.path if isinstance(arg, (OpenedFile, OpenedFolder)) else _winpath_to_parsec(arg)
-        with translate_error(self.event_bus, operation, path):
+        with self._translate_error(operation=operation, path=path):
             return func.__get__(self)(arg, *args, **kwargs)
 
     return wrapper
 
 
 class WinFSPOperations(BaseFileSystemOperations):
-    def __init__(self, event_bus, volume_label, fs_access):
+    def __init__(
+        self,
+        event_bus: EventBus,
+        fs_access: ThreadFSAccess,
+        volume_label: str,
+        mountpoint: PurePath,
+        workspace_id: EntryID,
+        timestamp: Optional[DateTime],
+    ):
         super().__init__()
         # see https://docs.microsoft.com/fr-fr/windows/desktop/SecAuthZ/security-descriptor-string-format  # noqa
         self._security_descriptor = SecurityDescriptor.from_string(
@@ -157,6 +199,14 @@ class WinFSPOperations(BaseFileSystemOperations):
             "free_size": 1 * 1024 * 1024 * 1024,  # 1 TB
             "volume_label": volume_label,
         }
+
+        self._translate_error = partial(
+            translate_error,
+            event_bus=self.event_bus,
+            mountpoint=mountpoint,
+            workspace_id=workspace_id,
+            timestamp=timestamp,
+        )
 
     def get_volume_info(self):
         return self._volume_info

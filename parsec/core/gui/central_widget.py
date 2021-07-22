@@ -1,7 +1,7 @@
 # Parsec Cloud (https://parsec.cloud) Copyright (c) AGPLv3 2016-2021 Scille SAS
 
 from typing import Optional, cast
-
+from pathlib import PurePath
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtGui import QPixmap, QColor, QIcon
 from PyQt5.QtWidgets import QGraphicsDropShadowEffect, QWidget, QMenu
@@ -12,10 +12,10 @@ from parsec.api.protocol import (
     HandshakeRevokedDevice,
     HandshakeOrganizationExpired,
 )
-from parsec.core.core_events import CoreEvent
 from parsec.api.data.manifest import WorkspaceEntry
+from parsec.core.core_events import CoreEvent
 from parsec.core.logged_core import LoggedCore, OrganizationStats
-from parsec.core.types import UserInfo, BackendOrganizationFileLinkAddr
+from parsec.core.types import UserInfo, BackendOrganizationFileLinkAddr, FsPath
 from parsec.core.backend_connection import (
     BackendConnectionError,
     BackendNotAvailable,
@@ -211,26 +211,30 @@ class CentralWidget(QWidget, Ui_CentralWidget):  # type: ignore[misc]
             self.new_notification.emit("WARNING", _("NOTIF_WARN_MOUNTPOINT_UNMOUNTED"))
         elif event == CoreEvent.MOUNTPOINT_REMOTE_ERROR:
             assert isinstance(kwargs["exc"], Exception)
-            assert isinstance(kwargs["path"], str)
-            exc: Exception = kwargs["exc"]
-            path: str = kwargs["path"]
+            assert isinstance(kwargs["mountpoint"], PurePath)
+            assert isinstance(kwargs["path"], FsPath)
+            exc = kwargs["exc"]
+            abspath = kwargs["path"].with_mountpoint(kwargs["mountpoint"])
             if isinstance(exc, FSWorkspaceNoReadAccess):
-                msg = _("NOTIF_WARN_WORKSPACE_READ_ACCESS_LOST_{}").format(path)
+                msg = _("NOTIF_WARN_WORKSPACE_READ_ACCESS_LOST_{}").format(abspath)
             elif isinstance(exc, FSWorkspaceNoWriteAccess):
-                msg = _("NOTIF_WARN_WORKSPACE_WRITE_ACCESS_LOST_{}").format(path)
+                msg = _("NOTIF_WARN_WORKSPACE_WRITE_ACCESS_LOST_{}").format(abspath)
             elif isinstance(exc, FSWorkspaceInMaintenance):
-                msg = _("NOTIF_WARN_WORKSPACE_IN_MAINTENANCE_{}").format(path)
+                msg = _("NOTIF_WARN_WORKSPACE_IN_MAINTENANCE_{}").format(abspath)
             else:
-                msg = _("NOTIF_WARN_MOUNTPOINT_REMOTE_ERROR_{}_{}").format(path, str(exc))
+                msg = _("NOTIF_WARN_MOUNTPOINT_REMOTE_ERROR_{}_{}").format(abspath, str(exc))
             self.new_notification.emit("WARNING", msg)
         elif event == CoreEvent.MOUNTPOINT_UNHANDLED_ERROR:
             assert isinstance(kwargs["exc"], Exception)
-            assert isinstance(kwargs["path"], str)
             assert isinstance(kwargs["operation"], str)
+            assert isinstance(kwargs["mountpoint"], PurePath)
+            assert isinstance(kwargs["path"], FsPath)
+            exc = kwargs["exc"]
+            abspath = kwargs["path"].with_mountpoint(kwargs["mountpoint"])
             self.new_notification.emit(
                 "ERROR",
                 _("NOTIF_ERR_MOUNTPOINT_UNEXPECTED_ERROR_{}_{}_{}").format(
-                    kwargs["operation"], kwargs["path"], str(kwargs["exc"])
+                    kwargs["operation"], abspath, str(kwargs["exc"])
                 ),
             )
         elif event == CoreEvent.SHARING_UPDATED:

@@ -252,7 +252,7 @@ def test_manifest_not_available(mountpoint_service_factory):
     mountpoint_service_factory(_bootstrap)
 
     with pytest.raises(OSError) as exc:
-        (x_path / "foo.txt").stat()
+        Path(x_path / "foo.txt").stat()
     if sys.platform == "win32":
         # This winerror code corresponds to ntstatus.STATUS_HOST_UNREACHABLE
         ERROR_HOST_UNREACHABLE = 1232
@@ -308,7 +308,7 @@ def test_unhandled_crash_in_fs_operation(caplog, mountpoint_service, monkeypatch
     )
 
     with pytest.raises(OSError) as exc:
-        (mountpoint_service.wpath / "crash_me").stat()
+        Path(mountpoint_service.wpath / "crash_me").stat()
 
     assert exc.value.errno == errno.EINVAL
     if sys.platform == "win32":

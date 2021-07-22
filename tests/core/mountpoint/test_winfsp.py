@@ -4,6 +4,7 @@ import pytest
 import os
 import time
 import threading
+from pathlib import Path
 
 from parsec.core.fs.utils import ntstatus
 
@@ -27,7 +28,7 @@ def test_rename_to_another_drive(mountpoint_service):
     mountpoint_service.execute(_bootstrap)
 
     with pytest.raises(OSError) as exc:
-        (x_path / "foo.txt").rename(y_path / "foo.txt")
+        Path(x_path / "foo.txt").rename(y_path / "foo.txt")
     assert str(exc.value).startswith(
         "[WinError 17] The system cannot move the file to a different disk drive"
     )
@@ -93,7 +94,7 @@ def test_teardown_during_fs_access(mountpoint_service, monkeypatch):
     try:
 
         with pytest.raises(OSError) as exc:
-            (mountpoint_service.wpath / "stop_loop").stat()
+            Path(mountpoint_service.wpath / "stop_loop").stat()
 
         assert str(exc.value).startswith(
             "[WinError 995] The I/O operation has been aborted because of either a thread exit or an application request"
@@ -161,8 +162,8 @@ def test_mount_workspace_with_non_win32_friendly_name(mountpoint_service_factory
     mountpoint_service_factory(_bootstrap)
 
     for workspace, (_, cooked_name) in zip(workspaces, items):
-        assert workspace.exists()
-        entries = list(workspace.iterdir())
+        assert Path(workspace).exists()
+        entries = list(Path(workspace).iterdir())
         assert [x.name for x in entries] == [cooked_name]
         assert entries[0].exists()
 
@@ -185,7 +186,7 @@ def test_mount_workspace_with_too_long_name(mountpoint_service_factory):
     workspaces = []
     mountpoint_service_factory(_bootstrap)
     for workspace in workspaces:
-        assert workspace.exists()
+        assert Path(workspace).exists()
 
 
 @pytest.mark.win32
@@ -236,8 +237,8 @@ def test_replace_if_exists(mountpoint_service):
 
     mountpoint_service.execute(_bootstrap)
 
-    foo = mountpoint_service.wpath / "foo.txt"
-    bar = mountpoint_service.wpath / "bar.txt"
+    foo = Path(mountpoint_service.wpath / "foo.txt")
+    bar = Path(mountpoint_service.wpath / "bar.txt")
     assert foo.read_bytes() == b"foo"
     assert bar.read_bytes() == b"bar"
     foo.replace(bar)

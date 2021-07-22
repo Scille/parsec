@@ -7,19 +7,21 @@ import errno
 import ctypes
 import signal
 import threading
+import importlib_resources
 from pathlib import PurePath
 from fuse import FUSE
 from structlog import get_logger
 from contextlib import contextmanager
 from itertools import count
 
+from parsec.event_bus import EventBus
+from parsec.core import resources as resources_module
+from parsec.core.fs.userfs import UserFS
+from parsec.core.fs.workspacefs import WorkspaceFS
 from parsec.core.core_events import CoreEvent
 from parsec.core.mountpoint.fuse_operations import FuseOperations
 from parsec.core.mountpoint.thread_fs_access import ThreadFSAccess
 from parsec.core.mountpoint.exceptions import MountpointDriverCrash
-
-from parsec.core import resources
-from pathlib import Path
 
 
 __all__ = ("fuse_mountpoint_runner",)
@@ -88,11 +90,11 @@ async def _teardown_mountpoint(mountpoint_path):
 
 
 async def fuse_mountpoint_runner(
-    user_fs,
-    workspace_fs,
+    user_fs: UserFS,
+    workspace_fs: WorkspaceFS,
     base_mountpoint_path: PurePath,
     config: dict,
-    event_bus,
+    event_bus: EventBus,
     *,
     task_status=trio.TASK_STATUS_IGNORED,
 ):
@@ -104,7 +106,6 @@ async def fuse_mountpoint_runner(
     fuse_thread_stopped = threading.Event()
     trio_token = trio.lowlevel.current_trio_token()
     fs_access = ThreadFSAccess(trio_token, workspace_fs)
-    fuse_operations = FuseOperations(event_bus, fs_access)
 
     mountpoint_path, initial_st_dev = await _bootstrap_mountpoint(
         base_mountpoint_path, workspace_fs
@@ -116,6 +117,9 @@ async def fuse_mountpoint_runner(
         "workspace_id": workspace_fs.workspace_id,
         "timestamp": getattr(workspace_fs, "timestamp", None),
     }
+
+    fuse_operations = FuseOperations(event_bus, fs_access, **event_kwargs)
+
     try:
         teardown_cancel_scope = None
         event_bus.send(CoreEvent.MOUNTPOINT_STARTING, **event_kwargs)
@@ -131,49 +135,51 @@ async def fuse_mountpoint_runner(
             encoding = sys.getfilesystemencoding()
 
             def _run_fuse_thread():
-                fuse_platform_options = {}
-                if sys.platform == "darwin":
-                    fuse_platform_options = {
-                        "local": True,
-                        "volname": workspace_fs.get_workspace_name(),
-                        "volicon": Path(resources.__file__).absolute().parent / "parsec.icns",
-                    }
-                    # osxfuse-specific options :
-                    # - local : allows mountpoint to show up correctly in finder (+ desktop)
-                    # - volname : specify volume name (default is OSXFUSE [...])
-                    # - volicon : specify volume icon (default is macOS drive icon)
+                with importlib_resources.path(resources_module, "parsec.icns") as parsec_icns_path:
 
-                else:
-                    fuse_platform_options = {"auto_unmount": True}
+                    fuse_platform_options = {}
+                    if sys.platform == "darwin":
+                        fuse_platform_options = {
+                            "local": True,
+                            "volname": workspace_fs.get_workspace_name(),
+                            "volicon": str(parsec_icns_path.absolute()),
+                        }
+                        # osxfuse-specific options :
+                        # - local : allows mountpoint to show up correctly in finder (+ desktop)
+                        # - volname : specify volume name (default is OSXFUSE [...])
+                        # - volicon : specify volume icon (default is macOS drive icon)
 
-                logger.info("Starting fuse thread...", mountpoint=mountpoint_path)
-                try:
-                    # Do not let fuse start if the runner is stopping
-                    # It's important that `fuse_thread_started` is set before the check
-                    # in order to avoid race conditions
-                    fuse_thread_started.set()
-                    if teardown_cancel_scope is not None:
-                        return
-                    FUSE(
-                        fuse_operations,
-                        str(mountpoint_path.absolute()),
-                        foreground=True,
-                        encoding=encoding,
-                        **fuse_platform_options,
-                        **config,
-                    )
+                    else:
+                        fuse_platform_options = {"auto_unmount": True}
 
-                except Exception as exc:
+                    logger.info("Starting fuse thread...", mountpoint=mountpoint_path)
                     try:
-                        errcode = errno.errorcode[exc.args[0]]
-                    except (KeyError, IndexError):
-                        errcode = f"Unknown error code: {exc}"
-                    raise MountpointDriverCrash(
-                        f"Fuse has crashed on {mountpoint_path}: {errcode}"
-                    ) from exc
+                        # Do not let fuse start if the runner is stopping
+                        # It's important that `fuse_thread_started` is set before the check
+                        # in order to avoid race conditions
+                        fuse_thread_started.set()
+                        if teardown_cancel_scope is not None:
+                            return
+                        FUSE(
+                            fuse_operations,
+                            str(mountpoint_path.absolute()),
+                            foreground=True,
+                            encoding=encoding,
+                            **fuse_platform_options,
+                            **config,
+                        )
 
-                finally:
-                    fuse_thread_stopped.set()
+                    except Exception as exc:
+                        try:
+                            errcode = errno.errorcode[exc.args[0]]
+                        except (KeyError, IndexError):
+                            errcode = f"Unknown error code: {exc}"
+                        raise MountpointDriverCrash(
+                            f"Fuse has crashed on {mountpoint_path}: {errcode}"
+                        ) from exc
+
+                    finally:
+                        fuse_thread_stopped.set()
 
             # The fusepy runner (FUSE) relies on the `fuse_main_real` function from libfuse
             # This function is high-level helper on top of the libfuse API that is intended

@@ -4,12 +4,15 @@ import math
 import trio
 import unicodedata
 from zlib import adler32
-from pathlib import Path
+from pathlib import PurePath
 from functools import partial
 from structlog import get_logger
 from winfspy import FileSystem, enable_debug_log
 from winfspy.plumbing import filetime_now
 
+from parsec.event_bus import EventBus
+from parsec.core.fs.userfs import UserFS
+from parsec.core.fs.workspacefs import WorkspaceFS
 from parsec.core.core_events import CoreEvent
 from parsec.core.win_registry import parsec_drive_icon_context
 from parsec.core.mountpoint.thread_fs_access import ThreadFSAccess
@@ -66,12 +69,12 @@ def sorted_drive_letters(index: int, length: int, grouping: int = 5) -> str:
     return result
 
 
-async def _get_available_drive(index, length) -> Path:
-    drives = [Path(f"{letter}:\\") for letter in sorted_drive_letters(index, length)]
+async def _get_available_drive(index, length) -> PurePath:
+    drives = (trio.Path(f"{letter}:\\") for letter in sorted_drive_letters(index, length))
     for drive in drives:
         try:
-            if not await trio.to_thread.run_sync(drive.exists):
-                return drive
+            if not await drive.exists():
+                return PurePath(drive)
         # Might fail for some unrelated reasons
         except OSError:
             continue
@@ -104,11 +107,11 @@ async def _wait_for_winfsp_ready(mountpoint_path, timeout=1.0):
 
 
 async def winfsp_mountpoint_runner(
-    user_fs,
-    workspace_fs,
-    base_mountpoint_path: Path,
+    user_fs: UserFS,
+    workspace_fs: WorkspaceFS,
+    base_mountpoint_path: PurePath,
     config: dict,
-    event_bus,
+    event_bus: EventBus,
     *,
     task_status=trio.TASK_STATUS_IGNORED,
 ):
@@ -124,7 +127,15 @@ async def winfsp_mountpoint_runner(
     user_manifest = user_fs.get_user_manifest()
     workspace_ids = [entry.id for entry in user_manifest.workspaces]
     workspace_index = workspace_ids.index(workspace_fs.workspace_id)
+    # `base_mountpoint_path` is ignored given we only mount from a drive
     mountpoint_path = await _get_available_drive(workspace_index, len(workspace_ids))
+
+    # Prepare event information
+    event_kwargs = {
+        "mountpoint": mountpoint_path,
+        "workspace_id": workspace_fs.workspace_id,
+        "timestamp": getattr(workspace_fs, "timestamp", None),
+    }
 
     if config.get("debug", False):
         enable_debug_log()
@@ -137,7 +148,9 @@ async def winfsp_mountpoint_runner(
         .decode("ascii")
     )
     volume_serial_number = _generate_volume_serial_number(device, workspace_fs.workspace_id)
-    operations = WinFSPOperations(event_bus, volume_label, fs_access)
+    operations = WinFSPOperations(
+        event_bus=event_bus, fs_access=fs_access, volume_label=volume_label, **event_kwargs
+    )
     # See https://docs.microsoft.com/en-us/windows/desktop/api/fileapi/nf-fileapi-getvolumeinformationa  # noqa
     fs = FileSystem(
         mountpoint_path.drive,
@@ -166,12 +179,6 @@ async def winfsp_mountpoint_runner(
         # security_timeout=10000,
     )
 
-    # Prepare event information
-    event_kwargs = {
-        "mountpoint": mountpoint_path,
-        "workspace_id": workspace_fs.workspace_id,
-        "timestamp": getattr(workspace_fs, "timestamp", None),
-    }
     try:
         event_bus.send(CoreEvent.MOUNTPOINT_STARTING, **event_kwargs)
 

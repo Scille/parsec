@@ -78,7 +78,7 @@ def translate_backend_cmds_errors() -> Iterator[None]:
     except BackendNotAvailable as exc:
         raise FSBackendOfflineError(str(exc)) from exc
     except BackendConnectionError as exc:
-        raise FSError(str(exc)) from exc
+        raise FSRemoteOperationError(str(exc)) from exc
 
 
 class UserRemoteLoader:
@@ -200,6 +200,7 @@ class UserRemoteLoader:
         Raises:
             FSError
             FSBackendOfflineError
+            FSRemoteOperationError
             FSWorkspaceNoAccess
             FSUserNotFoundError
             FSDeviceNotFoundError
@@ -215,6 +216,7 @@ class UserRemoteLoader:
         Raises:
             FSError
             FSBackendOfflineError
+            FSRemoteOperationError
             FSWorkspaceNoAccess
             FSUserNotFoundError
             FSDeviceNotFoundError
@@ -254,6 +256,7 @@ class UserRemoteLoader:
         """
         Raises:
             FSError
+            FSRemoteOperationError
             FSBackendOfflineError
             FSWorkspaceInMaintenance
             FSRemoteManifestNotFound
@@ -278,6 +281,7 @@ class UserRemoteLoader:
         """
         Raises:
             FSError
+            FSRemoteOperationError
             FSBackendOfflineError
         """
         certif = RealmRoleCertificateContent.build_realm_root_certif(
@@ -334,6 +338,7 @@ class RemoteLoader(UserRemoteLoader):
             FSError
             FSRemoteBlockNotFound
             FSBackendOfflineError
+            FSRemoteOperationError
             FSWorkspaceInMaintenance
             FSWorkspaceNoAccess
         """
@@ -369,6 +374,7 @@ class RemoteLoader(UserRemoteLoader):
         Raises:
             FSError
             FSBackendOfflineError
+            FSRemoteOperationError
             FSWorkspaceInMaintenance
             FSWorkspaceNoAccess
         """
@@ -418,6 +424,7 @@ class RemoteLoader(UserRemoteLoader):
         Raises:
             FSError
             FSBackendOfflineError
+            FSRemoteOperationError
             FSWorkspaceInMaintenance
             FSRemoteManifestNotFound
             FSBadEncryptionRevision
@@ -581,6 +588,7 @@ class RemoteLoader(UserRemoteLoader):
             FSError
             FSRemoteSyncError
             FSBackendOfflineError
+            FSRemoteOperationError
             FSWorkspaceInMaintenance
             FSBadEncryptionRevision
             FSWorkspaceNoAccess
@@ -620,6 +628,7 @@ class RemoteLoader(UserRemoteLoader):
             FSError
             FSRemoteSyncError
             FSBackendOfflineError
+            FSRemoteOperationError
             FSWorkspaceInMaintenance
             FSBadEncryptionRevision
             FSWorkspaceNoAccess
