@@ -46,6 +46,7 @@ async def test_init_with_backend_online(
             return {
                 "expiration_date": datetime(2000, 1, 1),
                 "user_profile_outsider_allowed": True,
+                "active_users_limit": None,
                 "status": "ok",
             }
         else:
@@ -70,7 +71,7 @@ async def test_init_with_backend_online(
     )
     assert conn.status == BackendConnStatus.LOST
     default_organization_config = OrganizationConfig(
-        expiration_date=None, user_profile_outsider_allowed=False
+        expiration_date=None, user_profile_outsider_allowed=False, active_users_limit=None
     )
     assert conn.get_organization_config() == default_organization_config
 

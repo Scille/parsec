@@ -40,7 +40,7 @@ async def components_factory(config: BackendConfig, event_bus: EventBus):
 
     webhooks = WebhooksComponent(config)
     http = HTTPComponent(config)
-    organization = MemoryOrganizationComponent(_send_event, webhooks)
+    organization = MemoryOrganizationComponent(_send_event, webhooks, config)
     user = MemoryUserComponent(_send_event, event_bus)
     invite = MemoryInviteComponent(_send_event, event_bus, config)
     message = MemoryMessageComponent(_send_event)

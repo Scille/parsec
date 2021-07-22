@@ -2571,3 +2571,6 @@ msgstr "Créer un nouvel espace de travail"
 
 msgid "ACTION_WORKSPACE_GOTO_FILE_LINK"
 msgstr "Trouver un fichier via son lien"
+
+msgid "USERS_LIMIT_REACHED"
+msgstr "Limite d'utilisateurs atteinte"

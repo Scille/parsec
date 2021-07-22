@@ -104,10 +104,11 @@ class BackendConfig:
     forward_proto_enforce_https: Optional[Tuple[bytes, bytes]]
     backend_addr: Optional[BackendAddr]
 
-    spontaneous_organization_bootstrap: bool
-    organization_bootstrap_webhook_url: Optional[str]
-
     debug: bool
+
+    bootstrap_webhook_url: Optional[str] = None
+    spontaneous_bootstrap: bool = False
+    default_users_limit: Optional[int] = None
 
     @property
     def db_type(self):

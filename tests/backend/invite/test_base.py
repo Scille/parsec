@@ -113,6 +113,7 @@ async def test_user_create_and_info(
 async def test_device_create_and_info(
     backend, alice, alice_backend_sock, alice2_backend_sock, backend_invited_sock_factory
 ):
+
     # Provide other unrelated invitations that should stay unchanged
     with backend.event_bus.listen() as spy:
         other_user_invitation = await backend.invite.new_for_user(

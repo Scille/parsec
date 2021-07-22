@@ -25,6 +25,7 @@ from parsec.api.data import UserCertificateContent, DeviceCertificateContent, Da
 from parsec.backend.user import User, Device
 from parsec.backend.webhooks import WebhooksComponent
 from parsec.backend.utils import catch_protocol_errors, api, Unset, UnsetType
+from parsec.backend.config import BackendConfig
 
 
 class OrganizationError(Exception):
@@ -59,16 +60,17 @@ class OrganizationExpiredError(OrganizationError):
 class Organization:
     organization_id: OrganizationID
     bootstrap_token: str
-    expiration_date: Optional[DateTime] = None
+    expiration_date: Union[UnsetType, Optional[DateTime]] = Unset
     root_verify_key: Optional[VerifyKey] = None
     user_profile_outsider_allowed: bool = False
+    active_users_limit: Optional[int] = None
 
     def is_bootstrapped(self):
         return self.root_verify_key is not None
 
     @property
     def is_expired(self):
-        return self.expiration_date is not None and self.expiration_date <= DateTime.now()
+        return isinstance(self.expiration_date, DateTime) and self.expiration_date <= DateTime.now()
 
     def evolve(self, **kwargs):
         return attr.evolve(self, **kwargs)
@@ -92,9 +94,12 @@ class OrganizationStats:
 
 
 class BaseOrganizationComponent:
-    def __init__(self, webhooks: WebhooksComponent, bootstrap_token_size: int = 32):
+    def __init__(
+        self, webhooks: WebhooksComponent, config: BackendConfig, bootstrap_token_size: int = 32
+    ):
         self.webhooks = webhooks
         self.bootstrap_token_size = bootstrap_token_size
+        self._config = config
 
     @api("organization_create", handshake_types=[APIV1_HandshakeType.ADMINISTRATION])
     @catch_protocol_errors
@@ -102,19 +107,25 @@ class BaseOrganizationComponent:
         msg = apiv1_organization_create_serializer.req_load(msg)
 
         bootstrap_token = token_hex(self.bootstrap_token_size)
-        expiration_date = msg.get("expiration_date", None)
+        expiration_date = msg.get("expiration_date", Unset)
+        default_users_limit = self._config.default_users_limit
         try:
             await self.create(
                 msg["organization_id"],
                 bootstrap_token=bootstrap_token,
                 expiration_date=expiration_date,
+                active_users_limit=default_users_limit,
             )
 
         except OrganizationAlreadyExistsError:
             return {"status": "already_exists"}
 
-        rep = {"bootstrap_token": bootstrap_token, "status": "ok"}
-        if expiration_date:
+        rep = {
+            "active_users_limit": default_users_limit,
+            "bootstrap_token": bootstrap_token,
+            "status": "ok",
+        }
+        if isinstance(expiration_date, DateTime):
             rep["expiration_date"] = expiration_date
 
         return apiv1_organization_create_serializer.rep_dump(rep)
@@ -130,34 +141,39 @@ class BaseOrganizationComponent:
         except OrganizationNotFoundError:
             return {"status": "not_found"}
 
-        return apiv1_organization_status_serializer.rep_dump(
-            {
-                "is_bootstrapped": organization.is_bootstrapped(),
-                "expiration_date": organization.expiration_date,
-                "user_profile_outsider_allowed": organization.user_profile_outsider_allowed,
-                "status": "ok",
-            }
-        )
+        rep = {
+            "is_bootstrapped": organization.is_bootstrapped(),
+            "user_profile_outsider_allowed": organization.user_profile_outsider_allowed,
+            "active_users_limit": organization.active_users_limit,
+            "status": "ok",
+        }
+
+        if isinstance(organization.expiration_date, DateTime):
+            rep["expiration_date"] = organization.expiration_date
+
+        return apiv1_organization_status_serializer.rep_dump(rep)
 
     @api("organization_config", handshake_types=[HandshakeType.AUTHENTICATED])
     @catch_protocol_errors
     async def api_authenticated_organization_config(self, client_ctx, msg):
         msg = organization_config_serializer.req_load(msg)
         organization_id = client_ctx.organization_id
-
         try:
             organization = await self.get(organization_id)
 
         except OrganizationNotFoundError:
             return {"status": "not_found"}
 
-        return organization_config_serializer.rep_dump(
-            {
-                "expiration_date": organization.expiration_date,
-                "user_profile_outsider_allowed": organization.user_profile_outsider_allowed,
-                "status": "ok",
-            }
-        )
+        rep = {
+            "user_profile_outsider_allowed": organization.user_profile_outsider_allowed,
+            "active_users_limit": organization.active_users_limit,
+            "status": "ok",
+        }
+
+        if isinstance(organization.expiration_date, DateTime):
+            rep["expiration_date"] = organization.expiration_date
+
+        return organization_config_serializer.rep_dump(rep)
 
     @api("organization_stats", handshake_types=[HandshakeType.AUTHENTICATED])
     @catch_protocol_errors
@@ -215,6 +231,7 @@ class BaseOrganizationComponent:
     @catch_protocol_errors
     async def api_organization_update(self, client_ctx, msg):
         msg = apiv1_organization_update_serializer.req_load(msg)
+        print(msg)
         try:
             await self.update(msg.pop("organization_id"), **msg)
         except OrganizationNotFoundError:
@@ -341,6 +358,8 @@ class BaseOrganizationComponent:
         except (OrganizationNotFoundError, OrganizationInvalidBootstrapTokenError):
             return {"status": "not_found"}
 
+        organization = await self.get(client_ctx.organization_id)
+
         # Note: we let OrganizationFirstUserCreationError bubbles up given
         # it should not occurs under normal circumstances
 
@@ -351,12 +370,17 @@ class BaseOrganizationComponent:
             device_label=first_device.device_label,
             human_email=user.human_handle.email if user.human_handle else None,
             human_label=user.human_handle.label if user.human_handle else None,
+            active_users_limit=organization.active_users_limit,
         )
 
         return apiv1_organization_bootstrap_serializer.rep_dump({"status": "ok"})
 
     async def create(
-        self, id: OrganizationID, bootstrap_token: str, expiration_date: Optional[DateTime] = None
+        self,
+        id: OrganizationID,
+        bootstrap_token: str,
+        expiration_date: Union[UnsetType, Optional[DateTime]] = Unset,
+        active_users_limit: Optional[int] = None,
     ) -> None:
         """
         Raises:
@@ -400,6 +424,7 @@ class BaseOrganizationComponent:
         id: OrganizationID,
         expiration_date: Union[UnsetType, Optional[DateTime]] = Unset,
         user_profile_outsider_allowed: Union[UnsetType, bool] = Unset,
+        active_users_limit: Union[UnsetType, int] = Unset,
     ):
         """
         Raises:

@@ -484,6 +484,7 @@ class PGInviteComponent(BaseInviteComponent):
             )
             if user_id:
                 raise InvitationAlreadyMemberError()
+
             token = await _do_new_user_invitation(
                 conn,
                 organization_id=organization_id,

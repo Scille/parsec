@@ -21,6 +21,42 @@ async def user_create(sock, **kwargs):
 
 @pytest.mark.trio
 @pytest.mark.parametrize("profile", UserProfile)
+async def test_user_create_nok_limit_reached(
+    backend, apiv1_backend_sock_factory, alice, mallory, profile
+):
+    now = pendulum.now()
+    user_certificate = UserCertificateContent(
+        author=alice.device_id,
+        timestamp=now,
+        user_id=mallory.user_id,
+        human_handle=None,
+        public_key=mallory.public_key,
+        profile=profile,
+    ).dump_and_sign(alice.signing_key)
+    device_certificate = DeviceCertificateContent(
+        author=alice.device_id,
+        timestamp=now,
+        device_id=mallory.device_id,
+        device_label=None,
+        verify_key=mallory.verify_key,
+    ).dump_and_sign(alice.signing_key)
+
+    await backend.organization.update(alice.organization_id, active_users_limit=3)
+    org = await backend.organization.get(alice.organization_id)
+    nb_users = (await backend.user.find(alice.organization_id))[1]
+
+    assert nb_users == 3
+    assert org.active_users_limit == 3
+
+    async with apiv1_backend_sock_factory(backend, alice) as sock:
+        rep = await user_create(
+            sock, user_certificate=user_certificate, device_certificate=device_certificate
+        )
+    assert rep == {"status": "not_allowed", "reason": "Users limit reached"}
+
+
+@pytest.mark.trio
+@pytest.mark.parametrize("profile", UserProfile)
 async def test_user_create_ok(backend, apiv1_backend_sock_factory, alice, mallory, profile):
     now = pendulum.now()
     user_certificate = UserCertificateContent(
@@ -45,7 +81,6 @@ async def test_user_create_ok(backend, apiv1_backend_sock_factory, alice, mallor
                 sock, user_certificate=user_certificate, device_certificate=device_certificate
             )
         assert rep == {"status": "ok"}
-
         # No guarantees this event occurs before the command's return
         await spy.wait_with_timeout(
             BackendEvent.USER_CREATED,

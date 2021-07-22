@@ -178,6 +178,7 @@ class MemoryInviteComponent(BaseInviteComponent):
         Raise: InvitationAlreadyMemberError
         """
         org = self._user_component._organizations[organization_id]
+
         for _, user in org.users.items():
             if (
                 user.human_handle

@@ -78,8 +78,8 @@ async def test_retry_policy_no_retry(postgresql_url, unused_tcp_port, asyncio_lo
         backend_addr=None,
         forward_proto_enforce_https=None,
         ssl_context=False,
-        spontaneous_organization_bootstrap=False,
-        organization_bootstrap_webhook_url=None,
+        spontaneous_bootstrap=False,
+        bootstrap_webhook_url=None,
         db_url=postgresql_url,
     )
 
@@ -122,8 +122,8 @@ async def test_retry_policy_allow_retry(postgresql_url, unused_tcp_port, asyncio
         backend_addr=None,
         forward_proto_enforce_https=None,
         ssl_context=False,
-        spontaneous_organization_bootstrap=False,
-        organization_bootstrap_webhook_url=None,
+        spontaneous_bootstrap=False,
+        bootstrap_webhook_url=None,
         db_url=postgresql_url,
     )
     # Allow to retry once

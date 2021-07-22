@@ -50,16 +50,21 @@ class MemoryOrganizationComponent(BaseOrganizationComponent):
         self._realm_component = realm
 
     async def create(
-        self, id: OrganizationID, bootstrap_token: str, expiration_date: Optional[DateTime] = None
+        self,
+        id: OrganizationID,
+        bootstrap_token: str,
+        expiration_date: Union[UnsetType, Optional[DateTime]] = Unset,
+        active_users_limit: Optional[int] = None,
     ) -> None:
         org = self._organizations.get(id)
-
         # Allow overwritting of not-yet-bootstrapped organization
         if org and org.root_verify_key:
             raise OrganizationAlreadyExistsError()
-
         self._organizations[id] = Organization(
-            organization_id=id, bootstrap_token=bootstrap_token, expiration_date=expiration_date
+            organization_id=id,
+            bootstrap_token=bootstrap_token,
+            expiration_date=expiration_date,
+            active_users_limit=active_users_limit,
         )
 
     async def get(self, id: OrganizationID) -> Organization:
@@ -142,6 +147,7 @@ class MemoryOrganizationComponent(BaseOrganizationComponent):
         id: OrganizationID,
         expiration_date: Union[UnsetType, Optional[DateTime]] = Unset,
         user_profile_outsider_allowed: Union[UnsetType, bool] = Unset,
+        active_users_limit: Union[UnsetType, int] = Unset,
     ) -> None:
         """
         Raises:
@@ -158,6 +164,8 @@ class MemoryOrganizationComponent(BaseOrganizationComponent):
             organization = organization.evolve(
                 user_profile_outsider_allowed=user_profile_outsider_allowed
             )
+        if active_users_limit is not Unset:
+            organization = organization.evolve(active_users_limit=active_users_limit)
 
         self._organizations[id] = organization
 

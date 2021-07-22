@@ -541,8 +541,8 @@ def backend_factory(
                 "backend_addr": None,
                 "forward_proto_enforce_https": None,
                 "ssl_context": ssl_context if ssl_context else False,
-                "spontaneous_organization_bootstrap": False,
-                "organization_bootstrap_webhook_url": None,
+                "bootstrap_webhook_url": None,
+                "spontaneous_bootstrap": False,
                 **config,
             }
         )
@@ -577,14 +577,13 @@ async def backend(backend_factory, request, fixtures_customization, backend_addr
     config["email_config"] = MockedEmailConfig(sender="Parsec <no-reply@parsec.com>", tmpdir=tmpdir)
     config["backend_addr"] = backend_addr
     if fixtures_customization.get("backend_spontaneous_organization_boostrap", False):
-        config["spontaneous_organization_bootstrap"] = True
+        config["spontaneous_bootstrap"] = True
     if fixtures_customization.get("backend_has_webhook", False):
         # Invalid port, hence we should crash if by mistake we try to reach this url
-        config["organization_bootstrap_webhook_url"] = "http://example.com:888888/webhook"
+        config["bootstrap_webhook_url"] = "http://example.com:888888/webhook"
     forward_proto_enforce_https = fixtures_customization.get("backend_forward_proto_enforce_https")
     if forward_proto_enforce_https:
         config["forward_proto_enforce_https"] = forward_proto_enforce_https
-
     async with backend_factory(populated=populated, config=config) as backend:
         yield backend
 

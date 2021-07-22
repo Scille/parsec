@@ -35,11 +35,12 @@ class WebhooksComponent:
         self,
         organization_id: OrganizationID,
         device_id: DeviceID,
+        active_users_limit: int,
         device_label: Optional[str],
         human_email: Optional[str],
         human_label: Optional[str],
     ):
-        if not self._config.organization_bootstrap_webhook_url:
+        if not self._config.bootstrap_webhook_url:
             return
         data = organization_bootstrap_webhook_serializer.dumps(
             {
@@ -48,8 +49,7 @@ class WebhooksComponent:
                 "device_label": device_label,
                 "human_email": human_email,
                 "human_label": human_label,
+                "active_users_limit": active_users_limit,
             }
         )
-        await trio.to_thread.run_sync(
-            _do_urllib_request, self._config.organization_bootstrap_webhook_url, data
-        )
+        await trio.to_thread.run_sync(_do_urllib_request, self._config.bootstrap_webhook_url, data)
