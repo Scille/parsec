@@ -204,6 +204,11 @@ def run_gui(config: CoreConfig, start_arg: Optional[str] = None, diagnose: bool 
         win.show_top()
         win.new_instance_needed.emit(start_arg)
 
+        if sys.platform == "darwin":
+            from parsec.core.gui.instance_widget import macfuse_installation_widget
+
+            macfuse_installation_widget(win)
+
         def kill_window(*args):
             win.close_app(force=True)
             QApplication.quit()

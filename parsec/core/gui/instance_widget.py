@@ -4,7 +4,6 @@ from parsec.core.config import CoreConfig
 from typing import Optional
 from parsec.core.core_events import CoreEvent
 import trio
-import sys
 from structlog import get_logger
 from PyQt5.QtCore import pyqtSignal, pyqtSlot
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QApplication
@@ -42,6 +41,19 @@ async def _do_run_core(config, device, qt_on_ready):
             async with trio.open_service_nursery() as nursery:
                 await nursery.start(core_jobs_ctx._start)
                 qt_on_ready.emit(core, core_jobs_ctx)
+
+
+def macfuse_installation_widget(window):
+    try:
+        import fuse  # noqa
+    except OSError:
+        show_info_link(
+            window,
+            _("TEXT_MACFUSE_INSTALL_WINDOW_TITLE"),
+            _("TEXT_LOGIN_ERROR_MACFUSE_NOT_AVAILABLE"),
+            _("TEXT_MACFUSE_DOWNLOAD_BUTTON"),
+            "https://osxfuse.github.io",
+        )
 
 
 class InstanceWidget(QWidget):
@@ -156,20 +168,11 @@ class InstanceWidget(QWidget):
                     exception=self.running_core_job.exc,
                 )
             elif isinstance(self.running_core_job.exc, MountpointFuseNotAvailable):
-                if sys.platform == "darwin":
-                    show_info_link(
-                        self,
-                        _("TEXT_MACFUSE_INSTALL_WINDOW_TITLE"),
-                        _("TEXT_LOGIN_ERROR_MACFUSE_NOT_AVAILABLE"),
-                        _("TEXT_MACFUSE_DOWNLOAD_BUTTON"),
-                        "https://osxfuse.github.io",
-                    )
-                else:
-                    show_error(
-                        self,
-                        _("TEXT_LOGIN_ERROR_FUSE_NOT_AVAILABLE"),
-                        exception=self.running_core_job.exc,
-                    )
+                show_error(
+                    self,
+                    _("TEXT_LOGIN_ERROR_FUSE_NOT_AVAILABLE"),
+                    exception=self.running_core_job.exc,
+                )
             else:
                 logger.exception("Unhandled error", exc_info=self.running_core_job.exc)
                 show_error(self, _("TEXT_LOGIN_UNKNOWN_ERROR"), exception=self.running_core_job.exc)

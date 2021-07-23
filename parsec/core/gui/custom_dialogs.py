@@ -366,8 +366,7 @@ class InfoLinkWidget(QWidget, Ui_InfoWidget):
         self.button_ok.setFocus()
 
     def _on_button_clicked(self, button):
-        if self.url:
-            desktop.open_url(self.url)
+        desktop.open_url(self.url)
 
 
 def show_info_link(parent, title, message, button_text, url):
